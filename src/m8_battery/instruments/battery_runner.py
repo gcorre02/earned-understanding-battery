@@ -2,6 +2,10 @@
 
 Runs the full Emergent Understanding Battery against a single system.
 All five instruments must pass + provenance constraint for overall PASS.
+
+Includes reset discrimination diagnostic (§6.7) — supplementary test
+that distinguishes earned, received, and transient structure by measuring
+persistence and regrowth after system reset.
 """
 
 from __future__ import annotations
@@ -39,6 +43,51 @@ class BatteryConfig:
 
     # Region partitions for integration (None = use system default)
     partition_families: list[list[str]] | None = None
+
+
+def run_reset_discrimination(
+    system: TestSystem,
+    domain_inputs: list[Any],
+    n_steps: int = 20,
+) -> dict[str, float]:
+    """Supplementary diagnostic — not a pass/fail instrument.
+
+    Distinguishes earned, received, and transient structure by measuring
+    what happens after system reset:
+    - Received (Class 1/2): metric persists (topology/weights unchanged)
+    - Transient (e.g. Foxworthy C): metric drops (hidden state resets)
+    - Earned (Class 3/4): metric drops then regrows (learning capability)
+
+    Args:
+        system: System under test (should have been operated already)
+        domain_inputs: Inputs for post-reset interaction
+        n_steps: Number of post-reset interaction steps
+
+    Returns:
+        Dict with pre_reset, post_reset, post_rerun metrics plus
+        reset_persistence and regrowth_rate diagnostics.
+    """
+    pre_reset = system.get_structure_metric()
+    system.reset()
+    post_reset = system.get_structure_metric()
+
+    for inp in domain_inputs[:n_steps]:
+        system.step(inp)
+    post_rerun = system.get_structure_metric()
+
+    reset_persistence = post_reset / pre_reset if pre_reset > 1e-10 else 0.0
+    if abs(pre_reset - post_reset) > 1e-10:
+        regrowth_rate = (post_rerun - post_reset) / n_steps
+    else:
+        regrowth_rate = 0.0
+
+    return {
+        "pre_reset": pre_reset,
+        "post_reset": post_reset,
+        "post_rerun": post_rerun,
+        "reset_persistence": reset_persistence,
+        "regrowth_rate": regrowth_rate,
+    }
 
 
 def run_battery(
@@ -132,6 +181,15 @@ def run_battery(
     prov_result = check_provenance(system, provenance)
     results["provenance_constraint"] = prov_result
 
+    # --- Phase 7: Reset discrimination diagnostic (§6.7) ---
+    # Supplementary — does not affect pass/fail. Reported in metadata.
+    reset_inputs = config.domain_a_inputs or config.probe_inputs
+    reset_diag = run_reset_discrimination(
+        system=system,
+        domain_inputs=reset_inputs,
+        n_steps=min(20, len(reset_inputs)),
+    )
+
     # --- Assemble result ---
     battery_result = BatteryResult(
         system_name=system_name,
@@ -143,6 +201,7 @@ def run_battery(
         provenance_passed=prov_result.passed,
         metadata={
             "reference_metric": reference_metric,
+            "reset_discrimination": reset_diag,
             "config": {
                 "measurement_interval": config.measurement_interval,
                 "wander_steps": config.wander_steps,

@@ -13,7 +13,7 @@ from m8_battery.instruments.generativity import run_generativity
 from m8_battery.instruments.transfer import run_transfer
 from m8_battery.instruments.self_engagement import run_self_engagement
 from m8_battery.instruments.provenance_constraint import check_provenance
-from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
+from m8_battery.instruments.battery_runner import run_battery, run_reset_discrimination, BatteryConfig
 from m8_battery.systems.class1.wordnet_graph import WordNetGraph
 from m8_battery.core.provenance import ProvenanceLog
 
@@ -230,3 +230,110 @@ class TestBatteryRunner:
         assert "generativity" in result.instrument_results
         assert "transfer" in result.instrument_results
         assert "self_engagement" in result.instrument_results
+
+    def test_battery_includes_reset_discrimination(self):
+        """Battery result metadata should include reset discrimination data."""
+        family = generate_domain_family(SMALL)
+        system = WordNetGraph(family["A"], seed=42)
+        nodes_a = list(family["A"].nodes())
+
+        config = BatteryConfig(
+            domain_a_inputs=nodes_a[:20],
+            domain_a_prime_inputs=nodes_a[:10],
+            domain_b_inputs=nodes_a[:10],
+            measurement_interval=5,
+            wander_steps=5,
+            recovery_window=5,
+        )
+
+        result = run_battery(
+            system=system,
+            system_name="Test",
+            system_class=SystemClass.CLASS_1,
+            config=config,
+            control_factory=lambda: WordNetGraph(family["A"], seed=99),
+        )
+
+        assert "reset_discrimination" in result.metadata
+        rd = result.metadata["reset_discrimination"]
+        assert "pre_reset" in rd
+        assert "post_reset" in rd
+        assert "post_rerun" in rd
+        assert "reset_persistence" in rd
+        assert "regrowth_rate" in rd
+
+
+class TestResetDiscrimination:
+    """Tests for the reset discrimination diagnostic (§6.7)."""
+
+    def test_class1_static_persistence(self):
+        """Class 1 (static graph): metric persists after reset.
+
+        Structure is topology-based, not state-based — reset doesn't change it.
+        """
+        G = generate_domain(SMALL)
+        system = WordNetGraph(G, seed=42)
+        nodes = list(G.nodes())
+
+        # Operate the system
+        for n in nodes[:15]:
+            system.step(n)
+
+        result = run_reset_discrimination(
+            system=system,
+            domain_inputs=nodes,
+            n_steps=10,
+        )
+
+        # Static graph: topology unchanged by reset
+        assert result["reset_persistence"] > 0.9, (
+            f"Class 1 should persist after reset, got {result['reset_persistence']}"
+        )
+        assert abs(result["regrowth_rate"]) < 0.01, (
+            f"Class 1 should show no regrowth, got {result['regrowth_rate']}"
+        )
+
+    def test_returns_all_fields(self):
+        """Reset discrimination should return all expected fields."""
+        G = generate_domain(SMALL)
+        system = WordNetGraph(G, seed=42)
+        nodes = list(G.nodes())
+
+        result = run_reset_discrimination(system, nodes, n_steps=5)
+
+        expected_keys = {"pre_reset", "post_reset", "post_rerun",
+                         "reset_persistence", "regrowth_rate"}
+        assert set(result.keys()) == expected_keys
+
+    def test_zero_metric_handled(self):
+        """System with zero structure metric should not raise."""
+        G = generate_domain(SMALL)
+        system = WordNetGraph(G, seed=42)
+
+        # Don't operate — metric may be non-zero for static graph
+        # but the function should handle edge cases gracefully
+        result = run_reset_discrimination(system, list(G.nodes()), n_steps=3)
+        assert isinstance(result["reset_persistence"], float)
+        assert isinstance(result["regrowth_rate"], float)
+
+    def test_foxworthy_c_transient(self):
+        """Foxworthy C (Class 2C): hidden state resets — transient dynamics."""
+        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+
+        G = generate_domain(SMALL)
+        n_features = SMALL.n_node_features
+        system = FoxworthyC(n_features=n_features, hidden_dim=32, seed=42)
+        system.set_graph(G)
+        nodes = list(G.nodes())
+
+        # Operate to build up hidden state
+        for n in nodes[:15]:
+            system.step(n)
+
+        result = run_reset_discrimination(system, nodes, n_steps=10)
+
+        # Foxworthy C: hidden state resets → metric drops → transient
+        # Pre-reset metric should differ from post-reset
+        assert result["pre_reset"] != result["post_reset"], (
+            f"Foxworthy C metric should change on reset"
+        )

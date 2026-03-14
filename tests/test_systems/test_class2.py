@@ -123,6 +123,58 @@ class TestFoxworthyC:
         assert clone._step_count == 0
 
 
+class TestFrozenLLM:
+    """Tests for TinyLlama adapter. These load the model (~1.1B params)."""
+
+    def test_lazy_loading(self):
+        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        system = FrozenLLM(seed=42)
+        assert system._model is None  # Not loaded yet
+
+    def test_structure_metric_triggers_load(self):
+        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        system = FrozenLLM(seed=42)
+        metric = system.get_structure_metric()
+        assert system._model is not None  # Now loaded
+        assert metric > 0.0
+
+    def test_structure_metric_constant(self):
+        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        G = generate_domain(SMALL)
+        system = FrozenLLM(seed=42)
+        system.set_graph(G)
+        m1 = system.get_structure_metric()
+        nodes = list(G.nodes())
+        system.step(nodes[0])
+        m2 = system.get_structure_metric()
+        assert abs(m1 - m2) < 1e-6  # Frozen → constant
+
+    def test_step_produces_output(self):
+        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        G = generate_domain(SMALL)
+        system = FrozenLLM(seed=42)
+        system.set_graph(G)
+        result = system.step(list(G.nodes())[0])
+        assert result["current_node"] is not None
+        assert "llm_response" in result
+
+    def test_regions_are_layers(self):
+        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        system = FrozenLLM(seed=42)
+        regions = system.get_regions()
+        assert len(regions) == 22  # TinyLlama has 22 layers
+        assert regions[0] == "layer_0"
+
+    def test_clone_does_not_load(self):
+        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        G = generate_domain(SMALL)
+        system = FrozenLLM(seed=42)
+        system.set_graph(G)
+        clone = system.clone()
+        assert clone._model is None  # Lazy — not loaded until needed
+        assert clone._graph is G
+
+
 class TestTextEncoder:
     def test_encode_neighbourhood(self):
         G = generate_domain(SMALL)

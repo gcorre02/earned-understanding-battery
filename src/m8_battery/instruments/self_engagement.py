@@ -75,10 +75,16 @@ def run_self_engagement(
 
     # Phase 2: Perturb the high-engagement region
     perturbed_system = system.perturb(target_region, method=perturbation_method)
+    provenance.log("perturbation", target_region=target_region, method=perturbation_method)
 
-    # Phase 3: Recovery — let perturbed system wander
+    # Phase 3: Recovery — let perturbed system wander (logged to provenance)
     for i in range(recovery_window):
-        perturbed_system.step(None)
+        metric_before = perturbed_system.get_structure_metric()
+        provenance.log_input(None, step_index=wander_steps + i)
+        output = perturbed_system.step(None)
+        metric_after = perturbed_system.get_structure_metric()
+        provenance.log_state_change(metric_before, metric_after, step_index=wander_steps + i)
+        provenance.log_output(output, step_index=wander_steps + i)
 
     post_perturbation = perturbed_system.get_engagement_distribution()
 

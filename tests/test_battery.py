@@ -293,6 +293,14 @@ class TestBatteryRunner:
         # Class 1: fresh and post-training should be nearly identical (no training)
         assert abs(bl["fresh_metric"] - bl["post_training_metric"]) < 1e-6
         assert abs(bl["metric_change_during_training"]) < 1e-6
+        # Two-window trajectory fields present
+        assert "post_battery_metric" in bl
+        assert "metric_change_during_battery" in bl
+        assert "trajectory_training" in bl
+        assert "trajectory_battery" in bl
+        # Class 1: both windows should be static
+        assert bl["trajectory_training"] == "static"
+        assert bl["trajectory_battery"] == "static"
 
 
 class TestResetDiscrimination:

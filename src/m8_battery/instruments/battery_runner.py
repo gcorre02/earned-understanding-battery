@@ -222,6 +222,27 @@ def run_battery(
         provenance=provenance,
     )
 
+    # --- Phase 5b: Post-battery metric for two-window trajectory ---
+    post_battery_metric = system.get_structure_metric()
+    baseline["post_battery_metric"] = post_battery_metric
+    baseline["metric_change_during_battery"] = (
+        post_battery_metric - baseline["post_training_metric"]
+    )
+
+    # Two-window trajectory summary:
+    # Window 1 (training): fresh → post-training
+    # Window 2 (battery): post-training → post-battery
+    training_change = baseline["metric_change_during_training"]
+    battery_change = baseline["metric_change_during_battery"]
+    baseline["trajectory_training"] = (
+        "earned" if abs(training_change) > 0.1
+        else "static"
+    )
+    baseline["trajectory_battery"] = (
+        "earned" if abs(battery_change) > 0.1
+        else "static"
+    )
+
     # --- Phase 6: Provenance constraint ---
     prov_result = check_provenance(system, provenance)
     results["provenance_constraint"] = prov_result

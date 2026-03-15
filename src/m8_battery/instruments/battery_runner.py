@@ -205,6 +205,30 @@ def run_battery(
     )
     timings["generativity"] = _time.monotonic() - t0
 
+    # --- Phase 3b: Generativity baseline control ---
+    # Run generativity on a fresh untrained system. If the fresh system
+    # also passes, the property is RECEIVED (pre-trained capability),
+    # not EARNED. Stored in baseline dict as supplementary diagnostic.
+    if control_factory is not None:
+        try:
+            fresh_for_gen = control_factory()
+            fresh_ref = fresh_for_gen.get_structure_metric()
+            fresh_gen = run_generativity(
+                system=fresh_for_gen,
+                domain_b_inputs=config.domain_b_inputs,
+                reference_metric=fresh_ref,
+            )
+            baseline["generativity_baseline_passed"] = fresh_gen.passed
+            baseline["generativity_baseline_effect_size"] = fresh_gen.effect_size
+            if fresh_gen.passed:
+                baseline["generativity_classification"] = "received"
+            elif results["generativity"].passed:
+                baseline["generativity_classification"] = "earned"
+            else:
+                baseline["generativity_classification"] = "absent"
+        except Exception:
+            baseline["generativity_classification"] = "unknown"
+
     # --- Phase 4: Transfer (domain A' vs naive) ---
     t0 = _time.monotonic()
     if control_factory is not None:

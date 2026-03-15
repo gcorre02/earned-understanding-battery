@@ -101,6 +101,12 @@ def run_self_engagement(
     else:
         cosine_sim = 0.0
 
+    # Random walk baseline: compute cosine similarity between
+    # pre-perturbation pattern and graph's stationary distribution.
+    # If cosine_sim ≈ baseline_sim, recovery is topology-driven (not earned).
+    baseline_sim = _compute_random_walk_baseline(pre_perturbation, regions)
+    adjusted_sim = cosine_sim - baseline_sim  # excess over random walk
+
     # Check if target region re-engagement recovered
     post_target_engagement = post_perturbation.get(target_region, 0.0)
     if pre_target_engagement > 1e-10:
@@ -108,32 +114,36 @@ def run_self_engagement(
     else:
         recovery_ratio = 0.0
 
-    # Decision logic
-    # Self-engagement = engagement pattern recovers after perturbation
-    # High cosine similarity (> 0.7) = pattern recovered
+    # Decision logic — uses adjusted similarity (excess over random walk)
+    # adjusted_sim > 0.2 = recovery exceeds what topology alone produces
     # Recovery ratio > 0.5 = target region re-engaged
-    has_recovery = cosine_sim > 0.7
+    has_recovery = adjusted_sim > 0.2
     target_recovered = recovery_ratio > 0.5
 
     if has_recovery and target_recovered:
         passed = True
         notes = (f"Self-engagement detected: cosine_sim={cosine_sim:.4f}, "
+                 f"baseline_sim={baseline_sim:.4f}, adjusted={adjusted_sim:.4f}, "
                  f"recovery_ratio={recovery_ratio:.4f}, "
                  f"target_region={target_region}")
-    elif cosine_sim < 0.3:
+    elif adjusted_sim < 0.0:
         passed = False
-        notes = (f"No self-engagement: engagement pattern disrupted. "
-                 f"cosine_sim={cosine_sim:.4f}, recovery_ratio={recovery_ratio:.4f}")
+        notes = (f"No self-engagement: recovery below random walk baseline. "
+                 f"cosine_sim={cosine_sim:.4f}, baseline_sim={baseline_sim:.4f}, "
+                 f"adjusted={adjusted_sim:.4f}")
     else:
         passed = None
         notes = (f"Ambiguous self-engagement: cosine_sim={cosine_sim:.4f}, "
+                 f"baseline_sim={baseline_sim:.4f}, adjusted={adjusted_sim:.4f}, "
                  f"recovery_ratio={recovery_ratio:.4f}")
 
-    effect_size = float(cosine_sim)
+    effect_size = float(adjusted_sim)
 
     provenance.log_measurement("self_engagement", {
         "passed": passed,
         "cosine_sim": cosine_sim,
+        "baseline_sim": baseline_sim,
+        "adjusted_sim": adjusted_sim,
         "recovery_ratio": float(recovery_ratio),
         "target_region": target_region,
         "wander_steps": wander_steps,
@@ -151,7 +161,38 @@ def run_self_engagement(
             "pre_target_engagement": float(pre_target_engagement),
             "post_target_engagement": float(post_target_engagement),
             "cosine_sim": float(cosine_sim),
+            "baseline_sim": float(baseline_sim),
+            "adjusted_sim": float(adjusted_sim),
             "recovery_ratio": float(recovery_ratio),
         },
         notes=notes,
     )
+
+
+def _compute_random_walk_baseline(
+    engagement_dist: dict[str, float],
+    regions: list[str],
+) -> float:
+    """Compute cosine similarity between engagement and uniform distribution.
+
+    A random walker on a graph converges to a stationary distribution
+    determined by node degrees. On an SBM with equal community sizes,
+    this is approximately uniform across communities. We use uniform
+    as the baseline — if the engagement pattern is close to uniform,
+    any "recovery" is just topology funnelling, not preference.
+
+    Returns cosine similarity between the engagement distribution
+    and a uniform distribution over regions.
+    """
+    if not engagement_dist or not regions:
+        return 0.0
+
+    eng_vec = np.array([engagement_dist.get(r, 0.0) for r in regions])
+    uniform_vec = np.ones(len(regions)) / len(regions)
+
+    eng_norm = np.linalg.norm(eng_vec)
+    uni_norm = np.linalg.norm(uniform_vec)
+
+    if eng_norm > 1e-10 and uni_norm > 1e-10:
+        return float(np.dot(eng_vec, uniform_vec) / (eng_norm * uni_norm))
+    return 0.0

@@ -155,9 +155,17 @@ class CuriosityAgent(TestSystem):
         self._graph = graph
 
     def reset(self) -> None:
+        """Reset all learned and transient state.
+
+        Clears trained model weights and RND predictor so the system
+        must retrain. Matches Foxworthy F reset semantics.
+        """
         self._current_node = None
         self._step_count = 0
         self._visit_counts = {}
+        self._model = None
+        self._wrapped_env = None
+        self._is_trained = False
 
     def step(self, input_data: Any) -> Any:
         if self._graph is None:

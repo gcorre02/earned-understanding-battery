@@ -75,9 +75,17 @@ class DQNAgent(TestSystem):
         self._graph = graph
 
     def reset(self) -> None:
+        """Reset all learned and transient state.
+
+        Clears trained model weights so the system must retrain.
+        Matches Foxworthy F reset semantics (learned structure
+        does not persist across resets).
+        """
         self._current_node = None
         self._step_count = 0
         self._visit_counts = {}
+        self._model = None
+        self._is_trained = False
         if self._env is not None:
             self._env.reset(seed=self._seed)
 

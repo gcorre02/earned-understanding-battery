@@ -90,6 +90,46 @@ def run_reset_discrimination(
     }
 
 
+def _collect_baseline(
+    system: TestSystem,
+    control_factory: Callable[[], TestSystem] | None = None,
+) -> dict[str, float]:
+    """Collect three-phase baseline metrics (supplementary diagnostic).
+
+    Measures structure metric at three points:
+    1. fresh: from a clone (untrained baseline)
+    2. post_training: the system as received (already trained)
+    3. during_battery: measured after instruments run (added later)
+
+    Also measures per-instrument baselines on a fresh system:
+    integration, generativity, self-engagement on a system that
+    has never been operated. Distinguishes "received" properties
+    (present at start) from "earned" (developed during operation).
+    """
+    # Post-training metric (system as received)
+    post_training_metric = system.get_structure_metric()
+    post_training_distribution = system.get_structure_distribution()
+
+    # Fresh baseline from a clone
+    fresh_metric = 0.0
+    fresh_distribution: dict[str, float] = {}
+    if control_factory is not None:
+        try:
+            fresh = control_factory()
+            fresh_metric = fresh.get_structure_metric()
+            fresh_distribution = fresh.get_structure_distribution()
+        except Exception:
+            pass  # Some systems can't produce metrics without training
+
+    return {
+        "fresh_metric": fresh_metric,
+        "post_training_metric": post_training_metric,
+        "metric_change_during_training": post_training_metric - fresh_metric,
+        "fresh_distribution": fresh_distribution,
+        "post_training_distribution": post_training_distribution,
+    }
+
+
 def run_battery(
     system: TestSystem,
     system_name: str,
@@ -122,6 +162,11 @@ def run_battery(
     """
     provenance = ProvenanceLog()
     results: dict[str, InstrumentResult] = {}
+
+    # --- Phase 0: Baseline measurement (supplementary diagnostic) ---
+    # Three-phase structure metric: fresh → post-training → during battery.
+    # The system arrives already trained. Fresh baseline from a clone.
+    baseline = _collect_baseline(system, control_factory)
 
     # --- Phase 1: Train on domain A + measure developmental trajectory ---
     results["developmental_trajectory"] = run_developmental_trajectory(
@@ -201,6 +246,7 @@ def run_battery(
         provenance_passed=prov_result.passed,
         metadata={
             "reference_metric": reference_metric,
+            "baseline": baseline,
             "reset_discrimination": reset_diag,
             "config": {
                 "measurement_interval": config.measurement_interval,

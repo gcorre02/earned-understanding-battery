@@ -262,6 +262,38 @@ class TestBatteryRunner:
         assert "reset_persistence" in rd
         assert "regrowth_rate" in rd
 
+    def test_battery_includes_baseline(self):
+        """Battery result metadata should include baseline measurement."""
+        family = generate_domain_family(SMALL)
+        system = WordNetGraph(family["A"], seed=42)
+        nodes_a = list(family["A"].nodes())
+
+        config = BatteryConfig(
+            domain_a_inputs=nodes_a[:10],
+            domain_a_prime_inputs=nodes_a[:5],
+            domain_b_inputs=nodes_a[:5],
+            measurement_interval=5,
+            wander_steps=5,
+            recovery_window=5,
+        )
+
+        result = run_battery(
+            system=system,
+            system_name="Test",
+            system_class=SystemClass.CLASS_1,
+            config=config,
+            control_factory=lambda: WordNetGraph(family["A"], seed=99),
+        )
+
+        assert "baseline" in result.metadata
+        bl = result.metadata["baseline"]
+        assert "fresh_metric" in bl
+        assert "post_training_metric" in bl
+        assert "metric_change_during_training" in bl
+        # Class 1: fresh and post-training should be nearly identical (no training)
+        assert abs(bl["fresh_metric"] - bl["post_training_metric"]) < 1e-6
+        assert abs(bl["metric_change_during_training"]) < 1e-6
+
 
 class TestResetDiscrimination:
     """Tests for the reset discrimination diagnostic (§6.7)."""

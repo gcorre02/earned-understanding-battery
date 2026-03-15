@@ -505,7 +505,8 @@ class FoxworthyF(TestSystem):
                 if (param.requires_grad
                         and f".{layer_idx}." in name
                         and "attn" in name):
-                    noise = torch.randn(param.shape, generator=rng, dtype=param.dtype, device=param.device) * 0.01
+                    noise = torch.randn(param.shape, generator=rng, dtype=param.dtype) * 0.01
+                    noise = noise.to(device=param.device)
                     param.add_(noise)
 
         return new

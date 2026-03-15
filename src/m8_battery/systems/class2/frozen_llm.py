@@ -255,9 +255,8 @@ class FrozenLLM(TestSystem):
         with torch.no_grad():
             layer = new._model.model.layers[layer_idx].self_attn
             rng = torch.Generator().manual_seed(self._seed + 999)
-            layer.q_proj.weight.copy_(
-                torch.randn(layer.q_proj.weight.shape, generator=rng, dtype=layer.q_proj.weight.dtype, device=layer.q_proj.weight.device) * 0.01
-            )
+            noise = torch.randn(layer.q_proj.weight.shape, generator=rng, dtype=layer.q_proj.weight.dtype) * 0.01
+            layer.q_proj.weight.copy_(noise.to(device=layer.q_proj.weight.device))
 
         new._structure_metric = None
         return new

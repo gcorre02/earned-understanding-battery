@@ -1,0 +1,59 @@
+{
+  "system_id": "3C",
+  "system_name": "Foxworthy Variant F",
+  "system_class": 3,
+  "scale": "medium",
+  "seed": 456,
+  "n_nodes": 150,
+  "overall_passed": null,
+  "provenance_passed": false,
+  "setup_time_s": 15.488014221191406,
+  "battery_time_s": 68.77123093605042,
+  "run_machine": "m3_max",
+  "instruments": {
+    "developmental_trajectory": {
+      "passed": true,
+      "effect_size": 1.6387010272158626,
+      "notes": "Developmental trajectory detected: slope=0.422960, R\u00b2=0.7353, monotonicity=0.75"
+    },
+    "integration": {
+      "passed": false,
+      "effect_size": 0.20348347826625485,
+      "notes": "Linear/uniform degradation: Gini=0.2035, CV=0.3675"
+    },
+    "generativity": {
+      "passed": true,
+      "effect_size": 0.5520595682404313,
+      "notes": "Generative response to novel domain: delta=4.863936, retention=1.3979, stability=0.6845"
+    },
+    "transfer": {
+      "passed": null,
+      "effect_size": 0.14214450776046778,
+      "notes": "Ambiguous transfer: advantage=-0.3091, trained_final=7.992802, naive_final=8.184015"
+    },
+    "self_engagement": {
+      "passed": false,
+      "effect_size": 0.0,
+      "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=1.3107"
+    }
+  },
+  "metadata": {
+    "reference_metric": 8.810528072164063,
+    "reset_discrimination": {
+      "pre_reset": 5.715619453044623,
+      "post_reset": 7.990086352386798,
+      "post_rerun": 9.97606933574363,
+      "reset_persistence": 1.3979388267584192,
+      "regrowth_rate": 0.09929914916784158
+    },
+    "config": {
+      "measurement_interval": 5,
+      "wander_steps": 15,
+      "perturbation_method": "shuffle_weights",
+      "recovery_window": 15,
+      "n_domain_a_inputs": 20,
+      "n_domain_b_inputs": 20,
+      "n_domain_a_prime_inputs": 20
+    }
+  }
+}

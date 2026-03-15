@@ -1,0 +1,59 @@
+{
+  "system_id": "2A",
+  "system_name": "Frozen TinyLlama 1.1B",
+  "system_class": 2,
+  "scale": "medium",
+  "seed": 123,
+  "n_nodes": 150,
+  "overall_passed": false,
+  "provenance_passed": false,
+  "setup_time_s": 4.673004150390625e-05,
+  "battery_time_s": 293.86542892456055,
+  "run_machine": "m3_max",
+  "instruments": {
+    "developmental_trajectory": {
+      "passed": false,
+      "effect_size": 0.0,
+      "notes": "Structure metric is constant \u2014 no developmental trajectory"
+    },
+    "integration": {
+      "passed": false,
+      "effect_size": 0.10000062738056643,
+      "notes": "Linear/uniform degradation: Gini=0.1000, CV=0.1798"
+    },
+    "generativity": {
+      "passed": false,
+      "effect_size": 0.0,
+      "notes": "No response to novel domain (metric unchanged): delta=0.000000"
+    },
+    "transfer": {
+      "passed": false,
+      "effect_size": 0.0,
+      "notes": "No transfer: trained and naive produce same metric. advantage=0.0000"
+    },
+    "self_engagement": {
+      "passed": false,
+      "effect_size": 0.0,
+      "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=1.0000"
+    }
+  },
+  "metadata": {
+    "reference_metric": 0.8310254649682478,
+    "reset_discrimination": {
+      "pre_reset": 0.8310254649682478,
+      "post_reset": 0.8310254649682478,
+      "post_rerun": 0.8310254649682478,
+      "reset_persistence": 1.0,
+      "regrowth_rate": 0.0
+    },
+    "config": {
+      "measurement_interval": 5,
+      "wander_steps": 15,
+      "perturbation_method": "shuffle_weights",
+      "recovery_window": 15,
+      "n_domain_a_inputs": 20,
+      "n_domain_b_inputs": 20,
+      "n_domain_a_prime_inputs": 20
+    }
+  }
+}

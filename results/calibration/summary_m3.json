@@ -1,0 +1,371 @@
+{
+  "run_machine": "m3_max",
+  "scale": "medium",
+  "n_nodes": 150,
+  "seeds": [
+    42,
+    123,
+    456
+  ],
+  "systems": [
+    "2A",
+    "3C"
+  ],
+  "total_time_s": 1244.486006975174,
+  "results": [
+    {
+      "system_id": "2A",
+      "system_name": "Frozen TinyLlama 1.1B",
+      "system_class": 2,
+      "scale": "medium",
+      "seed": 42,
+      "n_nodes": 150,
+      "overall_passed": false,
+      "provenance_passed": false,
+      "setup_time_s": 4.190783977508545,
+      "battery_time_s": 360.0852508544922,
+      "run_machine": "m3_max",
+      "instruments": {
+        "developmental_trajectory": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "Structure metric is constant \u2014 no developmental trajectory"
+        },
+        "integration": {
+          "passed": false,
+          "effect_size": 0.10000062738056643,
+          "notes": "Linear/uniform degradation: Gini=0.1000, CV=0.1798"
+        },
+        "generativity": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No response to novel domain (metric unchanged): delta=0.000000"
+        },
+        "transfer": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No transfer: trained and naive produce same metric. advantage=0.0000"
+        },
+        "self_engagement": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=1.0000"
+        }
+      },
+      "metadata": {
+        "reference_metric": 0.8310254649682478,
+        "reset_discrimination": {
+          "pre_reset": 0.8310254649682478,
+          "post_reset": 0.8310254649682478,
+          "post_rerun": 0.8310254649682478,
+          "reset_persistence": 1.0,
+          "regrowth_rate": 0.0
+        },
+        "config": {
+          "measurement_interval": 5,
+          "wander_steps": 15,
+          "perturbation_method": "shuffle_weights",
+          "recovery_window": 15,
+          "n_domain_a_inputs": 20,
+          "n_domain_b_inputs": 20,
+          "n_domain_a_prime_inputs": 20
+        }
+      }
+    },
+    {
+      "system_id": "2A",
+      "system_name": "Frozen TinyLlama 1.1B",
+      "system_class": 2,
+      "scale": "medium",
+      "seed": 123,
+      "n_nodes": 150,
+      "overall_passed": false,
+      "provenance_passed": false,
+      "setup_time_s": 4.673004150390625e-05,
+      "battery_time_s": 293.86542892456055,
+      "run_machine": "m3_max",
+      "instruments": {
+        "developmental_trajectory": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "Structure metric is constant \u2014 no developmental trajectory"
+        },
+        "integration": {
+          "passed": false,
+          "effect_size": 0.10000062738056643,
+          "notes": "Linear/uniform degradation: Gini=0.1000, CV=0.1798"
+        },
+        "generativity": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No response to novel domain (metric unchanged): delta=0.000000"
+        },
+        "transfer": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No transfer: trained and naive produce same metric. advantage=0.0000"
+        },
+        "self_engagement": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=1.0000"
+        }
+      },
+      "metadata": {
+        "reference_metric": 0.8310254649682478,
+        "reset_discrimination": {
+          "pre_reset": 0.8310254649682478,
+          "post_reset": 0.8310254649682478,
+          "post_rerun": 0.8310254649682478,
+          "reset_persistence": 1.0,
+          "regrowth_rate": 0.0
+        },
+        "config": {
+          "measurement_interval": 5,
+          "wander_steps": 15,
+          "perturbation_method": "shuffle_weights",
+          "recovery_window": 15,
+          "n_domain_a_inputs": 20,
+          "n_domain_b_inputs": 20,
+          "n_domain_a_prime_inputs": 20
+        }
+      }
+    },
+    {
+      "system_id": "2A",
+      "system_name": "Frozen TinyLlama 1.1B",
+      "system_class": 2,
+      "scale": "medium",
+      "seed": 456,
+      "n_nodes": 150,
+      "overall_passed": false,
+      "provenance_passed": false,
+      "setup_time_s": 4.601478576660156e-05,
+      "battery_time_s": 275.8248202800751,
+      "run_machine": "m3_max",
+      "instruments": {
+        "developmental_trajectory": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "Structure metric is constant \u2014 no developmental trajectory"
+        },
+        "integration": {
+          "passed": false,
+          "effect_size": 0.10000062738056643,
+          "notes": "Linear/uniform degradation: Gini=0.1000, CV=0.1798"
+        },
+        "generativity": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No response to novel domain (metric unchanged): delta=0.000000"
+        },
+        "transfer": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No transfer: trained and naive produce same metric. advantage=0.0000"
+        },
+        "self_engagement": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=1.0000"
+        }
+      },
+      "metadata": {
+        "reference_metric": 0.8310254649682478,
+        "reset_discrimination": {
+          "pre_reset": 0.8310254649682478,
+          "post_reset": 0.8310254649682478,
+          "post_rerun": 0.8310254649682478,
+          "reset_persistence": 1.0,
+          "regrowth_rate": 0.0
+        },
+        "config": {
+          "measurement_interval": 5,
+          "wander_steps": 15,
+          "perturbation_method": "shuffle_weights",
+          "recovery_window": 15,
+          "n_domain_a_inputs": 20,
+          "n_domain_b_inputs": 20,
+          "n_domain_a_prime_inputs": 20
+        }
+      }
+    },
+    {
+      "system_id": "3C",
+      "system_name": "Foxworthy Variant F",
+      "system_class": 3,
+      "scale": "medium",
+      "seed": 42,
+      "n_nodes": 150,
+      "overall_passed": null,
+      "provenance_passed": false,
+      "setup_time_s": 18.258808135986328,
+      "battery_time_s": 101.21415209770203,
+      "run_machine": "m3_max",
+      "instruments": {
+        "developmental_trajectory": {
+          "passed": false,
+          "effect_size": 3.559386075668516,
+          "notes": "No developmental trajectory: slope=-0.177293, R\u00b2=0.2080, monotonicity=0.50"
+        },
+        "integration": {
+          "passed": false,
+          "effect_size": 0.052203429205972,
+          "notes": "Linear/uniform degradation: Gini=0.0522, CV=0.1003"
+        },
+        "generativity": {
+          "passed": true,
+          "effect_size": 0.3250510177766417,
+          "notes": "Generative response to novel domain: delta=2.254143, retention=1.0893, stability=0.8107"
+        },
+        "transfer": {
+          "passed": null,
+          "effect_size": 0.4766316897340062,
+          "notes": "Ambiguous transfer: advantage=-0.3774, trained_final=9.775030, naive_final=8.896318"
+        },
+        "self_engagement": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=1.0000"
+        }
+      },
+      "metadata": {
+        "reference_metric": 6.93473504971938,
+        "reset_discrimination": {
+          "pre_reset": 8.928227103320488,
+          "post_reset": 8.000261261304267,
+          "post_rerun": 8.653348194784943,
+          "reset_persistence": 0.896063817454744,
+          "regrowth_rate": 0.032654346674033795
+        },
+        "config": {
+          "measurement_interval": 5,
+          "wander_steps": 15,
+          "perturbation_method": "shuffle_weights",
+          "recovery_window": 15,
+          "n_domain_a_inputs": 20,
+          "n_domain_b_inputs": 20,
+          "n_domain_a_prime_inputs": 20
+        }
+      }
+    },
+    {
+      "system_id": "3C",
+      "system_name": "Foxworthy Variant F",
+      "system_class": 3,
+      "scale": "medium",
+      "seed": 123,
+      "n_nodes": 150,
+      "overall_passed": null,
+      "provenance_passed": false,
+      "setup_time_s": 13.515936851501465,
+      "battery_time_s": 92.29380226135254,
+      "run_machine": "m3_max",
+      "instruments": {
+        "developmental_trajectory": {
+          "passed": null,
+          "effect_size": 3.5296695103022806,
+          "notes": "Ambiguous trajectory: slope=-0.183215, R\u00b2=0.4849, monotonicity=0.50"
+        },
+        "integration": {
+          "passed": false,
+          "effect_size": 0.0892497343041871,
+          "notes": "Linear/uniform degradation: Gini=0.0892, CV=0.1667"
+        },
+        "generativity": {
+          "passed": true,
+          "effect_size": 1.8174533705420992,
+          "notes": "Generative response to novel domain: delta=11.640603, retention=2.6422, stability=0.5676"
+        },
+        "transfer": {
+          "passed": null,
+          "effect_size": 2.0763611982475845,
+          "notes": "Ambiguous transfer: advantage=-0.1205, trained_final=5.801218, naive_final=8.247315"
+        },
+        "self_engagement": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=0.4800"
+        }
+      },
+      "metadata": {
+        "reference_metric": 6.404897809686665,
+        "reset_discrimination": {
+          "pre_reset": 5.8646826845593365,
+          "post_reset": 8.016684797038176,
+          "post_rerun": 10.03534272637064,
+          "reset_persistence": 1.3669426341078397,
+          "regrowth_rate": 0.10093289646662322
+        },
+        "config": {
+          "measurement_interval": 5,
+          "wander_steps": 15,
+          "perturbation_method": "shuffle_weights",
+          "recovery_window": 15,
+          "n_domain_a_inputs": 20,
+          "n_domain_b_inputs": 20,
+          "n_domain_a_prime_inputs": 20
+        }
+      }
+    },
+    {
+      "system_id": "3C",
+      "system_name": "Foxworthy Variant F",
+      "system_class": 3,
+      "scale": "medium",
+      "seed": 456,
+      "n_nodes": 150,
+      "overall_passed": null,
+      "provenance_passed": false,
+      "setup_time_s": 15.488014221191406,
+      "battery_time_s": 68.77123093605042,
+      "run_machine": "m3_max",
+      "instruments": {
+        "developmental_trajectory": {
+          "passed": true,
+          "effect_size": 1.6387010272158626,
+          "notes": "Developmental trajectory detected: slope=0.422960, R\u00b2=0.7353, monotonicity=0.75"
+        },
+        "integration": {
+          "passed": false,
+          "effect_size": 0.20348347826625485,
+          "notes": "Linear/uniform degradation: Gini=0.2035, CV=0.3675"
+        },
+        "generativity": {
+          "passed": true,
+          "effect_size": 0.5520595682404313,
+          "notes": "Generative response to novel domain: delta=4.863936, retention=1.3979, stability=0.6845"
+        },
+        "transfer": {
+          "passed": null,
+          "effect_size": 0.14214450776046778,
+          "notes": "Ambiguous transfer: advantage=-0.3091, trained_final=7.992802, naive_final=8.184015"
+        },
+        "self_engagement": {
+          "passed": false,
+          "effect_size": 0.0,
+          "notes": "No self-engagement: engagement pattern disrupted. cosine_sim=0.0000, recovery_ratio=1.3107"
+        }
+      },
+      "metadata": {
+        "reference_metric": 8.810528072164063,
+        "reset_discrimination": {
+          "pre_reset": 5.715619453044623,
+          "post_reset": 7.990086352386798,
+          "post_rerun": 9.97606933574363,
+          "reset_persistence": 1.3979388267584192,
+          "regrowth_rate": 0.09929914916784158
+        },
+        "config": {
+          "measurement_interval": 5,
+          "wander_steps": 15,
+          "perturbation_method": "shuffle_weights",
+          "recovery_window": 15,
+          "n_domain_a_inputs": 20,
+          "n_domain_b_inputs": 20,
+          "n_domain_a_prime_inputs": 20
+        }
+      }
+    }
+  ]
+}

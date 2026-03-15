@@ -301,6 +301,13 @@ class TestBatteryRunner:
         # Class 1: both windows should be static
         assert bl["trajectory_training"] == "static"
         assert bl["trajectory_battery"] == "static"
+        # Per-instrument baseline classifications
+        assert "instrument_classifications" in bl
+        cls = bl["instrument_classifications"]
+        assert "developmental_trajectory" in cls
+        assert "generativity" in cls
+        # Class 1 generativity should be absent (neither trained nor fresh passes)
+        assert cls["generativity"] == "absent"
 
 
 class TestResetDiscrimination:

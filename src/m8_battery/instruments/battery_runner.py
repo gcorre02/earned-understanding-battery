@@ -130,6 +130,115 @@ def _collect_baseline(
     }
 
 
+def _run_baseline_instruments(
+    control_factory: Callable[[], TestSystem] | None,
+    config: BatteryConfig,
+) -> dict[str, dict]:
+    """Run all 5 instruments on a fresh untrained system.
+
+    Returns per-instrument baseline: passed, effect_size, classification.
+    The classification is determined later by comparing with trained results.
+    """
+    if control_factory is None:
+        return {}
+
+    try:
+        fresh = control_factory()
+    except Exception:
+        return {}
+
+    baseline_results: dict[str, dict] = {}
+
+    # Trajectory: feed domain A inputs to fresh system
+    try:
+        dt = run_developmental_trajectory(
+            system=fresh, inputs=config.domain_a_inputs,
+            measurement_interval=config.measurement_interval,
+        )
+        baseline_results["developmental_trajectory"] = {
+            "passed": dt.passed, "effect_size": dt.effect_size,
+        }
+    except Exception:
+        baseline_results["developmental_trajectory"] = {"passed": None, "effect_size": None}
+
+    fresh_ref = fresh.get_structure_metric()
+
+    # Integration
+    try:
+        integ = run_integration(
+            system=fresh,
+            probe_inputs=config.probe_inputs or config.domain_a_inputs[:10],
+        )
+        baseline_results["integration"] = {
+            "passed": integ.passed, "effect_size": integ.effect_size,
+        }
+    except Exception:
+        baseline_results["integration"] = {"passed": None, "effect_size": None}
+
+    # Generativity
+    try:
+        gen = run_generativity(
+            system=fresh, domain_b_inputs=config.domain_b_inputs,
+            reference_metric=fresh_ref,
+        )
+        baseline_results["generativity"] = {
+            "passed": gen.passed, "effect_size": gen.effect_size,
+        }
+    except Exception:
+        baseline_results["generativity"] = {"passed": None, "effect_size": None}
+
+    # Transfer (fresh vs another fresh)
+    try:
+        fresh2 = control_factory()
+        trans = run_transfer(
+            system=fresh, naive_system=fresh2,
+            domain_a_prime_inputs=config.domain_a_prime_inputs,
+            measurement_interval=config.measurement_interval,
+        )
+        baseline_results["transfer"] = {
+            "passed": trans.passed, "effect_size": trans.effect_size,
+        }
+    except Exception:
+        baseline_results["transfer"] = {"passed": None, "effect_size": None}
+
+    # Self-engagement
+    try:
+        se = run_self_engagement(
+            system=fresh, wander_steps=config.wander_steps,
+            perturbation_method=config.perturbation_method,
+            recovery_window=config.recovery_window,
+        )
+        baseline_results["self_engagement"] = {
+            "passed": se.passed, "effect_size": se.effect_size,
+        }
+    except Exception:
+        baseline_results["self_engagement"] = {"passed": None, "effect_size": None}
+
+    return baseline_results
+
+
+def _classify_instruments(
+    trained_results: dict[str, InstrumentResult],
+    baseline_results: dict[str, dict],
+) -> dict[str, str]:
+    """Classify each instrument: earned / received / absent / anomalous."""
+    classifications = {}
+    for name, trained in trained_results.items():
+        bl = baseline_results.get(name, {})
+        bl_passed = bl.get("passed")
+        if trained.passed and bl_passed:
+            classifications[name] = "received"
+        elif trained.passed and not bl_passed:
+            classifications[name] = "earned"
+        elif not trained.passed and not bl_passed:
+            classifications[name] = "absent"
+        elif not trained.passed and bl_passed:
+            classifications[name] = "anomalous"
+        else:
+            classifications[name] = "unknown"
+    return classifications
+
+
 def run_battery(
     system: TestSystem,
     system_name: str,
@@ -205,30 +314,6 @@ def run_battery(
     )
     timings["generativity"] = _time.monotonic() - t0
 
-    # --- Phase 3b: Generativity baseline control ---
-    # Run generativity on a fresh untrained system. If the fresh system
-    # also passes, the property is RECEIVED (pre-trained capability),
-    # not EARNED. Stored in baseline dict as supplementary diagnostic.
-    if control_factory is not None:
-        try:
-            fresh_for_gen = control_factory()
-            fresh_ref = fresh_for_gen.get_structure_metric()
-            fresh_gen = run_generativity(
-                system=fresh_for_gen,
-                domain_b_inputs=config.domain_b_inputs,
-                reference_metric=fresh_ref,
-            )
-            baseline["generativity_baseline_passed"] = fresh_gen.passed
-            baseline["generativity_baseline_effect_size"] = fresh_gen.effect_size
-            if fresh_gen.passed:
-                baseline["generativity_classification"] = "received"
-            elif results["generativity"].passed:
-                baseline["generativity_classification"] = "earned"
-            else:
-                baseline["generativity_classification"] = "absent"
-        except Exception:
-            baseline["generativity_classification"] = "unknown"
-
     # --- Phase 4: Transfer (domain A' vs naive) ---
     t0 = _time.monotonic()
     if control_factory is not None:
@@ -295,6 +380,19 @@ def run_battery(
         n_steps=min(20, len(reset_inputs)),
     )
     timings["reset_discrimination"] = _time.monotonic() - t0
+
+    # --- Phase 8: Baseline instruments (all 5 on fresh system) ---
+    t0 = _time.monotonic()
+    instrument_results_for_classify = {
+        k: v for k, v in results.items() if k != "provenance_constraint"
+    }
+    baseline_instrument_results = _run_baseline_instruments(control_factory, config)
+    instrument_classifications = _classify_instruments(
+        instrument_results_for_classify, baseline_instrument_results,
+    )
+    baseline["instrument_baselines"] = baseline_instrument_results
+    baseline["instrument_classifications"] = instrument_classifications
+    timings["baseline_instruments"] = _time.monotonic() - t0
     timings["total"] = sum(timings.values())
 
     # --- Assemble result ---

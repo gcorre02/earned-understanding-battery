@@ -290,7 +290,7 @@ class FrozenGAT(TestSystem):
             start = head_idx * h_dim
             end = start + h_dim
             rng = torch.Generator().manual_seed(self._seed + 999)
-            new._conv1.lin_src.weight[start:end, :] = torch.randn(
+            new._conv1.lin.weight[start:end, :] = torch.randn(
                 h_dim, self._n_features, generator=rng
             ) * 0.1
 

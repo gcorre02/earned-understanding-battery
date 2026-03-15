@@ -7,6 +7,16 @@ Outputs BatteryResult JSON files to results/calibration/.
 
 from __future__ import annotations
 
+# Force CPU — CUDA segfaults on RTX 3060 Laptop with torch 2.6.0+cu124.
+# SB3 also creates cuda tensors that fail numpy conversion.
+# TODO: re-enable CUDA when driver resolved.
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+import torch
+torch.set_default_device("cpu")
+# Also monkey-patch cuda availability for SB3
+torch.cuda.is_available = lambda: False
+
 import argparse
 import json
 import sys
@@ -31,14 +41,27 @@ RESULTS_DIR = Path(__file__).parent.parent / "results" / "calibration"
 
 
 def _get_device() -> str:
-    """Auto-detect CUDA. Use GPU for calibration, CPU for tests."""
-    import torch
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    """Auto-detect CUDA. Use GPU for calibration, CPU for tests.
+
+    Note: CUDA 12.4 + RTX 3060 Laptop segfaults during TinyLlama
+    inference on this machine. Forced to CPU until driver resolved.
+    """
+    # TODO: re-enable CUDA when driver issue resolved
+    # import torch
+    # return "cuda" if torch.cuda.is_available() else "cpu"
+    return "cpu"
+
+
+def _count_communities(graph) -> int:
+    """Count communities in graph."""
+    return len({graph.nodes[n].get("features", {}).get("community", 0)
+                for n in graph.nodes()})
 
 
 def make_system(system_id: str, graph, seed: int, n_features: int):
     """Instantiate a system by ID. Returns (system, control_factory)."""
     device = _get_device()
+    n_classes = _count_communities(graph)
 
     if system_id == "1A":
         from m8_battery.systems.class1.wordnet_graph import WordNetGraph
@@ -64,9 +87,9 @@ def make_system(system_id: str, graph, seed: int, n_features: int):
 
     elif system_id == "2B":
         from m8_battery.systems.class2.frozen_gnn import FrozenGAT
-        system = FrozenGAT(n_features=n_features, seed=seed)
+        system = FrozenGAT(n_features=n_features, n_classes=n_classes, seed=seed)
         system.train_on_domain(graph)
-        return system, lambda: _train_gat(FrozenGAT(n_features=n_features, seed=seed + 1000), graph)
+        return system, lambda: _train_gat(FrozenGAT(n_features=n_features, n_classes=n_classes, seed=seed + 1000), graph)
 
     elif system_id == "2C":
         from m8_battery.systems.class2.foxworthy_c import FoxworthyC
@@ -168,8 +191,9 @@ def run_single(
     t_setup = time.time() - t0
     print(f"  Setup: {t_setup:.1f}s")
 
-    # Configure battery
-    n_inputs = min(50, len(nodes_a))
+    # Configure battery — reduce inputs for LLM systems (slow on CPU)
+    LLM_SYSTEMS = {"2A", "3C"}
+    n_inputs = min(20 if system_id in LLM_SYSTEMS else 50, len(nodes_a))
     battery_config = BatteryConfig(
         domain_a_inputs=nodes_a[:n_inputs],
         domain_a_prime_inputs=nodes_a_prime[:n_inputs],

@@ -30,8 +30,15 @@ PRESETS = {"small": SMALL, "medium": MEDIUM, "large": LARGE}
 RESULTS_DIR = Path(__file__).parent.parent / "results" / "calibration"
 
 
+def _get_device() -> str:
+    """Auto-detect CUDA. Use GPU for calibration, CPU for tests."""
+    import torch
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
 def make_system(system_id: str, graph, seed: int, n_features: int):
     """Instantiate a system by ID. Returns (system, control_factory)."""
+    device = _get_device()
 
     if system_id == "1A":
         from m8_battery.systems.class1.wordnet_graph import WordNetGraph
@@ -51,9 +58,9 @@ def make_system(system_id: str, graph, seed: int, n_features: int):
 
     elif system_id == "2A":
         from m8_battery.systems.class2.frozen_llm import FrozenLLM
-        system = FrozenLLM(seed=seed, device="cpu")
+        system = FrozenLLM(seed=seed, device=device)
         system.set_graph(graph)
-        return system, lambda: _clone_with_graph(FrozenLLM(seed=seed + 1000, device="cpu"), graph)
+        return system, lambda: _clone_with_graph(FrozenLLM(seed=seed + 1000, device=device), graph)
 
     elif system_id == "2B":
         from m8_battery.systems.class2.frozen_gnn import FrozenGAT
@@ -81,9 +88,9 @@ def make_system(system_id: str, graph, seed: int, n_features: int):
 
     elif system_id == "3C":
         from m8_battery.systems.class3.foxworthy_f import FoxworthyF
-        system = FoxworthyF(seed=seed, device="cpu", theta=0.0)
+        system = FoxworthyF(seed=seed, device=device, theta=0.0)
         system.train_on_domain(graph, n_warmup=50)
-        return system, lambda: _clone_with_graph(FoxworthyF(seed=seed + 1000, device="cpu", theta=0.0), graph)
+        return system, lambda: _clone_with_graph(FoxworthyF(seed=seed + 1000, device=device, theta=0.0), graph)
 
     else:
         raise ValueError(f"Unknown system: {system_id}")

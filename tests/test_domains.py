@@ -11,6 +11,7 @@ from m8_battery.domains.spectral_verifier import (
     verify_cross_format_invariance,
 )
 from m8_battery.domains.encoders.graph_encoder import encode_graph
+from m8_battery.domains.encoders.gym_encoder import encode_gym
 from m8_battery.domains.presets import SMALL, MEDIUM, LARGE
 
 
@@ -147,3 +148,34 @@ class TestGraphEncoder:
         domain = encode_graph(G)
         # All features should be finite numbers
         assert np.all(np.isfinite(domain.node_features))
+
+
+class TestGymEncoder:
+    def test_creates_env(self):
+        G = generate_domain(SMALL)
+        env = encode_gym(G, n_features=SMALL.n_node_features)
+        assert hasattr(env, "step")
+        assert hasattr(env, "reset")
+        assert hasattr(env, "action_masks")
+
+    def test_env_runs(self):
+        G = generate_domain(SMALL)
+        env = encode_gym(G, n_features=SMALL.n_node_features)
+        obs, info = env.reset(seed=42)
+        assert obs is not None
+        masks = env.action_masks()
+        action = np.where(masks)[0][0]
+        obs2, reward, term, trunc, info2 = env.step(action)
+        assert obs2 is not None
+
+    def test_curiosity_mode(self):
+        G = generate_domain(SMALL)
+        env = encode_gym(
+            G, n_features=SMALL.n_node_features,
+            reward_mode="curiosity",
+        )
+        obs, _ = env.reset(seed=42)
+        masks = env.action_masks()
+        action = np.where(masks)[0][0]
+        _, reward, _, _, _ = env.step(action)
+        assert reward == 0.0  # No extrinsic reward in curiosity mode

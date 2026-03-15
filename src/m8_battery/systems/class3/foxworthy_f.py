@@ -191,7 +191,9 @@ class FoxworthyF(TestSystem):
         surprisal = self._compute_surprisal(context)
 
         # Surprise gate: g(s) = σ(10(s - θ))
-        gate = 1.0 / (1.0 + math.exp(-10.0 * (surprisal - self._theta)))
+        exp_arg = -10.0 * (surprisal - self._theta)
+        exp_arg = max(-500.0, min(500.0, exp_arg))  # clamp to avoid overflow
+        gate = 1.0 / (1.0 + math.exp(exp_arg))
 
         # Surprise-gated learning
         if gate > 0.01:
@@ -278,7 +280,9 @@ class FoxworthyF(TestSystem):
                 self._model.enable_adapter_layers()
                 surprisal = base_out.loss.item()
 
-            gate = 1.0 / (1.0 + math.exp(-10.0 * (surprisal - self._theta)))
+            exp_arg = -10.0 * (surprisal - self._theta)
+            exp_arg = max(-500.0, min(500.0, exp_arg))  # clamp to avoid overflow
+            gate = 1.0 / (1.0 + math.exp(exp_arg))
             if gate < 0.01:
                 continue
 

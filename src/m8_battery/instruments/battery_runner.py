@@ -160,15 +160,19 @@ def run_battery(
     Returns:
         BatteryResult with per-instrument results and overall verdict
     """
+    import time as _time
+
     provenance = ProvenanceLog()
     results: dict[str, InstrumentResult] = {}
+    timings: dict[str, float] = {}
 
     # --- Phase 0: Baseline measurement (supplementary diagnostic) ---
-    # Three-phase structure metric: fresh → post-training → during battery.
-    # The system arrives already trained. Fresh baseline from a clone.
+    t0 = _time.monotonic()
     baseline = _collect_baseline(system, control_factory)
+    timings["baseline"] = _time.monotonic() - t0
 
     # --- Phase 1: Train on domain A + measure developmental trajectory ---
+    t0 = _time.monotonic()
     results["developmental_trajectory"] = run_developmental_trajectory(
         system=system,
         inputs=config.domain_a_inputs,
@@ -176,27 +180,33 @@ def run_battery(
         control_factory=control_factory,
         provenance=provenance,
     )
+    timings["developmental_trajectory"] = _time.monotonic() - t0
 
     # Record reference metric after domain A training
     reference_metric = system.get_structure_metric()
 
     # --- Phase 2: Integration ---
+    t0 = _time.monotonic()
     results["integration"] = run_integration(
         system=system,
         probe_inputs=config.probe_inputs or config.domain_a_inputs[:10],
         partition_families=config.partition_families,
         provenance=provenance,
     )
+    timings["integration"] = _time.monotonic() - t0
 
     # --- Phase 3: Generativity (novel domain B) ---
+    t0 = _time.monotonic()
     results["generativity"] = run_generativity(
         system=system,
         domain_b_inputs=config.domain_b_inputs,
         reference_metric=reference_metric,
         provenance=provenance,
     )
+    timings["generativity"] = _time.monotonic() - t0
 
     # --- Phase 4: Transfer (domain A' vs naive) ---
+    t0 = _time.monotonic()
     if control_factory is not None:
         naive = control_factory()
         results["transfer"] = run_transfer(
@@ -212,8 +222,10 @@ def run_battery(
             passed=None,
             notes="No control factory provided — cannot run transfer comparison",
         )
+    timings["transfer"] = _time.monotonic() - t0
 
     # --- Phase 5: Self-engagement (wander + perturb + recover) ---
+    t0 = _time.monotonic()
     results["self_engagement"] = run_self_engagement(
         system=system,
         wander_steps=config.wander_steps,
@@ -221,6 +233,7 @@ def run_battery(
         recovery_window=config.recovery_window,
         provenance=provenance,
     )
+    timings["self_engagement"] = _time.monotonic() - t0
 
     # --- Phase 5b: Post-battery metric for two-window trajectory ---
     post_battery_metric = system.get_structure_metric()
@@ -244,17 +257,21 @@ def run_battery(
     )
 
     # --- Phase 6: Provenance constraint ---
+    t0 = _time.monotonic()
     prov_result = check_provenance(system, provenance)
     results["provenance_constraint"] = prov_result
+    timings["provenance"] = _time.monotonic() - t0
 
     # --- Phase 7: Reset discrimination diagnostic (§6.7) ---
-    # Supplementary — does not affect pass/fail. Reported in metadata.
+    t0 = _time.monotonic()
     reset_inputs = config.domain_a_inputs or config.probe_inputs
     reset_diag = run_reset_discrimination(
         system=system,
         domain_inputs=reset_inputs,
         n_steps=min(20, len(reset_inputs)),
     )
+    timings["reset_discrimination"] = _time.monotonic() - t0
+    timings["total"] = sum(timings.values())
 
     # --- Assemble result ---
     battery_result = BatteryResult(
@@ -269,6 +286,7 @@ def run_battery(
             "reference_metric": reference_metric,
             "baseline": baseline,
             "reset_discrimination": reset_diag,
+            "instrument_timings_s": timings,
             "config": {
                 "measurement_interval": config.measurement_interval,
                 "wander_steps": config.wander_steps,

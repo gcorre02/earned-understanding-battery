@@ -62,12 +62,11 @@ def check_provenance(
     if len(outputs) == 0:
         issues.append("No output events — cannot trace causal chain completion")
 
-    # Check 3: Step index continuity
-    input_steps = sorted(e.data.get("step_index", -1) for e in inputs)
-    if input_steps and input_steps[0] >= 0:
-        expected = list(range(input_steps[0], input_steps[-1] + 1))
-        if input_steps != expected:
-            issues.append(f"Step index gaps: expected {len(expected)} steps, got {len(input_steps)}")
+    # Check 3: Step indices present (not continuity — multiple instruments
+    # log to the same provenance with independent step sequences)
+    input_steps = [e.data.get("step_index", -1) for e in inputs]
+    if not input_steps or all(s < 0 for s in input_steps):
+        issues.append("No step indices in input events")
 
     # Check 4: State changes have before/after metrics
     for sc in state_changes:

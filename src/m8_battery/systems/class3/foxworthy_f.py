@@ -159,6 +159,7 @@ class FoxworthyF(TestSystem):
         Matches the Class 3 interface (DQNAgent, CuriosityAgent).
         """
         self.set_graph(graph)
+        self.load_model()  # Always load — system must be measurable after this call
         nodes = list(graph.nodes())
         for i in range(n_warmup):
             self.step(nodes[i % len(nodes)])

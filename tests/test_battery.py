@@ -6,6 +6,7 @@ Full battery on Class 1 → overall FAIL (expected and correct).
 """
 
 import pytest
+import torch
 
 from m8_battery.core.types import SystemClass
 from m8_battery.domains.sbm_generator import generate_domain, generate_domain_family
@@ -417,8 +418,8 @@ class TestBaselineProtocol:
         )
 
     @pytest.mark.skipif(
-        not hasattr(__builtins__, '__FOXWORTHY_F_AVAILABLE__'),
-        reason="Foxworthy F (3C) requires DistilGPT-2 — run on M5 Max"
+        not (torch.cuda.is_available() or torch.backends.mps.is_available()),
+        reason="Foxworthy F (3C) requires GPU — run on M5 Max or CUDA machine"
     )
     def test_known_received(self):
         """3C generativity should classify as 'received' (F-022).

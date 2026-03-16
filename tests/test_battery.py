@@ -5,6 +5,8 @@ Extended for A3: all instruments on Class 1 → all NEGATIVE or FAIL.
 Full battery on Class 1 → overall FAIL (expected and correct).
 """
 
+import pytest
+
 from m8_battery.core.types import SystemClass
 from m8_battery.domains.sbm_generator import generate_domain, generate_domain_family
 from m8_battery.domains.presets import SMALL
@@ -308,6 +310,148 @@ class TestBatteryRunner:
         assert "generativity" in cls
         # Class 1 generativity should be absent (neither trained nor fresh passes)
         assert cls["generativity"] == "absent"
+
+
+class TestBaselineProtocol:
+    """Tests for the fresh-system baseline protocol.
+
+    Every instrument is run on a fresh untrained clone alongside the
+    trained system. Classification: earned/received/absent/anomalous.
+    """
+
+    def test_baseline_runs_for_all_instruments(self):
+        """All 5 instruments should have baseline classifications."""
+        family = generate_domain_family(SMALL)
+        system = WordNetGraph(family["A"], seed=42)
+        nodes_a = list(family["A"].nodes())
+
+        config = BatteryConfig(
+            domain_a_inputs=nodes_a[:10],
+            domain_a_prime_inputs=list(family["A_prime"].nodes())[:5],
+            domain_b_inputs=list(family["B"].nodes())[:5],
+            measurement_interval=5,
+            wander_steps=5,
+            recovery_window=5,
+        )
+
+        result = run_battery(
+            system=system, system_name="Test",
+            system_class=SystemClass.CLASS_1, config=config,
+            control_factory=lambda: WordNetGraph(family["A"], seed=99),
+        )
+
+        bl = result.metadata["baseline"]
+        cls = bl["instrument_classifications"]
+        baselines = bl["instrument_baselines"]
+
+        # All 5 instruments should be classified
+        for inst in ["developmental_trajectory", "integration",
+                     "generativity", "transfer", "self_engagement"]:
+            assert inst in cls, f"Missing classification for {inst}"
+            assert inst in baselines, f"Missing baseline result for {inst}"
+            assert cls[inst] in ("earned", "received", "absent", "anomalous", "unknown")
+
+    def test_classification_logic(self):
+        """Classification: earned if trained passes and fresh doesn't."""
+        family = generate_domain_family(SMALL)
+        system = WordNetGraph(family["A"], seed=42)
+        nodes_a = list(family["A"].nodes())
+
+        config = BatteryConfig(
+            domain_a_inputs=nodes_a[:10],
+            domain_a_prime_inputs=list(family["A_prime"].nodes())[:5],
+            domain_b_inputs=list(family["B"].nodes())[:5],
+            measurement_interval=5,
+            wander_steps=5,
+            recovery_window=5,
+        )
+
+        result = run_battery(
+            system=system, system_name="Test",
+            system_class=SystemClass.CLASS_1, config=config,
+            control_factory=lambda: WordNetGraph(family["A"], seed=99),
+        )
+
+        bl = result.metadata["baseline"]
+        cls = bl["instrument_classifications"]
+
+        # For each instrument, check the logic is consistent
+        for name, classification in cls.items():
+            trained_passed = result.instrument_results.get(name, None)
+            baseline_passed = bl["instrument_baselines"].get(name, {}).get("passed")
+            if trained_passed is not None:
+                tp = trained_passed.passed
+                if tp and baseline_passed:
+                    assert classification == "received"
+                elif tp and not baseline_passed:
+                    assert classification == "earned"
+                elif not tp and not baseline_passed:
+                    assert classification == "absent"
+                elif not tp and baseline_passed:
+                    assert classification == "anomalous"
+
+    def test_known_absent(self):
+        """Class 1 generativity should classify as 'absent'."""
+        family = generate_domain_family(SMALL)
+        system = WordNetGraph(family["A"], seed=42)
+        nodes_a = list(family["A"].nodes())
+
+        config = BatteryConfig(
+            domain_a_inputs=nodes_a[:10],
+            domain_a_prime_inputs=list(family["A_prime"].nodes())[:5],
+            domain_b_inputs=list(family["B"].nodes())[:5],
+            measurement_interval=5,
+            wander_steps=5,
+            recovery_window=5,
+        )
+
+        result = run_battery(
+            system=system, system_name="Test",
+            system_class=SystemClass.CLASS_1, config=config,
+            control_factory=lambda: WordNetGraph(family["A"], seed=99),
+        )
+
+        cls = result.metadata["baseline"]["instrument_classifications"]
+        assert cls["generativity"] == "absent", (
+            f"Class 1 generativity should be absent, got {cls['generativity']}"
+        )
+
+    @pytest.mark.skipif(
+        not hasattr(__builtins__, '__FOXWORTHY_F_AVAILABLE__'),
+        reason="Foxworthy F (3C) requires DistilGPT-2 — run on M5 Max"
+    )
+    def test_known_received(self):
+        """3C generativity should classify as 'received' (F-022).
+
+        Skip on Razer — DistilGPT-2 too slow. Run on M5 Max.
+        """
+        from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+
+        family = generate_domain_family(SMALL)
+        G = family["A"]
+        system = FoxworthyF(seed=42, device="cpu", theta=0.0)
+        system.train_on_domain(G, n_warmup=10)
+        nodes_a = list(G.nodes())
+
+        config = BatteryConfig(
+            domain_a_inputs=nodes_a[:10],
+            domain_a_prime_inputs=list(family["A_prime"].nodes())[:5],
+            domain_b_inputs=list(family["B"].nodes())[:5],
+            measurement_interval=5,
+            wander_steps=5,
+            recovery_window=5,
+        )
+
+        result = run_battery(
+            system=system, system_name="Foxworthy F",
+            system_class=SystemClass.CLASS_3, config=config,
+            control_factory=lambda: FoxworthyF(seed=99, device="cpu", theta=0.0),
+        )
+
+        cls = result.metadata["baseline"]["instrument_classifications"]
+        assert cls["generativity"] == "received", (
+            f"3C generativity should be received (F-022), got {cls['generativity']}"
+        )
 
 
 class TestResetDiscrimination:

@@ -207,12 +207,13 @@ def _run_baseline_instruments(
     except Exception:
         baseline_results["transfer"] = {"passed": None, "effect_size": None}
 
-    # Self-engagement
+    # Self-engagement (DN-20: fresh system has no trajectory → precondition fail)
     try:
         se = run_self_engagement(
             system=fresh, wander_steps=config.wander_steps,
             perturbation_method=config.perturbation_method,
             recovery_window=config.recovery_window,
+            trajectory_passed=None,  # Fresh system — no trajectory
         )
         baseline_results["self_engagement"] = {
             "passed": se.passed, "effect_size": se.effect_size,
@@ -351,7 +352,8 @@ def run_battery(
     _log(f"  transfer: {timings['transfer']:.1f}s passed={results['transfer'].passed}")
 
     # --- Phase 5: Self-engagement (wander + perturb + recover) ---
-    _log("Phase 5: self-engagement")
+    trajectory_passed = results["developmental_trajectory"].passed
+    _log(f"Phase 5: self-engagement (trajectory_passed={trajectory_passed})")
     t0 = _time.monotonic()
     results["self_engagement"] = run_self_engagement(
         system=system,
@@ -359,6 +361,8 @@ def run_battery(
         perturbation_method=config.perturbation_method,
         recovery_window=config.recovery_window,
         provenance=provenance,
+        control_factory=control_factory,
+        trajectory_passed=trajectory_passed,
     )
     timings["self_engagement"] = _time.monotonic() - t0
     _log(f"  self_engagement: {timings['self_engagement']:.1f}s passed={results['self_engagement'].passed}")

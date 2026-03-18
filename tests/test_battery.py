@@ -102,8 +102,8 @@ class TestTransfer:
 
 
 class TestSelfEngagement:
-    def test_class1_self_engagement(self):
-        """Class 1: engagement pattern may or may not recover (random walk)."""
+    def test_class1_self_engagement_precondition_fail(self):
+        """Class 1: trajectory absent → self-engagement precondition FAIL (DN-20)."""
         system, family, nodes_a, _, _ = _make_system_and_inputs()
 
         # Operate first
@@ -115,12 +115,12 @@ class TestSelfEngagement:
             wander_steps=15,
             perturbation_method="shuffle_weights",
             recovery_window=15,
+            trajectory_passed=False,  # Class 1 has no trajectory
         )
 
         assert result.name == "self_engagement"
-        # Class 1: random walker may or may not recover pattern
-        # (depends on graph structure, not earned preference)
-        assert result.passed is not None or result.passed is None
+        assert result.passed is False  # Precondition fail
+        assert result.raw_data.get("precondition") == "fail"
 
 
 class TestProvenanceConstraint:

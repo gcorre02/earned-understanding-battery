@@ -57,11 +57,15 @@ def _run_perturbation_protocol(
     if provenance is None:
         provenance = ProvenanceLog()
 
+    import time as _time
+
     regions = system.get_regions()
 
     # Phase 1: Free wander — establish engagement pattern
+    t0 = _time.monotonic()
     for i in range(wander_steps):
         system.step(None)
+    _log(f"  wander: {wander_steps} steps in {_time.monotonic()-t0:.2f}s")
 
     pre_engagement = system.get_engagement_distribution()
 
@@ -70,18 +74,22 @@ def _run_perturbation_protocol(
 
     # Identify highest-engagement region to perturb
     target_region = max(pre_engagement, key=pre_engagement.get)
+    _log(f"  target region: {target_region} (engagement={pre_engagement[target_region]:.4f})")
 
     # Phase 2: Perturb
+    t0 = _time.monotonic()
     perturbed = system.perturb(target_region, method=perturbation_method)
+    _log(f"  perturb: {_time.monotonic()-t0:.2f}s")
 
     # Measure IMMEDIATELY after perturbation (before recovery)
-    # Run 1 step to get an engagement reading
     perturbed.step(None)
     post_immediate = perturbed.get_engagement_distribution()
 
     # Phase 3: Recovery window
+    t0 = _time.monotonic()
     for i in range(recovery_window - 1):  # -1 because we already did 1 step
         perturbed.step(None)
+    _log(f"  recovery: {recovery_window} steps in {_time.monotonic()-t0:.2f}s")
 
     post_recovery = perturbed.get_engagement_distribution()
 
@@ -153,10 +161,13 @@ def run_self_engagement(
         )
 
     # --- Run protocol on trained system ---
-    _log("Running perturbation protocol on trained system")
+    import time as _time
+    _log("Running perturbation protocol on TRAINED system")
+    t0 = _time.monotonic()
     trained_result = _run_perturbation_protocol(
         system, wander_steps, recovery_window, perturbation_method, provenance,
     )
+    _log(f"  trained protocol: {_time.monotonic()-t0:.2f}s")
     if "error" in trained_result:
         return InstrumentResult(
             name="self_engagement",
@@ -173,12 +184,14 @@ def run_self_engagement(
             notes="No control_factory — fresh baseline required for DN-20",
         )
 
-    _log("Running perturbation protocol on fresh baseline")
+    _log("Running perturbation protocol on FRESH baseline")
+    t0 = _time.monotonic()
     try:
         fresh = control_factory()
         fresh_result = _run_perturbation_protocol(
             fresh, wander_steps, recovery_window, perturbation_method,
         )
+        _log(f"  fresh protocol: {_time.monotonic()-t0:.2f}s")
         if "error" in fresh_result:
             return InstrumentResult(
                 name="self_engagement",

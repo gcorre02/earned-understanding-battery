@@ -72,3 +72,15 @@ class TestSystem(ABC):
         Must behave identically to self from the same initial conditions
         but be fully independent (no shared mutable state).
         """
+
+    def set_training(self, mode: bool) -> None:
+        """Enable (True) or disable (False) learning during step().
+
+        When mode=False, step() should operate the system WITHOUT updating
+        any learned parameters. The system navigates using only what it
+        has already earned. Default: no-op (systems that don't learn during
+        step() need not override).
+
+        Used by generativity instrument (T1-03): domain B measurement must
+        be frozen to distinguish structural influence from online adaptation.
+        """

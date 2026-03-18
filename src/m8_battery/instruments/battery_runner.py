@@ -342,7 +342,10 @@ def run_battery(
         _log(f"  integration earned ratio: {min(earned_ratio, 1e6):.4f}")
 
     # --- Phase 3: Generativity (novel domain B) ---
-    _log("Phase 3: generativity")
+    # T1-03: Freeze learning during measurement. Generativity measures structural
+    # influence from domain A, not online adaptation on domain B.
+    system.set_training(False)
+    _log("Phase 3: generativity (learning FROZEN)")
     t0 = _time.monotonic()
     results["generativity"] = run_generativity(
         system=system,
@@ -352,6 +355,7 @@ def run_battery(
     )
     timings["generativity"] = _time.monotonic() - t0
     _log(f"  generativity: {timings['generativity']:.1f}s passed={results['generativity'].passed}")
+    system.set_training(True)  # Restore for subsequent phases
 
     # --- Phase 4: Transfer (domain A' vs naive) ---
     _log("Phase 4: transfer")

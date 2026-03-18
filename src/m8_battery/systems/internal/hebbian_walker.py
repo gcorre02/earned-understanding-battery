@@ -61,6 +61,9 @@ class HebbianWalker(TestSystem):
 
         self._original_weights = dict(self._weights)
 
+        # Training mode (T1-03: freeze during generativity measurement)
+        self._training = True
+
         # Walker state
         nodes = list(self._graph.nodes())
         self._current_node: int = self._rng.choice(nodes) if nodes else 0
@@ -75,6 +78,9 @@ class HebbianWalker(TestSystem):
             features = data.get("features", {})
             community = features.get("community", data.get("block", 0))
             self._node_to_community[node] = community
+
+    def set_training(self, mode: bool) -> None:
+        self._training = mode
 
     def reset(self) -> None:
         self._weights = dict(self._original_weights)
@@ -102,13 +108,14 @@ class HebbianWalker(TestSystem):
         # Choose next node
         next_node = self._rng.choice(neighbours, p=probs)
 
-        # Hebbian update: strengthen traversed edge
-        self._weights[(node, next_node)] = self._weights.get((node, next_node), 1.0) + self._eta
-        self._weights[(next_node, node)] = self._weights.get((next_node, node), 1.0) + self._eta
+        # Hebbian update: strengthen traversed edge (frozen when not training — T1-03)
+        if self._training:
+            self._weights[(node, next_node)] = self._weights.get((node, next_node), 1.0) + self._eta
+            self._weights[(next_node, node)] = self._weights.get((next_node, node), 1.0) + self._eta
 
-        # Global decay
-        for key in self._weights:
-            self._weights[key] *= (1.0 - self._decay)
+            # Global decay
+            for key in self._weights:
+                self._weights[key] *= (1.0 - self._decay)
 
         # Update state
         self._current_node = next_node
@@ -238,6 +245,7 @@ class HebbianWalker(TestSystem):
         new._visit_counts = dict(self._visit_counts)
         new._step_count = self._step_count
         new._node_to_community = dict(self._node_to_community)
+        new._training = self._training
         return new
 
     def train_on_domain(self, graph: nx.Graph, n_steps: int = 200) -> None:

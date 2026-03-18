@@ -12,10 +12,30 @@ from __future__ import annotations
 import pickle
 from typing import Any
 
+import igraph as ig
 import networkx as nx
 import numpy as np
 
 from m8_battery.core.test_system import TestSystem
+
+
+def _nx_to_igraph(G: nx.DiGraph) -> tuple[ig.Graph, dict[int, int], dict[int, int]]:
+    """Convert networkx DiGraph to igraph, returning node mappings.
+
+    Returns:
+        (ig_graph, nx_to_ig_map, ig_to_nx_map)
+    """
+    nodes = sorted(G.nodes())
+    nx_to_ig = {n: i for i, n in enumerate(nodes)}
+    ig_to_nx = {i: n for i, n in enumerate(nodes)}
+
+    edges = [(nx_to_ig[u], nx_to_ig[v]) for u, v in G.edges()]
+    weights = [G.edges[u, v].get("weight", 1.0) for u, v in G.edges()]
+
+    ig_g = ig.Graph(n=len(nodes), edges=edges, directed=True)
+    ig_g.es["weight"] = weights
+
+    return ig_g, nx_to_ig, ig_to_nx
 
 
 class WordNetGraph(TestSystem):
@@ -25,6 +45,9 @@ class WordNetGraph(TestSystem):
     For calibration, we pass SBM-generated graphs (synthetic entities).
     The WordNet name reflects its role: a static knowledge graph with
     fixed structure that never changes through operation.
+
+    Uses igraph (C backend) for shortest-path computation. Networkx is
+    retained for graph storage and attribute access. See F-020 governance.
     """
 
     def __init__(self, graph: nx.DiGraph, seed: int = 42) -> None:
@@ -38,6 +61,40 @@ class WordNetGraph(TestSystem):
 
         # Pre-compute structure metric (constant for Class 1)
         self._structure_metric = self._compute_structure_metric()
+
+        # F-020: Build igraph representation + all-pairs next-hop cache.
+        # igraph uses C for shortest paths — orders of magnitude faster
+        # than networkx on pathological graphs. The graph is static so
+        # the cache is valid for the lifetime of this instance.
+        self._ig_graph, self._nx_to_ig, self._ig_to_nx = _nx_to_igraph(self._graph)
+        self._next_hop_cache: dict[tuple, int | None] = {}
+        self._build_next_hop_cache()
+
+    def _build_next_hop_cache(self) -> None:
+        """Pre-compute next hop for all reachable (source, target) pairs.
+
+        Uses igraph's C-compiled shortest_paths for bulk computation.
+        500-node graph: ~0.1s with igraph vs ~hours with networkx on
+        pathological topologies.
+        """
+        n = self._ig_graph.vcount()
+        if n == 0:
+            return
+
+        # igraph bulk shortest paths — returns matrix of path objects
+        for source_ig in range(n):
+            try:
+                paths = self._ig_graph.get_shortest_paths(
+                    source_ig, weights="weight", mode="out"
+                )
+                source_nx = self._ig_to_nx[source_ig]
+                for target_ig, path in enumerate(paths):
+                    if len(path) > 1:
+                        self._next_hop_cache[(source_nx, self._ig_to_nx[target_ig])] = self._ig_to_nx[path[1]]
+                    elif len(path) == 1:
+                        self._next_hop_cache[(source_nx, self._ig_to_nx[target_ig])] = source_nx
+            except Exception:
+                pass
 
     def reset(self) -> None:
         """Restore to initial state."""
@@ -61,16 +118,12 @@ class WordNetGraph(TestSystem):
             self._current_node = nodes[0]
 
         if input_data is not None and input_data in self._graph:
-            # Navigate toward target — greedy shortest path step
-            try:
-                path = nx.shortest_path(
-                    self._graph, self._current_node, input_data,
-                    weight="weight"
-                )
-                if len(path) > 1:
-                    self._current_node = path[1]
-            except nx.NetworkXNoPath:
-                pass
+            # Navigate toward target — use cached next-hop (igraph, F-020)
+            next_hop = self._next_hop_cache.get(
+                (self._current_node, input_data)
+            )
+            if next_hop is not None:
+                self._current_node = next_hop
         else:
             # Random walk — choose a random neighbour
             neighbours = list(self._graph.successors(self._current_node))
@@ -195,13 +248,22 @@ class WordNetGraph(TestSystem):
 
         For a static graph this is constant — exactly what we want for
         a Class 1 system.
+
+        Uses igraph + numpy for eigendecomposition. networkx's
+        algebraic_connectivity uses ARPACK which hangs on certain
+        graph topologies (F-020: seed 123 never completed).
         """
         if self._graph.number_of_nodes() < 2:
             return 0.0
 
-        # Use undirected version for Laplacian eigenvalues
-        G_undirected = self._graph.to_undirected()
         try:
-            return float(nx.algebraic_connectivity(G_undirected, weight="weight"))
+            # Convert networkx undirected graph to igraph for eigendecomposition.
+            # Must use networkx's to_undirected() to match historical metric values.
+            G_und = self._graph.to_undirected()
+            ig_und, _, _ = _nx_to_igraph(nx.DiGraph(G_und))
+            ig_und_graph = ig_und.as_undirected(combine_edges="first")
+            laplacian = np.array(ig_und_graph.laplacian(weights="weight"))
+            eigenvalues = np.sort(np.linalg.eigvalsh(laplacian))
+            return float(eigenvalues[1]) if len(eigenvalues) > 1 else 0.0
         except Exception:
             return 0.0

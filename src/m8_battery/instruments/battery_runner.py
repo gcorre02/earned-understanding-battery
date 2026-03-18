@@ -382,11 +382,24 @@ def run_battery(
     timings["reset_discrimination"] = _time.monotonic() - t0
 
     # --- Phase 8: Baseline instruments (all 5 on fresh system) ---
+    # Option C (F-020): For Class 1 static systems, the baseline IS the trained
+    # system — no training occurs, fresh = trained. Skip redundant instrument runs
+    # and use trained results directly. Baseline result = trained result, explicitly
+    # recorded (not omitted). See F-020 governance.
     t0 = _time.monotonic()
     instrument_results_for_classify = {
         k: v for k, v in results.items() if k != "provenance_constraint"
     }
-    baseline_instrument_results = _run_baseline_instruments(control_factory, config)
+    if system_class == SystemClass.CLASS_1:
+        # Baseline skip for static systems — see F-020 governance.
+        # Fresh = trained for Class 1 (no learning). Record trained results
+        # as baseline to maintain identical output format.
+        baseline_instrument_results = {
+            name: {"passed": r.passed, "effect_size": r.effect_size}
+            for name, r in instrument_results_for_classify.items()
+        }
+    else:
+        baseline_instrument_results = _run_baseline_instruments(control_factory, config)
     instrument_classifications = _classify_instruments(
         instrument_results_for_classify, baseline_instrument_results,
     )

@@ -148,6 +148,54 @@ def run_integration(
     )
 
 
+def compute_integration_earned_ratio(
+    system: TestSystem,
+    control_factory,
+    probe_inputs: list[Any],
+) -> dict[str, float]:
+    """Compare integration between trained and fresh systems (supplementary).
+
+    Runs identical ablation protocol on both trained and fresh instances.
+    Returns ratio of reorganisation magnitudes — ratio > 1.0 means training
+    created ADDITIONAL integration beyond topology.
+
+    Literature basis: IIT Φ measures structural integration regardless of
+    provenance (Tononi 2004). Aaronson critique: inactive logic gates produce
+    high Φ from structure alone. This ratio distinguishes structural from earned.
+
+    Returns dict with trained_gini, fresh_gini, earned_ratio.
+    """
+    if control_factory is None:
+        return {"trained_gini": 0.0, "fresh_gini": 0.0, "earned_ratio": 1.0}
+
+    # Run integration on a CLONE of the trained system (non-mutating)
+    trained_clone = system.clone()
+    trained_result = run_integration(system=trained_clone, probe_inputs=probe_inputs)
+    trained_gini = trained_result.raw_data.get("gini", 0.0) if trained_result.raw_data else 0.0
+
+    # Run integration on fresh system
+    try:
+        fresh = control_factory()
+        fresh_result = run_integration(system=fresh, probe_inputs=probe_inputs)
+        fresh_gini = fresh_result.raw_data.get("gini", 0.0) if fresh_result.raw_data else 0.0
+    except Exception:
+        fresh_gini = 0.0
+
+    # Earned ratio: trained / fresh (> 1.0 means training added integration)
+    if fresh_gini > 1e-10:
+        earned_ratio = trained_gini / fresh_gini
+    elif trained_gini > 1e-10:
+        earned_ratio = float("inf")
+    else:
+        earned_ratio = 1.0
+
+    return {
+        "trained_gini": float(trained_gini),
+        "fresh_gini": float(fresh_gini),
+        "earned_ratio": float(min(earned_ratio, 1e6)),
+    }
+
+
 def _probe_metric(system: TestSystem, probe_inputs: list[Any]) -> float:
     """Run probe inputs and return final structure metric."""
     for inp in probe_inputs:

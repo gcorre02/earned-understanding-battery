@@ -24,8 +24,8 @@ import networkx as nx
 from m8_battery.core.test_system import TestSystem
 from m8_battery.core.types import BatteryResult, InstrumentResult, SystemClass
 from m8_battery.core.provenance import ProvenanceLog
-from m8_battery.instruments.developmental_trajectory import run_developmental_trajectory
-from m8_battery.instruments.integration import run_integration
+from m8_battery.instruments.developmental_trajectory import run_developmental_trajectory, compute_trajectory_compression
+from m8_battery.instruments.integration import run_integration, compute_integration_earned_ratio
 from m8_battery.instruments.generativity import run_generativity
 from m8_battery.instruments.transfer import run_transfer
 from m8_battery.instruments.self_engagement import run_self_engagement
@@ -303,6 +303,12 @@ def run_battery(
     timings["developmental_trajectory"] = _time.monotonic() - t0
     _log(f"  dev_trajectory: {timings['developmental_trajectory']:.1f}s passed={results['developmental_trajectory'].passed}")
 
+    # Trajectory compression supplement (LZ compressibility, TERL 2025)
+    traj_data = results["developmental_trajectory"].raw_data or {}
+    traj_values = traj_data.get("trajectory", [])
+    if traj_values:
+        baseline["trajectory_compression"] = compute_trajectory_compression(traj_values)
+
     # Record reference metric after domain A training
     reference_metric = system.get_structure_metric()
 
@@ -317,6 +323,23 @@ def run_battery(
     )
     timings["integration"] = _time.monotonic() - t0
     _log(f"  integration: {timings['integration']:.1f}s passed={results['integration'].passed}")
+
+    # Integration earned ratio (supplementary — IIT/Aaronson critique)
+    # Uses trained Gini from Phase 2 result, runs fresh integration separately
+    if control_factory is not None:
+        trained_gini = results["integration"].raw_data.get("gini", 0.0) if results["integration"].raw_data else 0.0
+        try:
+            fresh_for_integ = control_factory()
+            fresh_integ = run_integration(system=fresh_for_integ, probe_inputs=config.probe_inputs or config.domain_a_inputs[:10])
+            fresh_gini = fresh_integ.raw_data.get("gini", 0.0) if fresh_integ.raw_data else 0.0
+        except Exception:
+            fresh_gini = 0.0
+        earned_ratio = trained_gini / fresh_gini if fresh_gini > 1e-10 else (float("inf") if trained_gini > 1e-10 else 1.0)
+        baseline["integration_earned_ratio"] = {
+            "trained_gini": trained_gini, "fresh_gini": fresh_gini,
+            "earned_ratio": float(min(earned_ratio, 1e6)),
+        }
+        _log(f"  integration earned ratio: {min(earned_ratio, 1e6):.4f}")
 
     # --- Phase 3: Generativity (novel domain B) ---
     _log("Phase 3: generativity")

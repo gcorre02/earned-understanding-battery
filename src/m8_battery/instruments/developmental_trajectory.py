@@ -190,3 +190,45 @@ def _analyse_trajectory(
         },
         notes=notes,
     )
+
+
+def compute_trajectory_compression(trajectory: list[float]) -> dict[str, float]:
+    """Compute Lempel-Ziv compression ratio of structure metric time series.
+
+    Supplementary diagnostic. Decreasing compressibility over time indicates
+    the system is developing more structured (compressible) behaviour.
+
+    Literature basis:
+    - TERL (2025): "trajectories produced by TERL are more easily compressed"
+    - Brain entropy trajectories (PMC 2022): permutation entropy tracks maturation
+
+    Returns dict with early_ratio, late_ratio, compression_trend.
+    """
+    import bz2
+    import struct
+
+    if len(trajectory) < 6:
+        return {"early_ratio": 0.0, "late_ratio": 0.0, "compression_trend": 0.0}
+
+    # Split trajectory into early and late halves
+    mid = len(trajectory) // 2
+    early = trajectory[:mid]
+    late = trajectory[mid:]
+
+    def _compress_ratio(values: list[float]) -> float:
+        """Compression ratio: compressed_size / raw_size. Lower = more compressible."""
+        raw = struct.pack(f"{len(values)}d", *values)
+        compressed = bz2.compress(raw)
+        return len(compressed) / len(raw) if len(raw) > 0 else 1.0
+
+    early_ratio = _compress_ratio(early)
+    late_ratio = _compress_ratio(late)
+
+    # Compression trend: negative = late is more compressible (structured)
+    compression_trend = late_ratio - early_ratio
+
+    return {
+        "early_ratio": float(early_ratio),
+        "late_ratio": float(late_ratio),
+        "compression_trend": float(compression_trend),
+    }

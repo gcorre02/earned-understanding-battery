@@ -1,17 +1,24 @@
-"""Self-engagement (preferential self-engagement) instrument.
+"""Self-engagement instrument (DN-20 redesign).
 
-Tests whether engagement bias toward consolidated structure persists
-under perturbation of local structural advantages.
+Tests whether earned structure creates preferential self-engagement that
+persists under perturbation. Measures both RESISTANCE to perturbation
+and RECOVERY after perturbation, compared against a fresh baseline.
 
-The system wanders freely (no directed input), then a region is perturbed.
-If the system re-engages with its consolidated structure despite the
-perturbation, that demonstrates preferential self-engagement.
+Literature basis:
+- TMS-EEG: Casali et al. (2013), Casarotto et al. (2016) — perturb and measure
+- Basin stability: Menck et al. (2013) — return to attractor after perturbation
+- STAR Protocols (2025) — resistance measurement protocol
 
-A Class 1 system has no preference (random walk unchanged by perturbation).
-A Class 4 candidate returns to earned structure after perturbation.
+DN-20: Full redesign. Three additions over original:
+  A. Precondition check (trajectory must show signal)
+  B. Substrate-appropriate perturbation (per adapter)
+  C. Two-metric output (resistance + recovery, both vs fresh baseline)
 """
 
 from __future__ import annotations
+
+import sys
+from typing import Any, Callable
 
 import numpy as np
 
@@ -20,134 +27,235 @@ from m8_battery.core.types import InstrumentResult
 from m8_battery.core.provenance import ProvenanceLog
 
 
+def _log(msg: str) -> None:
+    print(f"[self_engagement] {msg}", file=sys.stderr, flush=True)
+
+
+def _cosine_sim(a: dict[str, float], b: dict[str, float], regions: list[str]) -> float:
+    """Cosine similarity between two engagement distributions."""
+    vec_a = np.array([a.get(r, 0.0) for r in regions])
+    vec_b = np.array([b.get(r, 0.0) for r in regions])
+    norm_a = np.linalg.norm(vec_a)
+    norm_b = np.linalg.norm(vec_b)
+    if norm_a > 1e-10 and norm_b > 1e-10:
+        return float(np.dot(vec_a, vec_b) / (norm_a * norm_b))
+    return 0.0
+
+
+def _run_perturbation_protocol(
+    system: TestSystem,
+    wander_steps: int,
+    recovery_window: int,
+    perturbation_method: str,
+    provenance: ProvenanceLog | None = None,
+) -> dict[str, Any]:
+    """Run the perturbation protocol on a single system instance.
+
+    Returns dict with pre_engagement, post_immediate, post_recovery,
+    target_region, disruption, recovery.
+    """
+    if provenance is None:
+        provenance = ProvenanceLog()
+
+    regions = system.get_regions()
+
+    # Phase 1: Free wander — establish engagement pattern
+    for i in range(wander_steps):
+        system.step(None)
+
+    pre_engagement = system.get_engagement_distribution()
+
+    if not pre_engagement:
+        return {"error": "no engagement distribution after wander"}
+
+    # Identify highest-engagement region to perturb
+    target_region = max(pre_engagement, key=pre_engagement.get)
+
+    # Phase 2: Perturb
+    perturbed = system.perturb(target_region, method=perturbation_method)
+
+    # Measure IMMEDIATELY after perturbation (before recovery)
+    # Run 1 step to get an engagement reading
+    perturbed.step(None)
+    post_immediate = perturbed.get_engagement_distribution()
+
+    # Phase 3: Recovery window
+    for i in range(recovery_window - 1):  # -1 because we already did 1 step
+        perturbed.step(None)
+
+    post_recovery = perturbed.get_engagement_distribution()
+
+    # Compute disruption (resistance) = 1 - cos_sim(pre, post_immediate)
+    disruption = 1.0 - _cosine_sim(pre_engagement, post_immediate, regions)
+
+    # Compute recovery = cos_sim(pre, post_recovery)
+    recovery = _cosine_sim(pre_engagement, post_recovery, regions)
+
+    return {
+        "pre_engagement": pre_engagement,
+        "post_immediate": post_immediate,
+        "post_recovery": post_recovery,
+        "target_region": target_region,
+        "disruption": disruption,
+        "recovery": recovery,
+        "regions": regions,
+    }
+
+
 def run_self_engagement(
     system: TestSystem,
     wander_steps: int,
     perturbation_method: str = "shuffle_weights",
     recovery_window: int = 20,
     provenance: ProvenanceLog | None = None,
+    control_factory: Callable[[], TestSystem] | None = None,
+    trajectory_passed: bool | None = None,
 ) -> InstrumentResult:
-    """Run the self-engagement instrument.
+    """Run the self-engagement instrument (DN-20 redesign).
 
-    1. Let system wander freely (no directed input) for wander_steps
-    2. Record engagement distribution (which regions it visits)
-    3. Perturb a high-engagement region
-    4. Let system wander for recovery_window steps
-    5. Check if engagement returns to pre-perturbation pattern
+    Protocol:
+    1. Precondition: check trajectory_passed. If absent/static → FAIL.
+    2. Run perturbation protocol on trained system.
+    3. Run identical protocol on fresh baseline (from control_factory).
+    4. Compute resistance ratio (fresh_disruption / trained_disruption).
+    5. Compute recovery ratio (trained_recovery / fresh_recovery).
+    6. Both ratios > 1.0 → PASS.
 
     Args:
-        system: System under test (should have been operated already)
-        wander_steps: Steps of free exploration before perturbation
-        perturbation_method: How to perturb (e.g., "shuffle_weights", "zero_weights")
-        recovery_window: Steps to observe after perturbation
+        system: Trained system under test
+        wander_steps: Free exploration steps before perturbation
+        perturbation_method: How to perturb
+        recovery_window: Steps after perturbation
         provenance: Optional provenance log
-
-    Returns:
-        InstrumentResult measuring engagement recovery
+        control_factory: Returns fresh matched control. Required for DN-20.
+        trajectory_passed: Result of trajectory instrument. None/False → precondition fail.
     """
     if provenance is None:
         provenance = ProvenanceLog()
+
+    # --- Precondition A: Did the system earn structure? ---
+    if trajectory_passed is None or trajectory_passed is False:
+        _log("Precondition FAIL: trajectory absent/static → self-engagement absent")
+        return InstrumentResult(
+            name="self_engagement",
+            passed=False,
+            effect_size=0.0,
+            notes="Precondition fail: trajectory absent/static — no earned structure to test",
+            raw_data={"precondition": "fail", "trajectory_passed": trajectory_passed},
+        )
 
     regions = system.get_regions()
     if len(regions) < 2:
         return InstrumentResult(
             name="self_engagement",
             passed=None,
-            notes="Insufficient regions for self-engagement test (need >= 2)",
+            notes="Insufficient regions (need >= 2)",
         )
 
-    # Phase 1: Free wander — establish engagement pattern
-    for i in range(wander_steps):
-        system.step(None)  # No directed input = wander
-
-    pre_perturbation = system.get_engagement_distribution()
-
-    # Identify highest-engagement region to perturb
-    if not pre_perturbation:
+    # --- Run protocol on trained system ---
+    _log("Running perturbation protocol on trained system")
+    trained_result = _run_perturbation_protocol(
+        system, wander_steps, recovery_window, perturbation_method, provenance,
+    )
+    if "error" in trained_result:
         return InstrumentResult(
             name="self_engagement",
             passed=None,
-            notes="No engagement distribution available after wander",
+            notes=f"Trained protocol error: {trained_result['error']}",
         )
 
-    target_region = max(pre_perturbation, key=pre_perturbation.get)
-    pre_target_engagement = pre_perturbation[target_region]
+    # --- Run protocol on fresh baseline ---
+    if control_factory is None:
+        _log("No control_factory — cannot compute fresh baseline")
+        return InstrumentResult(
+            name="self_engagement",
+            passed=None,
+            notes="No control_factory — fresh baseline required for DN-20",
+        )
 
-    # Phase 2: Perturb the high-engagement region
-    perturbed_system = system.perturb(target_region, method=perturbation_method)
-    provenance.log("perturbation", target_region=target_region, method=perturbation_method)
+    _log("Running perturbation protocol on fresh baseline")
+    try:
+        fresh = control_factory()
+        fresh_result = _run_perturbation_protocol(
+            fresh, wander_steps, recovery_window, perturbation_method,
+        )
+        if "error" in fresh_result:
+            return InstrumentResult(
+                name="self_engagement",
+                passed=None,
+                notes=f"Fresh protocol error: {fresh_result['error']}",
+            )
+    except Exception as e:
+        return InstrumentResult(
+            name="self_engagement",
+            passed=None,
+            notes=f"Fresh baseline failed: {e}",
+        )
 
-    # Phase 3: Recovery — let perturbed system wander (logged to provenance)
-    for i in range(recovery_window):
-        metric_before = perturbed_system.get_structure_metric()
-        provenance.log_input(None, step_index=wander_steps + i)
-        output = perturbed_system.step(None)
-        metric_after = perturbed_system.get_structure_metric()
-        provenance.log_state_change(metric_before, metric_after, step_index=wander_steps + i)
-        provenance.log_output(output, step_index=wander_steps + i)
+    # --- Compute ratios ---
+    trained_disruption = trained_result["disruption"]
+    fresh_disruption = fresh_result["disruption"]
+    trained_recovery = trained_result["recovery"]
+    fresh_recovery = fresh_result["recovery"]
 
-    post_perturbation = perturbed_system.get_engagement_distribution()
-
-    # Analysis: does engagement return to pre-perturbation pattern?
-    # Compute cosine similarity between pre and post distributions
-    pre_vec = np.array([pre_perturbation.get(r, 0.0) for r in regions])
-    post_vec = np.array([post_perturbation.get(r, 0.0) for r in regions])
-
-    pre_norm = np.linalg.norm(pre_vec)
-    post_norm = np.linalg.norm(post_vec)
-
-    if pre_norm > 1e-10 and post_norm > 1e-10:
-        cosine_sim = float(np.dot(pre_vec, post_vec) / (pre_norm * post_norm))
+    # Resistance ratio: fresh_disruption / trained_disruption
+    # > 1.0 means trained resists MORE (less disrupted)
+    if trained_disruption > 1e-10:
+        resistance_ratio = fresh_disruption / trained_disruption
+    elif fresh_disruption > 1e-10:
+        resistance_ratio = float("inf")  # trained not disrupted at all
     else:
-        cosine_sim = 0.0
+        resistance_ratio = 1.0  # neither disrupted
 
-    # Random walk baseline: compute cosine similarity between
-    # pre-perturbation pattern and graph's stationary distribution.
-    # If cosine_sim ≈ baseline_sim, recovery is topology-driven (not earned).
-    baseline_sim = _compute_random_walk_baseline(pre_perturbation, regions)
-    adjusted_sim = cosine_sim - baseline_sim  # excess over random walk
-
-    # Check if target region re-engagement recovered
-    post_target_engagement = post_perturbation.get(target_region, 0.0)
-    if pre_target_engagement > 1e-10:
-        recovery_ratio = post_target_engagement / pre_target_engagement
+    # Recovery ratio: trained_recovery / fresh_recovery
+    # > 1.0 means trained recovers MORE
+    if fresh_recovery > 1e-10:
+        recovery_ratio = trained_recovery / fresh_recovery
+    elif trained_recovery > 1e-10:
+        recovery_ratio = float("inf")  # trained recovers, fresh doesn't
     else:
-        recovery_ratio = 0.0
+        recovery_ratio = 1.0  # neither recovers
 
-    # Decision logic — uses adjusted similarity (excess over random walk)
-    # adjusted_sim > 0.2 = recovery exceeds what topology alone produces
-    # Recovery ratio > 0.5 = target region re-engaged
-    has_recovery = adjusted_sim > 0.2
-    target_recovered = recovery_ratio > 0.5
+    _log(f"Resistance ratio: {resistance_ratio:.4f} (fresh_disruption={fresh_disruption:.4f}, trained_disruption={trained_disruption:.4f})")
+    _log(f"Recovery ratio: {recovery_ratio:.4f} (trained_recovery={trained_recovery:.4f}, fresh_recovery={fresh_recovery:.4f})")
 
-    if has_recovery and target_recovered:
+    # --- Pass/fail: both ratios > 1.0 ---
+    passes_resistance = resistance_ratio > 1.0
+    passes_recovery = recovery_ratio > 1.0
+
+    if passes_resistance and passes_recovery:
         passed = True
-        notes = (f"Self-engagement detected: cosine_sim={cosine_sim:.4f}, "
-                 f"baseline_sim={baseline_sim:.4f}, adjusted={adjusted_sim:.4f}, "
-                 f"recovery_ratio={recovery_ratio:.4f}, "
-                 f"target_region={target_region}")
-    elif adjusted_sim < 0.0:
-        passed = False
-        notes = (f"No self-engagement: recovery below random walk baseline. "
-                 f"cosine_sim={cosine_sim:.4f}, baseline_sim={baseline_sim:.4f}, "
-                 f"adjusted={adjusted_sim:.4f}")
+        notes = (
+            f"Self-engagement detected (DN-20): "
+            f"resistance_ratio={resistance_ratio:.4f}, recovery_ratio={recovery_ratio:.4f}. "
+            f"Trained system resists perturbation MORE and recovers MORE than fresh baseline."
+        )
     else:
-        passed = None
-        notes = (f"Ambiguous self-engagement: cosine_sim={cosine_sim:.4f}, "
-                 f"baseline_sim={baseline_sim:.4f}, adjusted={adjusted_sim:.4f}, "
-                 f"recovery_ratio={recovery_ratio:.4f}")
+        passed = False
+        reasons = []
+        if not passes_resistance:
+            reasons.append(f"resistance_ratio={resistance_ratio:.4f}<=1.0")
+        if not passes_recovery:
+            reasons.append(f"recovery_ratio={recovery_ratio:.4f}<=1.0")
+        notes = (
+            f"No self-engagement: {', '.join(reasons)}. "
+            f"Trained system does not exceed fresh baseline."
+        )
 
-    effect_size = float(adjusted_sim)
+    # Effect size: geometric mean of the two ratios (capped for inf)
+    r_ratio = min(resistance_ratio, 100.0)
+    rec_ratio = min(recovery_ratio, 100.0)
+    effect_size = float(np.sqrt(r_ratio * rec_ratio)) - 1.0  # 0 = equal to fresh
 
     provenance.log_measurement("self_engagement", {
         "passed": passed,
-        "cosine_sim": cosine_sim,
-        "baseline_sim": baseline_sim,
-        "adjusted_sim": adjusted_sim,
-        "recovery_ratio": float(recovery_ratio),
-        "target_region": target_region,
-        "wander_steps": wander_steps,
-        "recovery_window": recovery_window,
+        "resistance_ratio": float(min(resistance_ratio, 1e6)),
+        "recovery_ratio": float(min(recovery_ratio, 1e6)),
+        "trained_disruption": trained_disruption,
+        "fresh_disruption": fresh_disruption,
+        "trained_recovery": trained_recovery,
+        "fresh_recovery": fresh_recovery,
+        "target_region": trained_result["target_region"],
     })
 
     return InstrumentResult(
@@ -155,44 +263,16 @@ def run_self_engagement(
         passed=passed,
         effect_size=effect_size,
         raw_data={
-            "pre_perturbation": pre_perturbation,
-            "post_perturbation": post_perturbation,
-            "target_region": target_region,
-            "pre_target_engagement": float(pre_target_engagement),
-            "post_target_engagement": float(post_target_engagement),
-            "cosine_sim": float(cosine_sim),
-            "baseline_sim": float(baseline_sim),
-            "adjusted_sim": float(adjusted_sim),
-            "recovery_ratio": float(recovery_ratio),
+            "precondition": "pass",
+            "resistance_ratio": float(min(resistance_ratio, 1e6)),
+            "recovery_ratio": float(min(recovery_ratio, 1e6)),
+            "trained_disruption": trained_disruption,
+            "fresh_disruption": fresh_disruption,
+            "trained_recovery": trained_recovery,
+            "fresh_recovery": fresh_recovery,
+            "target_region": trained_result["target_region"],
+            "trained_pre_engagement": trained_result["pre_engagement"],
+            "fresh_pre_engagement": fresh_result["pre_engagement"],
         },
         notes=notes,
     )
-
-
-def _compute_random_walk_baseline(
-    engagement_dist: dict[str, float],
-    regions: list[str],
-) -> float:
-    """Compute cosine similarity between engagement and uniform distribution.
-
-    A random walker on a graph converges to a stationary distribution
-    determined by node degrees. On an SBM with equal community sizes,
-    this is approximately uniform across communities. We use uniform
-    as the baseline — if the engagement pattern is close to uniform,
-    any "recovery" is just topology funnelling, not preference.
-
-    Returns cosine similarity between the engagement distribution
-    and a uniform distribution over regions.
-    """
-    if not engagement_dist or not regions:
-        return 0.0
-
-    eng_vec = np.array([engagement_dist.get(r, 0.0) for r in regions])
-    uniform_vec = np.ones(len(regions)) / len(regions)
-
-    eng_norm = np.linalg.norm(eng_vec)
-    uni_norm = np.linalg.norm(uniform_vec)
-
-    if eng_norm > 1e-10 and uni_norm > 1e-10:
-        return float(np.dot(eng_vec, uniform_vec) / (eng_norm * uni_norm))
-    return 0.0

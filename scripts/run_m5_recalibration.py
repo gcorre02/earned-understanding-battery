@@ -125,7 +125,14 @@ def make_system(system_id, graph, seed, n_features):
         from m8_battery.systems.class3.foxworthy_f import FoxworthyF
         s = FoxworthyF(seed=seed, device=device, theta=0.0)
         s.train_on_domain(graph, n_warmup=50)
-        return s, lambda: FoxworthyF(seed=seed + 1000, device=device, theta=0.0)
+        def _make_3c_control(g=graph, d=device, sd=seed):
+            """Control factory: graph-attached, model-loaded fresh FoxworthyF.
+            train_on_domain(g, n_warmup=0) loads model without training.
+            See F-022 lazy loading investigation."""
+            f = FoxworthyF(seed=sd + 1000, device=d, theta=0.0)
+            f.train_on_domain(g, n_warmup=0)
+            return f
+        return s, _make_3c_control
 
     raise ValueError(f"Unknown system: {system_id}")
 
@@ -235,7 +242,8 @@ def main():
                       f"setup={result['setup_time_s']}s battery={result['battery_time_s']}s")
                 for name, r in inst.items():
                     c = cls.get(name, "?")
-                    print(f"    {name}: passed={r['passed']} ES={r['effect_size']:.4f} cls={c}")
+                    es = r['effect_size'] if r['effect_size'] is not None else 0.0
+                    print(f"    {name}: passed={r['passed']} ES={es:.4f} cls={c}")
 
             except Exception as e:
                 print(f"  ERROR: {e}")

@@ -162,13 +162,34 @@ def _analyse_trajectory(
         else:
             effect_size = 0.0
 
-    # Decision logic
+    # DN-22 earned ratio: trained metric_range vs fresh metric_range
+    # If fresh also develops trajectory, the signal may not be earned.
+    earned_ratio = None
+    if control_trajectory is not None and len(control_trajectory) >= 3:
+        ctrl_arr = np.array(control_trajectory)
+        ctrl_range = ctrl_arr.max() - ctrl_arr.min()
+        if ctrl_range > 1e-10:
+            earned_ratio = float(metric_range / ctrl_range)
+        elif metric_range > 1e-10:
+            earned_ratio = float(min(metric_range / 1e-10, 1e6))  # Cap
+        else:
+            earned_ratio = 1.0  # Neither changes
+
+    # Decision logic (DN-22: earned ratio required if control available)
     has_trend = abs(slope) > 1e-6 and r_squared > 0.3
     has_monotonicity = monotonicity > 0.6
+    # Earned ratio > 1.0 means trained develops MORE than fresh
+    passes_earned = earned_ratio is None or earned_ratio > 1.0
 
-    if has_trend and has_monotonicity:
+    if has_trend and has_monotonicity and passes_earned:
         passed = True
         notes = f"Developmental trajectory detected: slope={slope:.6f}, R²={r_squared:.4f}, monotonicity={monotonicity:.2f}"
+        if earned_ratio is not None:
+            notes += f", earned_ratio={earned_ratio:.2f}"
+    elif has_trend and has_monotonicity and not passes_earned:
+        passed = False
+        notes = (f"Trajectory present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
+                 f"Fresh system shows similar development.")
     elif has_trend or has_monotonicity:
         passed = None
         notes = f"Ambiguous trajectory: slope={slope:.6f}, R²={r_squared:.4f}, monotonicity={monotonicity:.2f}"
@@ -187,6 +208,7 @@ def _analyse_trajectory(
             "r_squared": float(r_squared),
             "monotonicity": float(monotonicity),
             "metric_range": float(metric_range),
+            "earned_ratio": earned_ratio,
         },
         notes=notes,
     )

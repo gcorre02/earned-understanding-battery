@@ -335,11 +335,28 @@ def run_battery(
         except Exception:
             fresh_gini = 0.0
         earned_ratio = trained_gini / fresh_gini if fresh_gini > 1e-10 else (float("inf") if trained_gini > 1e-10 else 1.0)
+        earned_ratio = float(min(earned_ratio, 1e6))
         baseline["integration_earned_ratio"] = {
             "trained_gini": trained_gini, "fresh_gini": fresh_gini,
-            "earned_ratio": float(min(earned_ratio, 1e6)),
+            "earned_ratio": earned_ratio,
         }
-        _log(f"  integration earned ratio: {min(earned_ratio, 1e6):.4f}")
+        _log(f"  integration earned ratio: {earned_ratio:.4f}")
+
+        # DN-22: Wire earned ratio into pass condition. If integration passed
+        # but earned ratio <= 1.0, the signal is received (topology), not earned.
+        integ_result = results["integration"]
+        if integ_result.passed and earned_ratio <= 1.0:
+            results["integration"] = InstrumentResult(
+                name="integration",
+                passed=False,
+                effect_size=integ_result.effect_size,
+                raw_data={**(integ_result.raw_data or {}), "earned_ratio": earned_ratio},
+                notes=(f"Integration present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
+                       f"Fresh system shows similar reorganisation. {integ_result.notes}"),
+            )
+            _log(f"  integration DOWNGRADED: earned_ratio={earned_ratio:.2f} <= 1.0")
+        elif integ_result.raw_data is not None:
+            integ_result.raw_data["earned_ratio"] = earned_ratio
 
     # --- Phase 3: Generativity (novel domain B) ---
     # T1-03: Freeze learning during measurement. Generativity measures structural

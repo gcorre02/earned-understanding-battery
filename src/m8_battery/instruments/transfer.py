@@ -99,15 +99,32 @@ def run_transfer(
     else:
         effect_size = None
 
-    # Decision logic
+    # DN-22 earned ratio: trained_auc / naive_auc
+    # If naive also shows transfer (e.g., learns during step), the earned ratio
+    # distinguishes magnitude. Ratio > 1.0 means trained has MORE transfer.
+    if abs(naive_auc) > 1e-10:
+        earned_ratio = float(trained_auc / abs(naive_auc))
+    elif abs(trained_auc) > 1e-10:
+        earned_ratio = float(min(trained_auc / 1e-10, 1e6))
+    else:
+        earned_ratio = 1.0
+    earned_ratio = min(earned_ratio, 1e6)  # Cap
+
+    # Decision logic (DN-22: earned ratio required)
     # Transfer = trained system has measurably better structure on A'
     has_advantage = transfer_advantage > 0.1
     metrics_differ = abs(trained_final - naive_final) > 1e-6
+    passes_earned = earned_ratio > 1.0
 
-    if has_advantage and metrics_differ:
+    if has_advantage and metrics_differ and passes_earned:
         passed = True
         notes = (f"Transfer detected: advantage={transfer_advantage:.4f}, "
-                 f"trained_final={trained_final:.6f}, naive_final={naive_final:.6f}")
+                 f"trained_final={trained_final:.6f}, naive_final={naive_final:.6f}, "
+                 f"earned_ratio={earned_ratio:.2f}")
+    elif has_advantage and metrics_differ and not passes_earned:
+        passed = False
+        notes = (f"Transfer present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
+                 f"Naive system shows similar transfer.")
     elif not metrics_differ:
         passed = False
         notes = (f"No transfer: trained and naive produce same metric. "
@@ -122,6 +139,7 @@ def run_transfer(
         "transfer_advantage": float(transfer_advantage),
         "trained_final": float(trained_final),
         "naive_final": float(naive_final),
+        "earned_ratio": float(earned_ratio),
     })
 
     return InstrumentResult(
@@ -136,6 +154,7 @@ def run_transfer(
             "transfer_advantage": float(transfer_advantage),
             "trained_final": float(trained_final),
             "naive_final": float(naive_final),
+            "earned_ratio": float(earned_ratio),
         },
         notes=notes,
     )

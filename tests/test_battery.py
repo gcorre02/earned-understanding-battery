@@ -422,7 +422,11 @@ class TestBaselineProtocol:
         reason="Foxworthy F (3C) requires GPU — run on M5 Max or CUDA machine"
     )
     def test_known_received(self):
-        """3C generativity should classify as 'received' (F-022).
+        """3C generativity should classify as 'received' (F-022/DN-18).
+
+        Fresh FoxworthyF passes generativity (pre-trained LLM responds to
+        novel text). Classification: received — capability exists before
+        training. See F-022 resolution + DN-18.
 
         Skip on Razer — DistilGPT-2 too slow. Run on M5 Max.
         """
@@ -433,6 +437,17 @@ class TestBaselineProtocol:
         system = FoxworthyF(seed=42, device="cpu", theta=0.0)
         system.train_on_domain(G, n_warmup=10)
         nodes_a = list(G.nodes())
+
+        def make_fresh_control():
+            """Control factory that produces a graph-attached, model-loaded system.
+
+            train_on_domain(G, n_warmup=0) loads the model without training,
+            so get_structure_metric() returns the real Kaiming init norm (~8.0)
+            instead of 0.0. See F-022 lazy loading investigation.
+            """
+            f = FoxworthyF(seed=99, device="cpu", theta=0.0)
+            f.train_on_domain(G, n_warmup=0)
+            return f
 
         config = BatteryConfig(
             domain_a_inputs=nodes_a[:10],
@@ -446,7 +461,7 @@ class TestBaselineProtocol:
         result = run_battery(
             system=system, system_name="Foxworthy F",
             system_class=SystemClass.CLASS_3, config=config,
-            control_factory=lambda: FoxworthyF(seed=99, device="cpu", theta=0.0),
+            control_factory=make_fresh_control,
         )
 
         cls = result.metadata["baseline"]["instrument_classifications"]

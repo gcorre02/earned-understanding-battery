@@ -9,6 +9,7 @@ A Class 4 candidate should show non-linear degradation (integration).
 
 from __future__ import annotations
 
+import sys
 from typing import Any
 
 import numpy as np
@@ -60,7 +61,9 @@ def run_integration(
 
     # Measure per-region ablation degradation
     ablation_results = {}
-    for region_id in regions:
+    n_regions = len(regions)
+    for i, region_id in enumerate(regions):
+        print(f"[integration] ablation {i+1}/{n_regions}: {region_id}", file=sys.stderr, flush=True)
         try:
             ablated = system.ablate(region_id)
             ablated_metric = _probe_metric(ablated, probe_inputs)

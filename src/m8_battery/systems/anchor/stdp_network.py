@@ -1,16 +1,13 @@
 """Brian2 STDP spiking network — publishable self-engagement anchor.
 
-Paper 2 role: System 4A-anchor. Validates the self-engagement instrument
-by providing a system with earned, local synaptic structure that resists
-perturbation and recovers.
+Paper 2 role: System 4A-anchor. Validates the self-engagement instrument.
 
-Expected battery result: passes self-engagement, fails conjunction.
-
-Architecture (Option 3 — F-033 recommendation):
-- Training phase: Brian2 simulator runs STDP with rate-coded input.
-  Brian2 handles spike timing, STDP updates, weight bounds natively.
-- Battery operations: numpy-based LIF (no STDP) using extracted weights.
-  step(), perturb(), get_structure_metric() operate on the weight matrix.
+Architecture (DN-23 — live Brian2):
+- Brian2 simulator runs LIVE during ALL battery operations
+- STDP is ALWAYS active — weights update based on spike timing
+- step() advances the Brian2 simulation
+- perturb() modifies weights IN the live network
+- Fresh baseline also runs live (STDP active, untrained)
 
 Literature:
 - Bi & Poo (1998) — STDP
@@ -33,27 +30,18 @@ def _log(msg: str) -> None:
     print(f"[stdp] {msg}", file=sys.stderr, flush=True)
 
 
-def _train_with_brian2(
-    n_neurons: int,
-    n_groups: int,
-    connection_prob: float,
-    seed: int,
-    duration_s: float = 2.0,
+def _build_network(
+    n_neurons: int = 100,
+    n_groups: int = 4,
+    connection_prob: float = 0.1,
+    seed: int = 42,
     w_max: float = 1.0,
     a_plus: float = 0.01,
     a_minus: float = 0.0105,
     tau_stdp_ms: float = 20.0,
-    high_rate_hz: float = 50.0,
-    low_rate_hz: float = 5.0,
-    cycle_ms: float = 200.0,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Run Brian2 STDP training. Returns (weights, connectivity_mask, spike_counts, initial_weights).
-
-    Uses rate-coded input per Song et al. (2000): active group gets high-rate
-    Poisson input, other groups get low-rate. Groups cycle every cycle_ms.
-    This creates correlated spiking within groups → STDP potentiates within-group
-    synapses and depresses between-group synapses.
-    """
+    dt_ms: float = 1.0,
+) -> dict:
+    """Build a fresh Brian2 STDP network. Returns dict of components."""
     import brian2 as b2
     b2.prefs.codegen.target = 'numpy'
 
@@ -69,11 +57,11 @@ def _train_with_brian2(
 
     G = b2.NeuronGroup(n_neurons, eqs,
                         threshold='v > 15*mV', reset='v = 0*mV',
-                        refractory=2*b2.ms, method='euler')
+                        refractory=2*b2.ms, method='euler',
+                        dt=dt_ms*b2.ms)
     G.v = 'rand() * 10*mV'
-    G.group_id = [i // neurons_per_group for i in range(n_neurons)]
-    # Cap to n_groups-1
-    G.group_id = [min(g, n_groups - 1) for g in G.group_id]
+    group_ids = [min(i // neurons_per_group, n_groups - 1) for i in range(n_neurons)]
+    G.group_id = group_ids
 
     # Excitatory synapses with STDP
     S = b2.Synapses(G, G,
@@ -91,58 +79,34 @@ def _train_with_brian2(
         apost -= {a_minus}
         w = clip(w + apre, 0, {w_max})
         ''',
+        dt=dt_ms*b2.ms,
     )
     S.connect(p=connection_prob, condition='i != j')
     S.w = 'rand() * 0.5'
 
-    # Store initial weights
-    initial_w = np.array(S.w[:]).copy()
-
-    # Rate-coded input cycling through groups
-    @b2.network_operation(dt=cycle_ms * b2.ms)
-    def update_input(t):
-        phase = int(t / (cycle_ms * b2.ms)) % n_groups
-        for i in range(n_neurons):
-            grp = int(G.group_id[i])
-            if grp == phase:
-                G.I_ext[i] = high_rate_hz / 50.0 * 25 * b2.mV  # Supra-threshold
-            else:
-                G.I_ext[i] = low_rate_hz / 50.0 * 25 * b2.mV   # Sub-threshold
-
     mon = b2.SpikeMonitor(G)
 
-    net = b2.Network(G, S, update_input, mon)
-    _log(f"Brian2 training: {n_neurons} neurons, {duration_s}s, "
-         f"cycle={cycle_ms}ms, rates={high_rate_hz}/{low_rate_hz}Hz")
-    net.run(duration_s * b2.second)
-    _log(f"  {mon.num_spikes} spikes ({mon.num_spikes / (duration_s * n_neurons):.1f} Hz/neuron)")
+    net = b2.Network(G, S, mon)
 
-    # Extract weight matrix
-    weights = np.zeros((n_neurons, n_neurons), dtype=np.float64)
-    mask = np.zeros((n_neurons, n_neurons), dtype=bool)
-    pre_idx = np.array(S.i[:])
-    post_idx = np.array(S.j[:])
-    w_vals = np.array(S.w[:])
-    weights[pre_idx, post_idx] = w_vals
-    mask[pre_idx, post_idx] = True
-
-    # Extract spike counts per neuron
-    spike_counts = np.zeros(n_neurons, dtype=np.float64)
-    for i in range(n_neurons):
-        spike_counts[i] = np.sum(mon.i == i)
-
-    # Initial weight matrix (same connectivity)
-    initial_weights = np.zeros((n_neurons, n_neurons), dtype=np.float64)
-    initial_weights[pre_idx, post_idx] = initial_w
-
-    return weights, mask, spike_counts, initial_weights
+    return {
+        "net": net,
+        "G": G,
+        "S": S,
+        "mon": mon,
+        "n_neurons": n_neurons,
+        "n_groups": n_groups,
+        "group_ids": group_ids,
+        "dt_ms": dt_ms,
+    }
 
 
 class STDPNetwork(TestSystem):
-    """Brian2 STDP spiking neural network.
+    """Brian2 STDP spiking neural network — live simulator (DN-23).
 
-    Training: Brian2 simulator with rate-coded STDP (Song et al. 2000).
-    Battery operations: numpy-based LIF using extracted weight matrix.
+    Brian2 runs continuously. STDP is always active. The system is
+    always earning. step() advances the simulation. perturb() modifies
+    weights in the live network. clone() creates a new independent
+    Brian2 network with the same weight state.
     """
 
     def __init__(
@@ -154,7 +118,7 @@ class STDPNetwork(TestSystem):
         a_plus: float = 0.01,
         a_minus: float = 0.0105,
         n_groups: int = 4,
-        duration_s: float = 2.0,
+        dt_ms: float = 1.0,
     ) -> None:
         self._n_neurons = n_neurons
         self._connection_prob = connection_prob
@@ -163,235 +127,209 @@ class STDPNetwork(TestSystem):
         self._a_plus = a_plus
         self._a_minus = a_minus
         self._n_groups = n_groups
-        self._duration_s = duration_s
+        self._dt_ms = dt_ms
 
-        self._rng = np.random.default_rng(seed)
+        # Build live Brian2 network
+        self._components = _build_network(
+            n_neurons=n_neurons, n_groups=n_groups,
+            connection_prob=connection_prob, seed=seed,
+            w_max=w_max, a_plus=a_plus, a_minus=a_minus,
+            dt_ms=dt_ms,
+        )
 
-        # Group assignments (evenly split)
-        neurons_per_group = n_neurons // n_groups
-        self._neuron_groups: dict[int, int] = {}
-        for i in range(n_neurons):
-            self._neuron_groups[i] = min(i // neurons_per_group, n_groups - 1)
-
-        # Weights initialised as uniform random (pre-training)
-        self._weights = self._rng.uniform(0.1, 0.5, size=(n_neurons, n_neurons)).astype(np.float64)
-        np.fill_diagonal(self._weights, 0.0)
-        conn_mask = self._rng.random((n_neurons, n_neurons)) < connection_prob
-        np.fill_diagonal(conn_mask, False)
-        self._weights *= conn_mask
-        self._connectivity_mask = conn_mask.copy()
-        self._initial_weights = self._weights.copy()
-
-        # State
-        self._spike_counts = np.zeros(n_neurons, dtype=np.float64)
         self._step_count = 0
-        self._training = True
-        self._v = self._rng.uniform(0.0, 10.0, size=n_neurons)
-        self._v_threshold = 20.0
-        self._v_reset = 0.0
-        self._tau_m_ms = 20.0
-        self._is_trained = False
+        self._training = True  # T1-03: can freeze STDP
+
+        # Track visit counts per group for engagement
+        self._group_spike_counts = np.zeros(n_groups, dtype=np.float64)
+
+        # Store initial weights for reset
+        self._initial_weights = np.array(self._components["S"].w[:]).copy()
 
     def set_training(self, mode: bool) -> None:
+        """Enable/disable STDP during step().
+
+        When frozen, step() snapshots weights before Brian2 runs and
+        restores them after — LIF dynamics run but weight updates are undone.
+        """
         self._training = mode
 
     def reset(self) -> None:
-        self._weights = self._initial_weights.copy()
-        self._spike_counts = np.zeros(self._n_neurons, dtype=np.float64)
+        """Reset all synaptic weights to initial values. Network stays live."""
+        S = self._components["S"]
+        S.w[:] = self._initial_weights.copy()
         self._step_count = 0
-        self._v = self._rng.uniform(0.0, 10.0, size=self._n_neurons)
-        self._is_trained = False
-
-    def train_on_domain(self, graph: Any, n_steps: int = 0) -> None:
-        """Train via Brian2 STDP with rate-coded group input.
-
-        n_steps is ignored — duration_s controls training length.
-        graph is ignored — group structure is internal.
-        """
-        weights, mask, spike_counts, initial_weights = _train_with_brian2(
-            n_neurons=self._n_neurons,
-            n_groups=self._n_groups,
-            connection_prob=self._connection_prob,
-            seed=self._seed,
-            duration_s=self._duration_s,
-            w_max=self._w_max,
-            a_plus=self._a_plus,
-            a_minus=self._a_minus,
-        )
-        self._weights = weights
-        self._connectivity_mask = mask
-        self._spike_counts = spike_counts
-        self._initial_weights = initial_weights
-        self._is_trained = True
-        _log(f"  Gini={self.get_structure_metric():.4f}")
-
-        # Report within vs between group weights
-        for g in range(self._n_groups):
-            gn = [n for n, gr in self._neuron_groups.items() if gr == g]
-            within = self._weights[gn][:, gn]
-            within_nz = within[within > 0]
-            bv = []
-            for g2 in range(self._n_groups):
-                if g2 != g:
-                    g2n = [n for n, gr in self._neuron_groups.items() if gr == g2]
-                    bw = self._weights[gn][:, g2n]
-                    bv.extend(bw[bw > 0].tolist())
-            wm = within_nz.mean() if len(within_nz) > 0 else 0
-            bm = np.mean(bv) if bv else 0
-            _log(f"  group {g}: within={wm:.4f} between={bm:.4f} ratio={wm / max(bm, 1e-6):.2f}")
+        self._group_spike_counts = np.zeros(self._n_groups, dtype=np.float64)
 
     def step(self, input_data: Any) -> Any:
-        """Simulate one timestep using numpy LIF (no STDP — frozen dynamics).
+        """Advance Brian2 simulation by dt. STDP is active."""
+        import brian2 as b2
 
-        During battery operations, the network runs with fixed weights.
-        The STDP-trained weight structure determines behaviour.
-        """
-        dt = 1.0
-        tau_m = self._tau_m_ms
+        G = self._components["G"]
+        net = self._components["net"]
+        mon = self._components["mon"]
+        S = self._components["S"]
 
-        # Background + noise
-        input_current = np.full(self._n_neurons, 15.0)
-        input_current += self._rng.normal(0, 3.0, self._n_neurons)
+        # Set input currents
+        # Background: sub-threshold for all
+        for i in range(self._n_neurons):
+            G.I_ext[i] = 5 * b2.mV
 
-        # Domain input
+        # Domain input: boost target group
         if input_data is not None:
             try:
                 group_id = int(input_data) % self._n_groups
-                for neuron, group in self._neuron_groups.items():
-                    if group == group_id:
-                        input_current[neuron] += 15.0
+                for i in range(self._n_neurons):
+                    if self._components["group_ids"][i] == group_id:
+                        G.I_ext[i] = 30 * b2.mV
             except (ValueError, TypeError):
                 pass
+        else:
+            # Default: cycle through groups based on step count
+            group = self._step_count % (self._n_groups * 20) // 20
+            for i in range(self._n_neurons):
+                if self._components["group_ids"][i] == group:
+                    G.I_ext[i] = 30 * b2.mV
 
-        # Synaptic input from other neurons
-        firing = (self._v >= self._v_threshold).astype(np.float64)
-        synaptic_input = self._weights.T @ firing
+        # Snapshot weights if frozen (T1-03)
+        if not self._training:
+            w_before = np.array(S.w[:]).copy()
 
-        # LIF update
-        self._v += (dt / tau_m) * (-self._v + input_current + synaptic_input)
+        # Advance simulation by 1 timestep
+        spike_count_before = mon.num_spikes
+        net.run(self._dt_ms * b2.ms)
+        new_spikes = mon.num_spikes - spike_count_before
 
-        # Spike detection
-        spiked = self._v >= self._v_threshold
-        spike_indices = np.where(spiked)[0]
-        self._v[spiked] = self._v_reset
-        self._spike_counts[spiked] += 1
+        # Restore weights if frozen
+        if not self._training:
+            S.w[:] = w_before
+
+        # Update group spike counts from recent spikes
+        if new_spikes > 0:
+            recent_indices = mon.i[spike_count_before:]
+            for idx in recent_indices:
+                grp = self._components["group_ids"][int(idx)]
+                self._group_spike_counts[grp] += 1
+
         self._step_count += 1
 
         return {
-            "n_spikes": int(spiked.sum()),
-            "spike_indices": spike_indices.tolist(),
+            "n_spikes": int(new_spikes),
             "step": self._step_count,
         }
 
     def get_state(self) -> bytes:
+        S = self._components["S"]
         return pickle.dumps({
-            "weights": self._weights.copy(),
-            "spike_counts": self._spike_counts.copy(),
+            "weights": np.array(S.w[:]).copy(),
             "step_count": self._step_count,
-            "v": self._v.copy(),
-            "rng_state": self._rng.bit_generator.state,
-            "is_trained": self._is_trained,
+            "group_spike_counts": self._group_spike_counts.copy(),
         })
 
     def set_state(self, snapshot: bytes) -> None:
         state = pickle.loads(snapshot)
-        self._weights = state["weights"]
-        self._spike_counts = state["spike_counts"]
+        self._components["S"].w[:] = state["weights"]
         self._step_count = state["step_count"]
-        self._v = state["v"]
-        self._rng.bit_generator.state = state["rng_state"]
-        self._is_trained = state.get("is_trained", False)
+        self._group_spike_counts = state["group_spike_counts"]
 
     def get_structure_metric(self) -> float:
-        """Synaptic weight Gini coefficient across all connected synapses."""
-        connected = self._weights[self._connectivity_mask]
-        if len(connected) == 0 or connected.sum() < 1e-10:
+        """Synaptic weight Gini from LIVE network."""
+        w = np.array(self._components["S"].w[:])
+        if len(w) == 0 or w.sum() < 1e-10:
             return 0.0
-        sorted_vals = np.sort(connected)
+        sorted_vals = np.sort(w)
         n = len(sorted_vals)
         index = np.arange(1, n + 1)
         return float((2.0 * (index * sorted_vals).sum() / (n * sorted_vals.sum())) - (n + 1) / n)
 
     def get_structure_distribution(self) -> dict[str, float]:
-        """Per-group synaptic weight Gini."""
+        """Per-group weight Gini from LIVE network."""
+        S = self._components["S"]
+        pre = np.array(S.i[:])
+        post = np.array(S.j[:])
+        w = np.array(S.w[:])
+        group_ids = self._components["group_ids"]
+
         result = {}
         for g in range(self._n_groups):
-            group_neurons = [n for n, gr in self._neuron_groups.items() if gr == g]
-            if not group_neurons:
-                result[f"group_{g}"] = 0.0
-                continue
-            idx = np.array(group_neurons)
-            sub = self._weights[np.ix_(idx, idx)]
-            sub_mask = self._connectivity_mask[np.ix_(idx, idx)]
-            vals = sub[sub_mask]
+            g_neurons = set(i for i, gid in enumerate(group_ids) if gid == g)
+            mask = np.array([int(pre[k]) in g_neurons and int(post[k]) in g_neurons for k in range(len(pre))])
+            vals = w[mask]
             if len(vals) == 0 or vals.sum() < 1e-10:
                 result[f"group_{g}"] = 0.0
                 continue
-            sorted_vals = np.sort(vals)
-            n = len(sorted_vals)
-            index = np.arange(1, n + 1)
-            gini = float((2.0 * (index * sorted_vals).sum() / (n * sorted_vals.sum())) - (n + 1) / n)
-            result[f"group_{g}"] = gini
+            sv = np.sort(vals)
+            n = len(sv)
+            idx = np.arange(1, n + 1)
+            result[f"group_{g}"] = float((2.0 * (idx * sv).sum() / (n * sv.sum())) - (n + 1) / n)
         return result
 
     def get_engagement_distribution(self) -> dict[str, float]:
         """Spike rate per neuron group, normalised."""
-        total = self._spike_counts.sum() or 1.0
-        result = {}
-        for g in range(self._n_groups):
-            group_neurons = [n for n, gr in self._neuron_groups.items() if gr == g]
-            group_spikes = self._spike_counts[group_neurons].sum()
-            result[f"group_{g}"] = float(group_spikes / total)
-        return result
+        total = self._group_spike_counts.sum() or 1.0
+        return {f"group_{g}": float(self._group_spike_counts[g] / total) for g in range(self._n_groups)}
 
     def ablate(self, region_id: str) -> TestSystem:
-        """Remove all synapses to/from neurons in target group."""
-        new = self._clone_internal()
+        """Remove all synapses to/from neurons in target group. Returns new network."""
+        new = self._build_clone()
         group_id = int(region_id.replace("group_", ""))
-        group_neurons = [n for n, g in new._neuron_groups.items() if g == group_id]
-        idx = np.array(group_neurons)
-        new._weights[idx, :] = 0.0
-        new._weights[:, idx] = 0.0
-        new._connectivity_mask[idx, :] = False
-        new._connectivity_mask[:, idx] = False
+        S = new._components["S"]
+        pre = np.array(S.i[:])
+        post = np.array(S.j[:])
+        group_ids = new._components["group_ids"]
+        for k in range(len(pre)):
+            if group_ids[int(pre[k])] == group_id or group_ids[int(post[k])] == group_id:
+                S.w[k] = 0.0
         return new
 
     def perturb(self, region_id: str, method: str = "reset_weights") -> TestSystem:
-        """Reset synaptic weights within target group to initial values."""
-        new = self._clone_internal()
+        """Reset synaptic weights within target group to initial values. Returns new network."""
+        new = self._build_clone()
         group_id = int(region_id.replace("group_", ""))
-        group_neurons = [n for n, g in new._neuron_groups.items() if g == group_id]
-        idx = np.array(group_neurons)
-        new._weights[np.ix_(idx, idx)] = new._initial_weights[np.ix_(idx, idx)]
+        S = new._components["S"]
+        pre = np.array(S.i[:])
+        post = np.array(S.j[:])
+        group_ids = new._components["group_ids"]
+        for k in range(len(pre)):
+            if group_ids[int(pre[k])] == group_id and group_ids[int(post[k])] == group_id:
+                S.w[k] = new._initial_weights[k]
         return new
 
     def get_regions(self) -> list[str]:
         return [f"group_{g}" for g in range(self._n_groups)]
 
     def clone(self) -> TestSystem:
-        return self._clone_internal()
+        return self._build_clone()
 
-    def _clone_internal(self) -> STDPNetwork:
-        new = STDPNetwork.__new__(STDPNetwork)
-        new._n_neurons = self._n_neurons
-        new._connection_prob = self._connection_prob
-        new._seed = self._seed
-        new._w_max = self._w_max
-        new._a_plus = self._a_plus
-        new._a_minus = self._a_minus
-        new._n_groups = self._n_groups
-        new._duration_s = self._duration_s
-        new._rng = np.random.default_rng(self._seed + self._step_count + 7919)
-        new._neuron_groups = dict(self._neuron_groups)
-        new._weights = self._weights.copy()
-        new._connectivity_mask = self._connectivity_mask.copy()
+    def _build_clone(self) -> STDPNetwork:
+        """Create independent Brian2 network with same weight state."""
+        new = STDPNetwork(
+            n_neurons=self._n_neurons,
+            connection_prob=self._connection_prob,
+            seed=self._seed + self._step_count + 7919,
+            w_max=self._w_max,
+            a_plus=self._a_plus,
+            a_minus=self._a_minus,
+            n_groups=self._n_groups,
+            dt_ms=self._dt_ms,
+        )
+        # Copy current weights into the new network
+        new._components["S"].w[:] = np.array(self._components["S"].w[:]).copy()
         new._initial_weights = self._initial_weights.copy()
-        new._spike_counts = self._spike_counts.copy()
         new._step_count = self._step_count
+        new._group_spike_counts = self._group_spike_counts.copy()
         new._training = self._training
-        new._v = self._v.copy()
-        new._v_threshold = self._v_threshold
-        new._v_reset = self._v_reset
-        new._tau_m_ms = self._tau_m_ms
-        new._is_trained = self._is_trained
         return new
+
+    def train_on_domain(self, graph: Any, n_steps: int = 2000) -> None:
+        """Train via rate-coded group input with live STDP.
+
+        Cycles through groups, each getting supra-threshold drive for 20 steps.
+        STDP is active — weights update based on spike timing.
+        """
+        _log(f"Training STDP network: {n_steps} steps, {self._n_neurons} neurons (live Brian2)")
+        for i in range(n_steps):
+            group = (i // 20) % self._n_groups
+            self.step(group)
+        _log(f"  done: Gini={self.get_structure_metric():.4f}, "
+             f"spikes={self._group_spike_counts.sum():.0f}")

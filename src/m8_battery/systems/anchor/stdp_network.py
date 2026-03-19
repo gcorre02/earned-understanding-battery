@@ -40,6 +40,8 @@ def _build_network(
     a_minus: float = 0.0105,
     tau_stdp_ms: float = 20.0,
     dt_ms: float = 1.0,
+    pre_indices: np.ndarray | None = None,
+    post_indices: np.ndarray | None = None,
 ) -> dict:
     """Build a fresh Brian2 STDP network. Returns dict of components."""
     import brian2 as b2
@@ -81,7 +83,11 @@ def _build_network(
         ''',
         dt=dt_ms*b2.ms,
     )
-    S.connect(p=connection_prob, condition='i != j')
+    if pre_indices is not None and post_indices is not None:
+        # Use exact connectivity from source network
+        S.connect(i=pre_indices, j=post_indices)
+    else:
+        S.connect(p=connection_prob, condition='i != j')
     S.w = 'rand() * 0.5'
 
     mon = b2.SpikeMonitor(G)
@@ -171,11 +177,12 @@ class STDPNetwork(TestSystem):
         S = self._components["S"]
 
         # Set input currents
-        # Background: sub-threshold for all
+        # Background: moderate — neurons fire from combined background + recurrent input
+        # Strong within-group weights create higher firing rates in trained groups
         for i in range(self._n_neurons):
-            G.I_ext[i] = 5 * b2.mV
+            G.I_ext[i] = 10 * b2.mV
 
-        # Domain input: boost target group
+        # Domain input: boost target group (training and battery domain operation)
         if input_data is not None:
             try:
                 group_id = int(input_data) % self._n_groups
@@ -184,12 +191,8 @@ class STDPNetwork(TestSystem):
                         G.I_ext[i] = 30 * b2.mV
             except (ValueError, TypeError):
                 pass
-        else:
-            # Default: cycle through groups based on step count
-            group = self._step_count % (self._n_groups * 20) // 20
-            for i in range(self._n_neurons):
-                if self._components["group_ids"][i] == group:
-                    G.I_ext[i] = 30 * b2.mV
+        # When input_data is None (wander/recovery): only background + recurrent
+        # Spike rates will depend on synaptic weight structure, not external drive
 
         # Snapshot weights if frozen (T1-03)
         if not self._training:
@@ -283,7 +286,13 @@ class STDPNetwork(TestSystem):
         return new
 
     def perturb(self, region_id: str, method: str = "reset_weights") -> TestSystem:
-        """Reset synaptic weights within target group to initial values. Returns new network."""
+        """Reset synaptic weights within target group to initial values.
+
+        Only resets intra-group synapses (both pre AND post in target group).
+        Cross-group connections preserved — the network can still drive the
+        perturbed group via intact pathways. STDP may rebuild the within-group
+        structure from correlated cross-group input.
+        """
         new = self._build_clone()
         group_id = int(region_id.replace("group_", ""))
         S = new._components["S"]
@@ -302,23 +311,39 @@ class STDPNetwork(TestSystem):
         return self._build_clone()
 
     def _build_clone(self) -> STDPNetwork:
-        """Create independent Brian2 network with same weight state."""
-        new = STDPNetwork(
-            n_neurons=self._n_neurons,
-            connection_prob=self._connection_prob,
-            seed=self._seed + self._step_count + 7919,
-            w_max=self._w_max,
-            a_plus=self._a_plus,
-            a_minus=self._a_minus,
-            n_groups=self._n_groups,
-            dt_ms=self._dt_ms,
-        )
-        # Copy current weights into the new network
-        new._components["S"].w[:] = np.array(self._components["S"].w[:]).copy()
-        new._initial_weights = self._initial_weights.copy()
+        """Create independent Brian2 network with same connectivity and weights."""
+        # Extract exact connectivity from source
+        src_S = self._components["S"]
+        pre_idx = np.array(src_S.i[:]).copy()
+        post_idx = np.array(src_S.j[:]).copy()
+        src_weights = np.array(src_S.w[:]).copy()
+
+        new = STDPNetwork.__new__(STDPNetwork)
+        new._n_neurons = self._n_neurons
+        new._connection_prob = self._connection_prob
+        new._seed = self._seed + self._step_count + 7919
+        new._w_max = self._w_max
+        new._a_plus = self._a_plus
+        new._a_minus = self._a_minus
+        new._n_groups = self._n_groups
+        new._dt_ms = self._dt_ms
+        new._training = self._training
         new._step_count = self._step_count
         new._group_spike_counts = self._group_spike_counts.copy()
-        new._training = self._training
+
+        # Build new Brian2 network with SAME connectivity
+        new._components = _build_network(
+            n_neurons=self._n_neurons, n_groups=self._n_groups,
+            connection_prob=self._connection_prob,
+            seed=self._seed + self._step_count + 7919,
+            w_max=self._w_max, a_plus=self._a_plus, a_minus=self._a_minus,
+            dt_ms=self._dt_ms,
+            pre_indices=pre_idx, post_indices=post_idx,
+        )
+
+        # Copy weights from source
+        new._components["S"].w[:] = src_weights
+        new._initial_weights = self._initial_weights.copy()
         return new
 
     def train_on_domain(self, graph: Any, n_steps: int = 2000) -> None:

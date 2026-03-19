@@ -73,6 +73,15 @@ class TestSystem(ABC):
         but be fully independent (no shared mutable state).
         """
 
+    def reset_engagement_tracking(self) -> None:
+        """Reset engagement counters for windowed measurement.
+
+        Called by self-engagement instrument before each measurement phase
+        so that get_engagement_distribution() reflects recent activity only,
+        not cumulative history. Default: no-op (systems whose engagement
+        distribution is already instantaneous need not override).
+        """
+
     def set_training(self, mode: bool) -> None:
         """Enable (True) or disable (False) learning during step().
 

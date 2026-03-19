@@ -62,6 +62,8 @@ def _run_perturbation_protocol(
     regions = system.get_regions()
 
     # Phase 1: Free wander — establish engagement pattern
+    # Reset engagement tracking so we measure THIS window, not cumulative history
+    system.reset_engagement_tracking()
     t0 = _time.monotonic()
     for i in range(wander_steps):
         system.step(None)
@@ -81,11 +83,13 @@ def _run_perturbation_protocol(
     perturbed = system.perturb(target_region, method=perturbation_method)
     _log(f"  perturb: {_time.monotonic()-t0:.2f}s")
 
-    # Measure IMMEDIATELY after perturbation (before recovery)
+    # Measure IMMEDIATELY after perturbation — windowed
+    perturbed.reset_engagement_tracking()
     perturbed.step(None)
     post_immediate = perturbed.get_engagement_distribution()
 
-    # Phase 3: Recovery window
+    # Phase 3: Recovery window — windowed
+    perturbed.reset_engagement_tracking()
     t0 = _time.monotonic()
     for i in range(recovery_window - 1):  # -1 because we already did 1 step
         perturbed.step(None)

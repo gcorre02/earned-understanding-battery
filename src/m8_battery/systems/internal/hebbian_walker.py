@@ -79,6 +79,10 @@ class HebbianWalker(TestSystem):
             community = features.get("community", data.get("block", 0))
             self._node_to_community[node] = community
 
+    def reset_engagement_tracking(self) -> None:
+        """Reset visit counts for windowed engagement measurement."""
+        self._visit_counts = {}
+
     def set_training(self, mode: bool) -> None:
         self._training = mode
 

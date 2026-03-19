@@ -152,6 +152,10 @@ class STDPNetwork(TestSystem):
         # Store initial weights for reset
         self._initial_weights = np.array(self._components["S"].w[:]).copy()
 
+    def reset_engagement_tracking(self) -> None:
+        """Reset spike counts for windowed engagement measurement."""
+        self._group_spike_counts = np.zeros(self._n_groups, dtype=np.float64)
+
     def set_training(self, mode: bool) -> None:
         """Enable/disable STDP during step().
 

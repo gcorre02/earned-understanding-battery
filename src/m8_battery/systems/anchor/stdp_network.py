@@ -177,10 +177,11 @@ class STDPNetwork(TestSystem):
         S = self._components["S"]
 
         # Set input currents
-        # Background: moderate — neurons fire from combined background + recurrent input
-        # Strong within-group weights create higher firing rates in trained groups
+        # Background: low enough that recurrent drive matters at scale (DN-23 scale note).
+        # At 1000 neurons, ~25 within-group connections per neuron — recurrent input
+        # becomes a meaningful fraction of total drive. Weight structure shapes firing.
         for i in range(self._n_neurons):
-            G.I_ext[i] = 10 * b2.mV
+            G.I_ext[i] = 13 * b2.mV
 
         # Domain input: boost target group (training and battery domain operation)
         if input_data is not None:
@@ -286,12 +287,13 @@ class STDPNetwork(TestSystem):
         return new
 
     def perturb(self, region_id: str, method: str = "reset_weights") -> TestSystem:
-        """Reset synaptic weights within target group to initial values.
+        """Reset ALL synaptic weights to/from target group to initial values.
 
-        Only resets intra-group synapses (both pre AND post in target group).
-        Cross-group connections preserved — the network can still drive the
-        perturbed group via intact pathways. STDP may rebuild the within-group
-        structure from correlated cross-group input.
+        Resets synapses where pre OR post neuron is in the target group.
+        At scale (1000+ neurons), within-group-only perturbation affects <6%
+        of synapses — too weak to disrupt engagement. Full to/from reset
+        is the TMS analogy: disrupt all connections of the stimulated region.
+        STDP dynamics in the live network may rebuild these connections.
         """
         new = self._build_clone()
         group_id = int(region_id.replace("group_", ""))
@@ -300,7 +302,7 @@ class STDPNetwork(TestSystem):
         post = np.array(S.j[:])
         group_ids = new._components["group_ids"]
         for k in range(len(pre)):
-            if group_ids[int(pre[k])] == group_id and group_ids[int(post[k])] == group_id:
+            if group_ids[int(pre[k])] == group_id or group_ids[int(post[k])] == group_id:
                 S.w[k] = new._initial_weights[k]
         return new
 
@@ -344,17 +346,70 @@ class STDPNetwork(TestSystem):
         # Copy weights from source
         new._components["S"].w[:] = src_weights
         new._initial_weights = self._initial_weights.copy()
+
+        # Copy membrane voltages so clone starts in same dynamic state
+        # (avoids cold-start problem where recurrent network needs activity to sustain)
+        new._components["G"].v[:] = self._components["G"].v[:]
         return new
 
-    def train_on_domain(self, graph: Any, n_steps: int = 2000) -> None:
-        """Train via rate-coded group input with live STDP.
+    def train_on_domain(self, graph: Any, n_steps: int = 2000, duration_s: float = 5.0) -> None:
+        """Train via Brian2 native network_operation with rate-coded input.
 
-        Cycles through groups, each getting supra-threshold drive for 20 steps.
-        STDP is active — weights update based on spike timing.
+        Uses Brian2's @network_operation to cycle through groups with
+        high/low input rates — the same protocol that Song et al. (2000)
+        uses and that was validated in our Brian2 native test (ratios 1.35-1.51x).
+        n_steps is ignored — duration_s controls training length.
         """
-        _log(f"Training STDP network: {n_steps} steps, {self._n_neurons} neurons (live Brian2)")
-        for i in range(n_steps):
-            group = (i // 20) % self._n_groups
-            self.step(group)
-        _log(f"  done: Gini={self.get_structure_metric():.4f}, "
-             f"spikes={self._group_spike_counts.sum():.0f}")
+        import brian2 as b2
+        b2.prefs.codegen.target = 'numpy'
+
+        G = self._components["G"]
+        net = self._components["net"]
+        mon = self._components["mon"]
+        n_groups = self._n_groups
+        group_ids = self._components["group_ids"]
+        n_neurons = self._n_neurons
+        cycle_ms = 200.0
+
+        # Rate-coded input: active group gets supra-threshold, others sub-threshold
+        @b2.network_operation(dt=cycle_ms * b2.ms)
+        def update_input(t):
+            phase = int(t / (cycle_ms * b2.ms)) % n_groups
+            for i in range(n_neurons):
+                if group_ids[i] == phase:
+                    G.I_ext[i] = 25 * b2.mV  # Supra-threshold
+                else:
+                    G.I_ext[i] = 5 * b2.mV   # Sub-threshold
+
+        net.add(update_input)
+
+        _log(f"Training STDP: {self._n_neurons} neurons, {duration_s}s, "
+             f"cycle={cycle_ms}ms (Brian2 native)")
+        spike_before = mon.num_spikes
+        net.run(duration_s * b2.second)
+        new_spikes = mon.num_spikes - spike_before
+
+        net.remove(update_input)
+
+        # Update spike counts
+        for idx in mon.i[spike_before:]:
+            grp = group_ids[int(idx)]
+            self._group_spike_counts[grp] += 1
+
+        self._step_count += int(duration_s * 1000 / self._dt_ms)
+
+        _log(f"  done: {new_spikes} spikes ({new_spikes/(duration_s*n_neurons):.1f}Hz/neuron), "
+             f"Gini={self.get_structure_metric():.4f}")
+
+        # Report within/between
+        S = self._components["S"]
+        pre = np.array(S.i[:])
+        post = np.array(S.j[:])
+        w = np.array(S.w[:])
+        for g in range(n_groups):
+            gn = set(i for i, gid in enumerate(group_ids) if gid == g)
+            wi = [k for k in range(len(pre)) if int(pre[k]) in gn and int(post[k]) in gn]
+            bi = [k for k in range(len(pre)) if int(pre[k]) in gn and int(post[k]) not in gn]
+            wm = w[wi].mean() if wi else 0
+            bm = w[bi].mean() if bi else 0
+            _log(f"  group {g}: within={wm:.4f} between={bm:.4f} ratio={wm/max(bm,1e-6):.2f}")

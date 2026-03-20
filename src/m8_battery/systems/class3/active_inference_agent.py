@@ -227,8 +227,8 @@ class ActiveInferenceAgent(TestSystem):
         return result
 
     def get_representation_state(self):
-        """pB for CKA (T1-02)."""
-        return self._pB.reshape(1, -1)
+        """pB reshaped for CKA (T1-02). Uses (n_states, n_states*n_actions) layout."""
+        return self._pB.reshape(self._n_nodes, -1)
 
     def ablate(self, region_id: str) -> TestSystem:
         """Zero out transitions involving target community."""

@@ -241,9 +241,13 @@ class STDPNetwork(TestSystem):
         self._group_spike_counts = state["group_spike_counts"]
 
     def get_representation_state(self):
-        """Synaptic weight vector for CKA computation (T1-02)."""
+        """Synaptic weight vector for CKA (T1-02). Reshaped to (n_groups, -1)."""
         w = np.array(self._components["S"].w[:])
-        return w.reshape(1, -1)
+        # Reshape to avoid (1, N) which creates N×N matrix in CKA
+        n = max(self._n_groups, int(np.sqrt(len(w))))
+        pad = n - (len(w) % n) if len(w) % n != 0 else 0
+        w_padded = np.pad(w, (0, pad))
+        return w_padded.reshape(n, -1)
 
     def get_structure_metric(self) -> float:
         """Synaptic weight Gini from LIVE network."""

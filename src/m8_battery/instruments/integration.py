@@ -111,6 +111,63 @@ def run_integration(
     else:
         gini = 0.0
 
+    # T1-04: Post-ablation stability check
+    # Does the system form a stable new regime after ablation, or collapse?
+    # Ablate the highest-degradation region, run M steps, measure stability.
+    reorganisation_stability = None
+    if ablation_results:
+        highest_deg_region = max(
+            ((r, d["degradation"]) for r, d in ablation_results.items()
+             if d.get("degradation") is not None),
+            key=lambda x: abs(x[1]), default=(None, 0)
+        )[0]
+        if highest_deg_region is not None:
+            try:
+                ablated_for_stability = system.ablate(highest_deg_region)
+                # Run M/2 steps, measure engagement
+                M = len(probe_inputs) if probe_inputs else 10
+                for _ in range(max(M // 2, 5)):
+                    ablated_for_stability.step(probe_inputs[0] if probe_inputs else None)
+                eng_mid = ablated_for_stability.get_engagement_distribution()
+                # Run another M/2 steps
+                for _ in range(max(M // 2, 5)):
+                    ablated_for_stability.step(probe_inputs[0] if probe_inputs else None)
+                eng_final = ablated_for_stability.get_engagement_distribution()
+                # Stability = cosine similarity between mid and final
+                keys = sorted(set(list(eng_mid.keys()) + list(eng_final.keys())))
+                v_mid = np.array([eng_mid.get(k, 0) for k in keys])
+                v_fin = np.array([eng_final.get(k, 0) for k in keys])
+                n_mid, n_fin = np.linalg.norm(v_mid), np.linalg.norm(v_fin)
+                if n_mid > 1e-10 and n_fin > 1e-10:
+                    reorganisation_stability = float(np.dot(v_mid, v_fin) / (n_mid * n_fin))
+                else:
+                    reorganisation_stability = 0.0
+            except Exception:
+                reorganisation_stability = None
+
+    # T1-04: Low-engagement control ablation
+    # If ANY ablation causes global change → fragile, not integrated
+    control_ablation_gini = None
+    engagement = system.get_engagement_distribution()
+    if engagement and len(regions) >= 2:
+        lowest_eng_region = min(regions, key=lambda r: engagement.get(r, 0.0))
+        try:
+            control_ablated = system.ablate(lowest_eng_region)
+            control_metric = _probe_metric(control_ablated, probe_inputs)
+            control_degradation = baseline_metric - control_metric
+            # Compute Gini including control ablation
+            control_degs = individual_degradations + [control_degradation]
+            sorted_ctrl = np.sort(np.abs(control_degs))
+            n_ctrl = len(sorted_ctrl)
+            if n_ctrl > 0 and sorted_ctrl.sum() > 0:
+                idx_ctrl = np.arange(1, n_ctrl + 1)
+                control_ablation_gini = float(
+                    (2 * np.sum(idx_ctrl * sorted_ctrl) - (n_ctrl + 1) * np.sum(sorted_ctrl))
+                    / (n_ctrl * np.sum(sorted_ctrl))
+                )
+        except Exception:
+            control_ablation_gini = None
+
     # Decision logic
     # High Gini (> 0.3) = some regions disproportionately important = integration
     # High CV (> 0.5) = non-uniform degradation = integration
@@ -119,6 +176,8 @@ def run_integration(
     if has_integration:
         passed = True
         notes = f"Non-linear degradation detected: Gini={gini:.4f}, CV={cv:.4f}"
+        if reorganisation_stability is not None:
+            notes += f", reorganisation_stability={reorganisation_stability:.4f}"
     else:
         passed = False
         notes = f"Linear/uniform degradation: Gini={gini:.4f}, CV={cv:.4f}"
@@ -131,6 +190,8 @@ def run_integration(
         "cv": cv,
         "n_regions": len(regions),
         "baseline_metric": baseline_metric,
+        "reorganisation_stability": reorganisation_stability,
+        "control_ablation_gini": control_ablation_gini,
     })
 
     return InstrumentResult(
@@ -143,6 +204,8 @@ def run_integration(
             "sum_individual_degradation": sum_individual,
             "gini": float(gini),
             "cv": float(cv),
+            "reorganisation_stability": reorganisation_stability,
+            "control_ablation_gini": control_ablation_gini,
         },
         notes=notes,
     )

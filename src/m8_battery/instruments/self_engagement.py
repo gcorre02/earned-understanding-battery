@@ -116,20 +116,38 @@ def _run_perturbation_protocol(
     perturbed.step(None)
     post_immediate = perturbed.get_engagement_distribution()
 
-    # Phase 3: Recovery window — windowed
-    perturbed.reset_engagement_tracking()
+    # Phase 3: Recovery horizon family (T1-01g)
+    # Measure recovery at multiple windows: W/2, W, 2W, 4W
+    # The curve shape is diagnostic — instant=topology, gradual=genuine, none=destroyed
     t0 = _time.monotonic()
-    for i in range(recovery_window - 1):  # -1 because we already did 1 step
-        perturbed.step(None)
-    _log(f"  recovery: {recovery_window} steps in {_time.monotonic()-t0:.2f}s")
+    recovery_horizons = [max(1, recovery_window // 2), recovery_window,
+                         recovery_window * 2, recovery_window * 4]
+    recovery_curve = []
+    steps_run = 1  # Already ran 1 step for post_immediate
 
+    for horizon in recovery_horizons:
+        steps_needed = horizon - steps_run
+        if steps_needed > 0:
+            perturbed.reset_engagement_tracking()
+            for _ in range(steps_needed):
+                perturbed.step(None)
+            steps_run = horizon
+        eng = perturbed.get_engagement_distribution()
+        cos_sim = _cosine_sim(pre_engagement, eng, regions)
+        recovery_curve.append((horizon, cos_sim))
+
+    _log(f"  recovery curve: {[(h, f'{c:.4f}') for h, c in recovery_curve]} "
+         f"in {_time.monotonic()-t0:.2f}s")
+
+    # Primary recovery uses W (second point in curve)
     post_recovery = perturbed.get_engagement_distribution()
+    recovery_at_W = next((c for h, c in recovery_curve if h == recovery_window), 0.0)
 
     # Compute disruption (resistance) = 1 - cos_sim(pre, post_immediate)
     disruption = 1.0 - _cosine_sim(pre_engagement, post_immediate, regions)
 
-    # Compute recovery = cos_sim(pre, post_recovery)
-    recovery = _cosine_sim(pre_engagement, post_recovery, regions)
+    # Compute recovery = cos_sim at primary window W
+    recovery = recovery_at_W
 
     return {
         "pre_engagement": pre_engagement,
@@ -138,6 +156,7 @@ def _run_perturbation_protocol(
         "target_region": target_region,
         "disruption": disruption,
         "recovery": recovery,
+        "recovery_curve": recovery_curve,
         "regions": regions,
         "perturbation_validated": perturbation_validated,
         "perturbation_caveat": perturbation_caveat,

@@ -37,6 +37,8 @@ SYSTEM_CLASSES = {
     "1A": SystemClass.CLASS_1, "1B": SystemClass.CLASS_1, "1C": SystemClass.CLASS_1,
     "2A": SystemClass.CLASS_2, "2B": SystemClass.CLASS_2, "2C": SystemClass.CLASS_2,
     "3A": SystemClass.CLASS_3, "3B": SystemClass.CLASS_3, "3C": SystemClass.CLASS_3,
+    "HEB": SystemClass.CLASS_3,   # Internal only — NEVER PUBLISH
+    "STDP": SystemClass.CLASS_3,  # Paper 2 system 4A-anchor
 }
 
 SYSTEM_NAMES = {
@@ -49,6 +51,8 @@ SYSTEM_NAMES = {
     "3A": "DQN (MaskablePPO)",
     "3B": "Curiosity (RND)",
     "3C": "Foxworthy Variant F",
+    "HEB": "Hebbian Walker (internal)",
+    "STDP": "Brian2 STDP (4A-anchor)",
 }
 
 # LLM systems get MPS on M5, everything else CPU
@@ -134,6 +138,23 @@ def make_system(system_id, graph, seed, n_features):
             return f
         return s, _make_3c_control
 
+    elif system_id == "HEB":
+        from m8_battery.systems.internal.hebbian_walker import HebbianWalker
+        s = HebbianWalker(graph, seed=seed, eta=0.1, decay=0.01, temperature=0.5)
+        s.train_on_domain(graph, n_steps=300)
+        return s, lambda sd=seed: HebbianWalker(graph, seed=sd + 1000, eta=0.1, decay=0.01, temperature=0.5)
+
+    elif system_id == "STDP":
+        from m8_battery.systems.anchor.stdp_network import STDPNetwork
+        s = STDPNetwork(n_neurons=1000, connection_prob=0.1, seed=seed, n_groups=4)
+        s.train_on_domain(None, duration_s=10.0)
+        def _make_stdp_fresh(sd=seed):
+            f = STDPNetwork(n_neurons=1000, connection_prob=0.1, seed=sd + 1000, n_groups=4)
+            for _ in range(100):
+                f.step(0)
+            return f
+        return s, _make_stdp_fresh
+
     raise ValueError(f"Unknown system: {system_id}")
 
 
@@ -152,7 +173,13 @@ def run_single(system_id, seed):
     system, control_factory = make_system(system_id, graph_a, seed, config.n_node_features)
     t_setup = time.time() - t0
 
-    n_inputs = 20 if system_id in LLM_SYSTEMS else 50
+    # STDP needs more inputs for trajectory detection (R² requires enough measurement points)
+    if system_id == "STDP":
+        n_inputs = 160
+    elif system_id in LLM_SYSTEMS:
+        n_inputs = 20
+    else:
+        n_inputs = 50
     battery_config = BatteryConfig(
         domain_a_inputs=nodes_a[:n_inputs],
         domain_a_prime_inputs=list(family["A_prime"].nodes())[:n_inputs],

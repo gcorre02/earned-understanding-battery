@@ -25,6 +25,7 @@ CLASS_MAP = {
     "1A": 1, "1B": 1, "1C": 1,
     "2A": 2, "2B": 2, "2C": 2,
     "3A": 3, "3B": 3, "3C": 3,
+    "3D": 3, "3E": 3,
     "HEB": "anchor", "STDP": "anchor",
 }
 
@@ -66,7 +67,7 @@ def analyse_instrument(runs, inst_name):
 
     # Per-system summary
     print(f"\n  Per-system results:")
-    for sid in ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "HEB", "STDP"]:
+    for sid in ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "3D", "3E", "HEB", "STDP"]:
         if sid not in by_system:
             continue
         vals = by_system[sid]
@@ -114,7 +115,7 @@ def conjunction_validation(runs):
     print(f"  {'-'*50}")
 
     any_class13_pass = False
-    for sid in ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "HEB", "STDP"]:
+    for sid in ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "3D", "3E", "HEB", "STDP"]:
         for seed in [42, 123, 456]:
             key = f"{sid}_s{seed}"
             if key not in by_key:

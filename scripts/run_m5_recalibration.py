@@ -39,6 +39,8 @@ SYSTEM_CLASSES = {
     "3A": SystemClass.CLASS_3, "3B": SystemClass.CLASS_3, "3C": SystemClass.CLASS_3,
     "HEB": SystemClass.CLASS_3,   # Publishable per DN-28
     "STDP": SystemClass.CLASS_3,  # Paper 2 system 4A-anchor
+    "3D": SystemClass.CLASS_3,    # Empowerment (Klyubin 2005)
+    "3E": SystemClass.CLASS_3,    # Active inference (Friston 2010)
 }
 
 SYSTEM_NAMES = {
@@ -53,6 +55,8 @@ SYSTEM_NAMES = {
     "3C": "Foxworthy Variant F",
     "HEB": "Hebbian Walker (System HEB)",
     "STDP": "Brian2 STDP (4A-anchor)",
+    "3D": "Empowerment (Klyubin)",
+    "3E": "Active Inference (Friston)",
 }
 
 # LLM systems get MPS on M5, everything else CPU
@@ -155,6 +159,18 @@ def make_system(system_id, graph, seed, n_features):
             return f
         return s, _make_stdp_fresh
 
+    elif system_id == "3D":
+        from m8_battery.systems.class3.empowerment_agent import EmpowermentAgent
+        s = EmpowermentAgent(graph, seed=seed, recompute_interval=100)
+        s.train_on_domain(graph, n_steps=2000)
+        return s, lambda g=graph, sd=seed: EmpowermentAgent(g, seed=sd + 1000, recompute_interval=100)
+
+    elif system_id == "3E":
+        from m8_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
+        s = ActiveInferenceAgent(graph, seed=seed)
+        s.train_on_domain(graph, n_steps=1000)
+        return s, lambda g=graph, sd=seed: ActiveInferenceAgent(g, seed=sd + 1000)
+
     raise ValueError(f"Unknown system: {system_id}")
 
 
@@ -239,7 +255,7 @@ def run_single(system_id, seed):
 
 def main():
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    all_systems = ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "HEB", "STDP"]
+    all_systems = ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "HEB", "STDP", "3D", "3E"]
     total = len(all_systems) * len(SEEDS)
 
     print(f"M5 Max Full Recalibration (T1-09) — {total} runs")

@@ -239,12 +239,13 @@ def run_single(system_id, seed):
 
 def main():
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    all_systems = ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C"]
+    all_systems = ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "HEB", "STDP"]
     total = len(all_systems) * len(SEEDS)
 
-    print(f"M5 Max Full Recalibration — {total} runs")
+    print(f"M5 Max Full Recalibration (T1-09) — {total} runs")
     print(f"Scale: MEDIUM (150 nodes, 6 communities)")
     print(f"LLM systems ({LLM_SYSTEMS}) on MPS, rest on CPU")
+    print(f"Anchor systems: HEB (internal), STDP (1000 neurons, ~18min/run)")
     print("=" * 70)
 
     count = 0

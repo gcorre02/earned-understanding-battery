@@ -310,6 +310,19 @@ class STDPNetwork(TestSystem):
                 S.w[k] = new._initial_weights[k]
         return new
 
+    def boost(self, region_id: str) -> TestSystem:
+        """Boost synaptic weights within target group to w_max (T1-01f decoy)."""
+        new = self._build_clone()
+        group_id = int(region_id.replace("group_", ""))
+        S = new._components["S"]
+        pre = np.array(S.i[:])
+        post = np.array(S.j[:])
+        group_ids = new._components["group_ids"]
+        for k in range(len(pre)):
+            if group_ids[int(pre[k])] == group_id and group_ids[int(post[k])] == group_id:
+                S.w[k] = new._w_max
+        return new
+
     def get_regions(self) -> list[str]:
         return [f"group_{g}" for g in range(self._n_groups)]
 

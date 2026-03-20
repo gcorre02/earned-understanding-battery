@@ -116,6 +116,38 @@ def _run_perturbation_protocol(
     perturbed.step(None)
     post_immediate = perturbed.get_engagement_distribution()
 
+    # T1-01f: False-attractor control
+    # Boost a non-target region to create a decoy attractor. If the system
+    # reconstructs the ORIGINAL pattern instead of drifting to the decoy,
+    # that's stronger evidence of earned self-engagement.
+    decoy_region = None
+    original_recovery_ratio = None
+    decoy_drift_ratio = None
+    non_target_regions = [r for r in regions if r != target_region]
+    if non_target_regions:
+        # Pick lowest-engagement region as decoy
+        decoy_region = min(non_target_regions, key=lambda r: pre_engagement.get(r, 0.0))
+        boosted = perturbed.boost(decoy_region)
+
+        # Run recovery on the boosted system
+        boosted.reset_engagement_tracking()
+        for _ in range(recovery_window):
+            boosted.step(None)
+        boosted_recovery = boosted.get_engagement_distribution()
+
+        # Compare: did the system return to original target or drift to decoy?
+        pre_target = pre_engagement.get(target_region, 0.0)
+        rec_target = boosted_recovery.get(target_region, 0.0)
+        pre_decoy = pre_engagement.get(decoy_region, 0.0)
+        rec_decoy = boosted_recovery.get(decoy_region, 0.0)
+
+        original_recovery_ratio = rec_target / max(pre_target, 1e-10)
+        decoy_drift_ratio = rec_decoy / max(pre_decoy, 1e-10)
+
+        prefers_original = original_recovery_ratio > decoy_drift_ratio
+        _log(f"  T1-01f: decoy={decoy_region} original_recovery={original_recovery_ratio:.4f} "
+             f"decoy_drift={decoy_drift_ratio:.4f} prefers_original={prefers_original}")
+
     # Phase 3: Recovery horizon family (T1-01g)
     # Measure recovery at multiple windows: W/2, W, 2W, 4W
     # The curve shape is diagnostic — instant=topology, gradual=genuine, none=destroyed
@@ -160,6 +192,9 @@ def _run_perturbation_protocol(
         "regions": regions,
         "perturbation_validated": perturbation_validated,
         "perturbation_caveat": perturbation_caveat,
+        "decoy_region": decoy_region,
+        "original_recovery_ratio": original_recovery_ratio,
+        "decoy_drift_ratio": decoy_drift_ratio,
     }
 
 
@@ -350,6 +385,9 @@ def run_self_engagement(
             "fresh_pre_engagement": fresh_result["pre_engagement"],
             "perturbation_validated": trained_validated,
             "perturbation_caveat": trained_caveat,
+            "decoy_region": trained_result.get("decoy_region"),
+            "original_recovery_ratio": trained_result.get("original_recovery_ratio"),
+            "decoy_drift_ratio": trained_result.get("decoy_drift_ratio"),
         },
         notes=notes,
     )

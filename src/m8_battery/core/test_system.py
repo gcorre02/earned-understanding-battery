@@ -73,6 +73,19 @@ class TestSystem(ABC):
         but be fully independent (no shared mutable state).
         """
 
+    def boost(self, region_id: str) -> TestSystem:
+        """Return new system instance with boosted structure in target region.
+
+        Used by T1-01f false-attractor control: after perturbation of the
+        target region, boost a non-target region to create a decoy attractor.
+        If the system reconstructs the ORIGINAL pattern instead of drifting
+        to the decoy, that's stronger evidence of earned self-engagement.
+
+        Default: return clone (no boost). Adapters can override with
+        substrate-appropriate boosting (e.g., strengthen edges, boost weights).
+        """
+        return self.clone()
+
     def reset_engagement_tracking(self) -> None:
         """Reset engagement counters for windowed measurement.
 

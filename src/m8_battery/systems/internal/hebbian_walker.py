@@ -227,6 +227,19 @@ class HebbianWalker(TestSystem):
 
         return new
 
+    def boost(self, region_id: str) -> TestSystem:
+        """Strengthen edge weights in target community (T1-01f decoy)."""
+        new = self._clone_internal()
+        community_id = int(region_id.replace("community_", ""))
+        community_nodes = {n for n, c in new._node_to_community.items() if c == community_id}
+
+        # Boost: set within-community weights to max observed weight
+        max_weight = max(new._weights.values()) if new._weights else 1.0
+        for (u, v) in list(new._weights.keys()):
+            if u in community_nodes and v in community_nodes:
+                new._weights[(u, v)] = max_weight
+        return new
+
     def get_regions(self) -> list[str]:
         communities = sorted(set(self._node_to_community.values()))
         return [f"community_{c}" for c in communities]

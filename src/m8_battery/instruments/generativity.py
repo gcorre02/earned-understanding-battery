@@ -86,15 +86,19 @@ def run_generativity(
     metric_changed = abs(delta) > 1e-6
     structure_retained = retention > 0.5
 
+    # T1-05: Failure mode classification
     if metric_changed and structure_retained:
         passed = True
+        failure_mode = "earned"
         notes = (f"Generative response to novel domain: delta={delta:.6f}, "
                  f"retention={retention:.4f}, stability={trajectory_stability:.4f}")
     elif not metric_changed:
         passed = False
+        failure_mode = "absent"  # No behavioural divergence on novel domain
         notes = f"No response to novel domain (metric unchanged): delta={delta:.6f}"
     else:
         passed = None
+        failure_mode = "architectural"  # Response exists but structure not retained
         notes = (f"Ambiguous response: delta={delta:.6f}, "
                  f"retention={retention:.4f}, stability={trajectory_stability:.4f}")
 
@@ -122,4 +126,5 @@ def run_generativity(
             "trajectory": [float(x) for x in trajectory],
         },
         notes=notes,
+        failure_mode=failure_mode,
     )

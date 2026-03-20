@@ -173,13 +173,28 @@ def run_integration(
     # High CV (> 0.5) = non-uniform degradation = integration
     has_integration = gini > 0.3 or cv > 0.5
 
+    # T1-05: Failure mode classification
     if has_integration:
         passed = True
+        # Check if it's fragile (control ablation also causes global change)
+        if control_ablation_gini is not None and control_ablation_gini > 0.3:
+            failure_mode = "fragile"  # Any ablation causes global change
+        elif reorganisation_stability is not None and reorganisation_stability < 0.5:
+            failure_mode = "earned"  # Reorganises to new stable regime
+        else:
+            failure_mode = "earned"
         notes = f"Non-linear degradation detected: Gini={gini:.4f}, CV={cv:.4f}"
         if reorganisation_stability is not None:
             notes += f", reorganisation_stability={reorganisation_stability:.4f}"
     else:
         passed = False
+        # Classify the failure
+        if max(abs(d) for d in individual_degradations) < 1e-6:
+            failure_mode = "absent"  # No reorganisation at all
+        elif cv < 0.2:
+            failure_mode = "modular"  # Only local effect, no global reorganisation
+        else:
+            failure_mode = "topological"  # Fresh shows same pattern
         notes = f"Linear/uniform degradation: Gini={gini:.4f}, CV={cv:.4f}"
 
     effect_size = float(gini)
@@ -208,6 +223,7 @@ def run_integration(
             "control_ablation_gini": control_ablation_gini,
         },
         notes=notes,
+        failure_mode=failure_mode,
     )
 
 

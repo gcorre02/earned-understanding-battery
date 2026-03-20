@@ -238,6 +238,7 @@ def run_self_engagement(
             effect_size=0.0,
             notes="Precondition fail: trajectory absent/static — no earned structure to test",
             raw_data={"precondition": "fail", "trajectory_passed": trajectory_passed},
+            failure_mode="precondition-fail",
         )
 
     regions = system.get_regions()
@@ -329,8 +330,10 @@ def run_self_engagement(
     trained_caveat = trained_result.get("perturbation_caveat")
     fresh_validated = fresh_result.get("perturbation_validated", True)
 
+    # T1-05: Failure mode classification
     if passes_resistance and passes_recovery:
         passed = True
+        failure_mode = "earned"
         notes = (
             f"Self-engagement detected (DN-20): "
             f"resistance_ratio={resistance_ratio:.4f}, recovery_ratio={recovery_ratio:.4f}. "
@@ -341,12 +344,27 @@ def run_self_engagement(
         reasons = []
         if not passes_resistance:
             reasons.append(f"resistance_ratio={resistance_ratio:.4f}<=1.0")
+            failure_mode = "no-resistance"
         if not passes_recovery:
             reasons.append(f"recovery_ratio={recovery_ratio:.4f}<=1.0")
+            failure_mode = "no-recovery"
+        if not passes_resistance and not passes_recovery:
+            # Check if fresh also recovers (topology-driven)
+            if fresh_result.get("recovery", 0) > 0.8:
+                failure_mode = "topology-driven"
+            else:
+                failure_mode = "no-resistance"
         notes = (
             f"No self-engagement: {', '.join(reasons)}. "
             f"Trained system does not exceed fresh baseline."
         )
+
+    # Check decoy drift (T1-01f)
+    trained_decoy_drift = trained_result.get("decoy_drift_ratio")
+    trained_original_recovery = trained_result.get("original_recovery_ratio")
+    if (passed and trained_decoy_drift is not None and trained_original_recovery is not None
+            and trained_decoy_drift > trained_original_recovery):
+        failure_mode = "decoy-drift"
 
     # Append perturbation validation caveat if present
     if trained_caveat:
@@ -390,4 +408,5 @@ def run_self_engagement(
             "decoy_drift_ratio": trained_result.get("decoy_drift_ratio"),
         },
         notes=notes,
+        failure_mode=failure_mode,
     )

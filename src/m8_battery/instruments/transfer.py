@@ -116,21 +116,26 @@ def run_transfer(
     metrics_differ = abs(trained_final - naive_final) > 1e-6
     passes_earned = earned_ratio > 1.0
 
+    # T1-05: Failure mode classification
     if has_advantage and metrics_differ and passes_earned:
         passed = True
+        failure_mode = "earned"
         notes = (f"Transfer detected: advantage={transfer_advantage:.4f}, "
                  f"trained_final={trained_final:.6f}, naive_final={naive_final:.6f}, "
                  f"earned_ratio={earned_ratio:.2f}")
     elif has_advantage and metrics_differ and not passes_earned:
         passed = False
+        failure_mode = "statistical"  # Naive shows similar → distributional overlap
         notes = (f"Transfer present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
                  f"Naive system shows similar transfer.")
     elif not metrics_differ:
         passed = False
+        failure_mode = "absent"  # No advantage at all
         notes = (f"No transfer: trained and naive produce same metric. "
                  f"advantage={transfer_advantage:.4f}")
     else:
         passed = None
+        failure_mode = "shortcut"  # Advantage exists but ambiguous
         notes = (f"Ambiguous transfer: advantage={transfer_advantage:.4f}, "
                  f"trained_final={trained_final:.6f}, naive_final={naive_final:.6f}")
 
@@ -157,6 +162,7 @@ def run_transfer(
             "earned_ratio": float(earned_ratio),
         },
         notes=notes,
+        failure_mode=failure_mode,
     )
 
 

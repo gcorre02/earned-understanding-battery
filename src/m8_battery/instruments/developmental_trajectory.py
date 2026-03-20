@@ -181,20 +181,25 @@ def _analyse_trajectory(
     # Earned ratio > 1.0 means trained develops MORE than fresh
     passes_earned = earned_ratio is None or earned_ratio > 1.0
 
+    # T1-05: Failure mode classification
     if has_trend and has_monotonicity and passes_earned:
         passed = True
+        failure_mode = "earned"
         notes = f"Developmental trajectory detected: slope={slope:.6f}, R²={r_squared:.4f}, monotonicity={monotonicity:.2f}"
         if earned_ratio is not None:
             notes += f", earned_ratio={earned_ratio:.2f}"
     elif has_trend and has_monotonicity and not passes_earned:
         passed = False
+        failure_mode = "architectural"  # Fresh shows same → structure is architectural
         notes = (f"Trajectory present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
                  f"Fresh system shows similar development.")
     elif has_trend or has_monotonicity:
         passed = None
+        failure_mode = "noise"  # Inconsistent signal
         notes = f"Ambiguous trajectory: slope={slope:.6f}, R²={r_squared:.4f}, monotonicity={monotonicity:.2f}"
     else:
         passed = False
+        failure_mode = "absent"  # No metric change
         notes = f"No developmental trajectory: slope={slope:.6f}, R²={r_squared:.4f}, monotonicity={monotonicity:.2f}"
 
     return InstrumentResult(
@@ -211,6 +216,7 @@ def _analyse_trajectory(
             "earned_ratio": earned_ratio,
         },
         notes=notes,
+        failure_mode=failure_mode,
     )
 
 

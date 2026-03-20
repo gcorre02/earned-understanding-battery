@@ -40,6 +40,7 @@ class InstrumentResult:
     p_value: float | None = None
     raw_data: dict[str, Any] = field(default_factory=dict)
     notes: str = ""
+    failure_mode: str = ""  # T1-05: named failure classification (e.g., "absent", "architectural")
 
 
 @dataclass

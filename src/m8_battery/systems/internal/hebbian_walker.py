@@ -145,6 +145,11 @@ class HebbianWalker(TestSystem):
         self._step_count = state["step_count"]
         self._rng.bit_generator.state = state["rng_state"]
 
+    def get_representation_state(self):
+        """Edge weight vector for CKA computation (T1-02)."""
+        values = np.array(list(self._weights.values()))
+        return values.reshape(1, -1)
+
     def get_structure_metric(self) -> float:
         """Edge weight Gini coefficient. Higher = more unequal = more structure."""
         values = np.array(list(self._weights.values()))

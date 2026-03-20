@@ -240,6 +240,11 @@ class STDPNetwork(TestSystem):
         self._step_count = state["step_count"]
         self._group_spike_counts = state["group_spike_counts"]
 
+    def get_representation_state(self):
+        """Synaptic weight vector for CKA computation (T1-02)."""
+        w = np.array(self._components["S"].w[:])
+        return w.reshape(1, -1)
+
     def get_structure_metric(self) -> float:
         """Synaptic weight Gini from LIVE network."""
         w = np.array(self._components["S"].w[:])

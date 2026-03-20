@@ -130,6 +130,11 @@ class FoxworthyC(TestSystem):
         self._visit_counts = state["visit_counts"]
         self._hidden = torch.tensor(state["hidden"])
 
+    def get_representation_state(self):
+        """GRU hidden state vector for CKA computation (T1-02)."""
+        import numpy as np
+        return self._hidden.detach().cpu().numpy().reshape(1, -1)
+
     def get_structure_metric(self) -> float:
         """Hidden state norm — changes with state but weights are fixed.
 

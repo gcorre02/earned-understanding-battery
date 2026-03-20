@@ -291,6 +291,9 @@ def run_battery(
     _log(f"  baseline: {timings['baseline']:.1f}s")
 
     # --- Phase 1: Train on domain A + measure developmental trajectory ---
+    # T1-02: Collect early representation snapshot for CKA
+    early_repr = system.get_representation_state()
+
     _log("Phase 1: developmental trajectory")
     t0 = _time.monotonic()
     results["developmental_trajectory"] = run_developmental_trajectory(
@@ -302,6 +305,48 @@ def run_battery(
     )
     timings["developmental_trajectory"] = _time.monotonic() - t0
     _log(f"  dev_trajectory: {timings['developmental_trajectory']:.1f}s passed={results['developmental_trajectory'].passed}")
+
+    # T1-02: Collect late representation snapshot and compute CKA
+    late_repr = system.get_representation_state()
+    if early_repr is not None and late_repr is not None:
+        from m8_battery.analysis.cka import linear_cka, snapshot_hash
+        import numpy as np
+        cka_value = linear_cka(np.asarray(early_repr), np.asarray(late_repr))
+        early_hash = snapshot_hash(np.asarray(early_repr))
+        late_hash = snapshot_hash(np.asarray(late_repr))
+
+        # Directional agreement: scalar trajectory vs CKA
+        traj_result = results["developmental_trajectory"]
+        scalar_increases = (traj_result.raw_data or {}).get("slope", 0) > 0
+        cka_decreases = cka_value < 0.95  # Representations changed meaningfully
+        if scalar_increases and cka_decreases:
+            agreement = "consistent"
+        elif not scalar_increases and not cka_decreases:
+            agreement = "consistent"  # Both flat
+        elif scalar_increases and not cka_decreases:
+            agreement = "inconsistent"  # Scalar changed but representations didn't
+        else:
+            agreement = "inconsistent"  # Representations changed but scalar didn't
+
+        baseline["metric_bundle"] = {
+            "cka_early_late": float(cka_value),
+            "early_snapshot_hash": early_hash,
+            "early_snapshot_shape": list(np.asarray(early_repr).shape),
+            "late_snapshot_hash": late_hash,
+            "late_snapshot_shape": list(np.asarray(late_repr).shape),
+            "feasible": True,
+            "scalar_direction": "increasing" if scalar_increases else "flat_or_decreasing",
+            "cka_direction": "decreasing" if cka_decreases else "stable",
+            "agreement": agreement,
+        }
+        _log(f"  metric bundle: CKA={cka_value:.4f} agreement={agreement}")
+        if agreement == "inconsistent":
+            _log(f"  WARNING: metric bundle DISAGREEMENT — scalar vs CKA")
+    else:
+        baseline["metric_bundle"] = {
+            "feasible": False,
+            "reason": "no_representation_state" if early_repr is None else "static_system",
+        }
 
     # Trajectory compression supplement (LZ compressibility, TERL 2025)
     traj_data = results["developmental_trajectory"].raw_data or {}

@@ -433,6 +433,19 @@ class FoxworthyF(TestSystem):
         if "optimizer_state" in state and self._optimizer is not None:
             self._optimizer.load_state_dict(state["optimizer_state"])
 
+    def get_representation_state(self):
+        """LoRA adapter weight matrix for CKA computation (T1-02)."""
+        if self._model is None:
+            return None
+        import numpy as np
+        params = []
+        for name, param in self._model.named_parameters():
+            if param.requires_grad and "lora_" in name:
+                params.append(param.detach().cpu().numpy().flatten())
+        if not params:
+            return None
+        return np.concatenate(params).reshape(1, -1)  # (1, n_params) for CKA
+
     def get_structure_metric(self) -> float:
         """Adapter parameter L2 norm — changes as system learns."""
         return self._adapter_param_norm()

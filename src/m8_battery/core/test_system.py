@@ -73,6 +73,17 @@ class TestSystem(ABC):
         but be fully independent (no shared mutable state).
         """
 
+    def get_representation_state(self) -> Any:
+        """Return a matrix snapshot of internal state for CKA computation.
+
+        Returns None if not supported (Class 1 static, Class 2 frozen).
+        Returns np.ndarray for systems with computable representations.
+
+        Used by T1-02 metric bundle: CKA between early and late snapshots
+        measures whether internal representations changed during operation.
+        """
+        return None  # Default: not supported
+
     def boost(self, region_id: str) -> TestSystem:
         """Return new system instance with boosted structure in target region.
 

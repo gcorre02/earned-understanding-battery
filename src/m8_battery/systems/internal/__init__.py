@@ -1,2 +1,2 @@
-# Internal test-suite-only systems.
-# MOAT: Systems in this package must NEVER be published or referenced in papers.
+# Internal test-suite systems.
+# Note: HebbianWalker is now publishable per DN-28. See systems/internal/hebbian_walker.py.

@@ -1,17 +1,28 @@
-"""Hebbian graph walker — internal test-suite-only system.
+"""System HEB: Hebbian graph walker.
 
-MOAT: This system must NEVER be published or referenced in Paper 2.
-It resembles Manny's kappa dynamics. Internal validation only.
+Single-agent system with traversal-dependent edge reinforcement and
+global decay. Equivalent to ant colony optimisation without a
+solution-quality signal (Dorigo et al., 1996). Represents the simplest
+form of local, unsupervised, continuously-learning graph-based system.
 
-Purpose: Verify the self-engagement instrument can produce a positive.
-If this system fails self-engagement, the instrument has a deeper problem.
+Passes 4/5 battery instruments (trajectory, integration, transfer,
+self-engagement). Fails generativity — local edge reinforcement does
+not produce structural influence that generalises to novel domains
+without further learning.
 
 Architecture:
-- Undirected SBM graph with community structure
-- Edge weights: Hebbian update on traversal, global decay per step
+- SBM graph with community structure
+- Edge weights: Hebbian update on traversal (Hebb, 1949), global decay
 - Action selection: softmax over neighbour edge weights
 - Structure metric: edge weight Gini coefficient
 - No external objective, no reward signal, no teacher
+
+Literature:
+- Hebb DO (1949). The Organization of Behavior. Wiley.
+- Dorigo M, Maniezzo V, Colorni A (1996). Ant System: Optimization by
+  a Colony of Cooperating Agents. IEEE Trans Syst Man Cybern B 26(1):29-41.
+
+Publication decision: DN-28 (2026-03-20). Publishable as System HEB in Paper 2.
 """
 
 from __future__ import annotations
@@ -27,14 +38,14 @@ from m8_battery.core.test_system import TestSystem
 
 
 class HebbianWalker(TestSystem):
-    """Pure-Python Hebbian graph walker.
+    """Hebbian graph walker (System HEB).
 
-    INTERNAL TEST SUITE ONLY — NEVER PUBLISH.
-
-    Walks an undirected graph. Strengthens edges on traversal (Hebbian).
-    All edges decay globally each step. Over time, frequently-traversed
-    edges become strong, rarely-traversed edges decay to near-zero.
+    Walks a graph, strengthens edges on traversal (Hebbian learning),
+    decays all edges globally each step. Over time, frequently-traversed
+    edges become strong, rarely-traversed edges decay toward zero.
     This creates earned, region-specific structure.
+
+    Equivalent to ant colony optimisation without a solution-quality signal.
     """
 
     def __init__(

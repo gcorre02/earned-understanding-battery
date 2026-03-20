@@ -1,7 +1,7 @@
-"""Tests for HebbianWalker — internal test-suite-only system.
+"""Tests for HebbianWalker (System HEB).
 
-MOAT: This system must NEVER be published. Internal validation only.
-Purpose: verify self-engagement instrument can produce a positive.
+Publishable per DN-28. Validates self-engagement instrument and
+demonstrates 4/5 battery profile (fails generativity).
 """
 
 import pytest

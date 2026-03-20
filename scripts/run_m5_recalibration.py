@@ -37,7 +37,7 @@ SYSTEM_CLASSES = {
     "1A": SystemClass.CLASS_1, "1B": SystemClass.CLASS_1, "1C": SystemClass.CLASS_1,
     "2A": SystemClass.CLASS_2, "2B": SystemClass.CLASS_2, "2C": SystemClass.CLASS_2,
     "3A": SystemClass.CLASS_3, "3B": SystemClass.CLASS_3, "3C": SystemClass.CLASS_3,
-    "HEB": SystemClass.CLASS_3,   # Internal only — NEVER PUBLISH
+    "HEB": SystemClass.CLASS_3,   # Publishable per DN-28
     "STDP": SystemClass.CLASS_3,  # Paper 2 system 4A-anchor
 }
 
@@ -51,7 +51,7 @@ SYSTEM_NAMES = {
     "3A": "DQN (MaskablePPO)",
     "3B": "Curiosity (RND)",
     "3C": "Foxworthy Variant F",
-    "HEB": "Hebbian Walker (internal)",
+    "HEB": "Hebbian Walker (System HEB)",
     "STDP": "Brian2 STDP (4A-anchor)",
 }
 

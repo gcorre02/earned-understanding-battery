@@ -78,10 +78,38 @@ def _run_perturbation_protocol(
     target_region = max(pre_engagement, key=pre_engagement.get)
     _log(f"  target region: {target_region} (engagement={pre_engagement[target_region]:.4f})")
 
+    # T1-01e: Perturbation validation gate
+    # Verify target region has elevated structure before perturbation
+    pre_structure = system.get_structure_distribution()
+    target_structure_pre = pre_structure.get(target_region, 0.0)
+    non_target_structures = [v for k, v in pre_structure.items() if k != target_region]
+    mean_non_target = sum(non_target_structures) / max(len(non_target_structures), 1)
+    perturbation_validated = True
+    perturbation_caveat = None
+
     # Phase 2: Perturb
     t0 = _time.monotonic()
     perturbed = system.perturb(target_region, method=perturbation_method)
     _log(f"  perturb: {_time.monotonic()-t0:.2f}s")
+
+    # T1-01e: Verify perturbation reduced target structure
+    post_structure = perturbed.get_structure_distribution()
+    target_structure_post = post_structure.get(target_region, 0.0)
+
+    if target_structure_pre <= mean_non_target:
+        perturbation_caveat = (f"T1-01e: target region {target_region} structure "
+                               f"({target_structure_pre:.4f}) not elevated vs "
+                               f"non-target mean ({mean_non_target:.4f})")
+        perturbation_validated = False
+        _log(f"  CAVEAT: {perturbation_caveat}")
+    elif target_structure_post >= target_structure_pre:
+        perturbation_caveat = (f"T1-01e: perturbation did not reduce target structure "
+                               f"(pre={target_structure_pre:.4f}, post={target_structure_post:.4f})")
+        perturbation_validated = False
+        _log(f"  CAVEAT: {perturbation_caveat}")
+    else:
+        _log(f"  T1-01e validated: target structure {target_structure_pre:.4f} → "
+             f"{target_structure_post:.4f} (non-target mean={mean_non_target:.4f})")
 
     # Measure IMMEDIATELY after perturbation — windowed
     perturbed.reset_engagement_tracking()
@@ -111,6 +139,8 @@ def _run_perturbation_protocol(
         "disruption": disruption,
         "recovery": recovery,
         "regions": regions,
+        "perturbation_validated": perturbation_validated,
+        "perturbation_caveat": perturbation_caveat,
     }
 
 
@@ -240,6 +270,11 @@ def run_self_engagement(
     passes_resistance = resistance_ratio > 1.0
     passes_recovery = recovery_ratio > 1.0
 
+    # T1-01e: Check perturbation validation from both trained and fresh protocols
+    trained_validated = trained_result.get("perturbation_validated", True)
+    trained_caveat = trained_result.get("perturbation_caveat")
+    fresh_validated = fresh_result.get("perturbation_validated", True)
+
     if passes_resistance and passes_recovery:
         passed = True
         notes = (
@@ -258,6 +293,10 @@ def run_self_engagement(
             f"No self-engagement: {', '.join(reasons)}. "
             f"Trained system does not exceed fresh baseline."
         )
+
+    # Append perturbation validation caveat if present
+    if trained_caveat:
+        notes += f" [CAVEAT: {trained_caveat}]"
 
     # Effect size: geometric mean of the two ratios (capped for inf)
     r_ratio = min(resistance_ratio, 100.0)
@@ -290,6 +329,8 @@ def run_self_engagement(
             "target_region": trained_result["target_region"],
             "trained_pre_engagement": trained_result["pre_engagement"],
             "fresh_pre_engagement": fresh_result["pre_engagement"],
+            "perturbation_validated": trained_validated,
+            "perturbation_caveat": trained_caveat,
         },
         notes=notes,
     )

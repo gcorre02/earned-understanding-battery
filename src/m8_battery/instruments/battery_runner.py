@@ -414,6 +414,7 @@ def run_battery(
         domain_b_inputs=config.domain_b_inputs,
         reference_metric=reference_metric,
         provenance=provenance,
+        control_factory=control_factory,
     )
     timings["generativity"] = _time.monotonic() - t0
     _log(f"  generativity: {timings['generativity']:.1f}s passed={results['generativity'].passed}")

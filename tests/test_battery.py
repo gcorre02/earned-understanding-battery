@@ -67,9 +67,9 @@ class TestGenerativity:
         )
 
         assert result.name == "generativity"
-        # Class 1: metric is constant → no response to novel domain → FAIL
+        # Class 1: no behavioural divergence on novel domain → FAIL
         assert result.passed is False
-        assert "unchanged" in result.notes.lower() or "no response" in result.notes.lower()
+        assert "no behavioural divergence" in result.notes.lower() or "absent" in result.failure_mode
 
     def test_empty_inputs(self):
         G = generate_domain(SMALL)

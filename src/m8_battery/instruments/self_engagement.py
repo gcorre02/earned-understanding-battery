@@ -101,15 +101,26 @@ def _run_perturbation_protocol(
                                f"({target_structure_pre:.4f}) not elevated vs "
                                f"non-target mean ({mean_non_target:.4f})")
         perturbation_validated = False
-        _log(f"  CAVEAT: {perturbation_caveat}")
+        _log(f"  PRECONDITION FAILED: {perturbation_caveat}")
     elif target_structure_post >= target_structure_pre:
         perturbation_caveat = (f"T1-01e: perturbation did not reduce target structure "
                                f"(pre={target_structure_pre:.4f}, post={target_structure_post:.4f})")
         perturbation_validated = False
-        _log(f"  CAVEAT: {perturbation_caveat}")
+        _log(f"  PRECONDITION FAILED: {perturbation_caveat}")
     else:
         _log(f"  T1-01e validated: target structure {target_structure_pre:.4f} → "
              f"{target_structure_post:.4f} (non-target mean={mean_non_target:.4f})")
+
+    # DN-31 Option C: return indeterminate when preconditions fail
+    if not perturbation_validated:
+        return {
+            "indeterminate": True,
+            "perturbation_caveat": perturbation_caveat,
+            "target_region": target_region,
+            "target_structure_pre": target_structure_pre,
+            "target_structure_post": target_structure_post,
+            "mean_non_target": mean_non_target,
+        }
 
     # Measure IMMEDIATELY after perturbation — windowed
     perturbed.reset_engagement_tracking()
@@ -262,6 +273,16 @@ def run_self_engagement(
             name="self_engagement",
             passed=None,
             notes=f"Trained protocol error: {trained_result['error']}",
+        )
+    # DN-31 Option C: perturbation precondition failed → indeterminate
+    if trained_result.get("indeterminate"):
+        _log(f"  DN-31: perturbation precondition failed — returning indeterminate")
+        return InstrumentResult(
+            name="self_engagement",
+            passed=None,
+            notes=f"Perturbation precondition failed: {trained_result['perturbation_caveat']}",
+            raw_data=trained_result,
+            failure_mode="perturbation-precondition-failed",
         )
 
     # --- Run protocol on fresh baseline ---

@@ -371,6 +371,7 @@ def run_self_engagement(
         notes += f" [CAVEAT: {trained_caveat}]"
 
     # Effect size: geometric mean of the two ratios (capped for inf)
+    # Capped at 100.0 (self-engagement uses geometric mean of ratios; lower cap prevents one extreme ratio from dominating)
     r_ratio = min(resistance_ratio, 100.0)
     rec_ratio = min(recovery_ratio, 100.0)
     effect_size = float(np.sqrt(r_ratio * rec_ratio)) - 1.0  # 0 = equal to fresh

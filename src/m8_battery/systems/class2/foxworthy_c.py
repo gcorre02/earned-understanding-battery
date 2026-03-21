@@ -121,6 +121,7 @@ class FoxworthyC(TestSystem):
             "step_count": self._step_count,
             "visit_counts": self._visit_counts,
             "hidden": self._hidden.numpy(),
+            "initial_hidden": self._initial_hidden.numpy(),
         })
 
     def set_state(self, snapshot: bytes) -> None:
@@ -129,6 +130,8 @@ class FoxworthyC(TestSystem):
         self._step_count = state["step_count"]
         self._visit_counts = state["visit_counts"]
         self._hidden = torch.tensor(state["hidden"])
+        if "initial_hidden" in state:
+            self._initial_hidden = torch.tensor(state["initial_hidden"])
 
     def get_representation_state(self):
         """GRU hidden state vector for CKA computation (T1-02)."""

@@ -105,6 +105,7 @@ def _classify_signal(
         return "degenerate_fresh"
     if jsd > 0.99 * MAX_JSD:
         return "maximum_divergence"  # Red flag — investigate
+    # PRELIMINARY threshold — 5% edge overlap. Not calibrated from data.
     if edge_overlap is not None and edge_overlap > 0.05:
         return "potentially_confounded"
     if coherence <= 0:

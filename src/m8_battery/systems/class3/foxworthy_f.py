@@ -164,6 +164,30 @@ class FoxworthyF(TestSystem):
         """Attach a graph for navigation."""
         self._graph = graph
 
+    def set_domain(self, graph) -> None:
+        """Switch to a new graph domain, preserving learned LoRA weights.
+
+        LoRA adapters are graph-independent (they process node features via
+        the language model), so they transfer naturally across domains.
+        Only the graph topology and navigation state need updating.
+
+        Used by the generativity instrument to measure structural influence
+        of domain-A learning on novel domain-B navigation.
+        """
+        # 1. Switch underlying graph topology
+        self.set_graph(graph)
+
+        # 2. Reset navigation state (graph-dependent)
+        self._current_node = None
+        self._visit_counts = {}
+
+        # 3. Rebuild community mapping (derived from new graph)
+        #    Community info is read from node features at query time in
+        #    get_engagement_distribution(), so no explicit rebuild needed.
+
+        # Note: LoRA weights, optimizer state, replay buffer, step_count,
+        # and training mode are intentionally preserved.
+
     def train_on_domain(
         self, graph, n_warmup: int = 50,
     ) -> None:

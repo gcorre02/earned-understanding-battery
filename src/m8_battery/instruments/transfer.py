@@ -108,7 +108,8 @@ def run_transfer(
         earned_ratio = float(min(trained_auc / 1e-10, 1e6))
     else:
         earned_ratio = 1.0
-    earned_ratio = min(earned_ratio, 1e6)  # Cap
+    # Capped at 1e6 (ratio-based, not geometric mean — higher cap acceptable)
+    earned_ratio = min(earned_ratio, 1e6)
 
     # Decision logic (DN-22: earned ratio required)
     # Transfer = trained system has measurably better structure on A'

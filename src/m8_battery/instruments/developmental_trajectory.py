@@ -171,7 +171,8 @@ def _analyse_trajectory(
         if ctrl_range > 1e-10:
             earned_ratio = float(metric_range / ctrl_range)
         elif metric_range > 1e-10:
-            earned_ratio = float(min(metric_range / 1e-10, 1e6))  # Cap
+            # Capped at 1e6 (ratio-based, not geometric mean — higher cap acceptable)
+            earned_ratio = float(min(metric_range / 1e-10, 1e6))
         else:
             earned_ratio = 1.0  # Neither changes
 

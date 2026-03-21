@@ -319,7 +319,8 @@ def run_battery(
         # Directional agreement: scalar trajectory vs CKA
         traj_result = results["developmental_trajectory"]
         scalar_increases = (traj_result.raw_data or {}).get("slope", 0) > 0
-        cka_decreases = cka_value < 0.95  # Representations changed meaningfully
+        # PRELIMINARY threshold — not calibrated. Documents whether representations changed.
+        cka_decreases = cka_value < 0.95
         if scalar_increases and cka_decreases:
             agreement = "consistent"
         elif not scalar_increases and not cka_decreases:
@@ -482,6 +483,7 @@ def run_battery(
     # Window 2 (battery): post-training → post-battery
     training_change = baseline["metric_change_during_training"]
     battery_change = baseline["metric_change_during_battery"]
+    # PRELIMINARY threshold — absolute change, not relative. Scale-dependent.
     baseline["trajectory_training"] = (
         "earned" if abs(training_change) > 0.1
         else "static"

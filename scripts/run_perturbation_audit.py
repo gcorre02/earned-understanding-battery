@@ -29,10 +29,13 @@ def audit_perturbation(system, wander_steps=50, perturbation_method="shuffle_wei
     if not engagement or all(v < 1e-10 for v in engagement.values()):
         return {"status": "degenerate_engagement", "target_region": None}
 
-    target_region = max(engagement, key=engagement.get)
-    target_engagement = engagement[target_region]
-
+    # DN-32: target highest-STRUCTURE region, not highest-engagement
     structure = system.get_structure_distribution()
+    if not structure or all(v < 1e-10 for v in structure.values()):
+        return {"status": "degenerate_structure", "target_region": None}
+
+    target_region = max(structure, key=structure.get)
+    target_engagement = engagement.get(target_region, 0.0)
     target_structure_pre = structure.get(target_region, 0.0)
     non_target = [v for k, v in structure.items() if k != target_region]
     mean_non_target = sum(non_target) / max(len(non_target), 1)

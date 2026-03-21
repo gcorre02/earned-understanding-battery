@@ -309,6 +309,10 @@ def main():
     from m8_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
     from m8_battery.systems.positive_controls.gnn_navigator import GNNNavigator
 
+    # GPU device for LLM-based systems
+    _llm_device = "mps" if torch.backends.mps.is_available() else "cpu"
+    _log(f"LLM device: {_llm_device}")
+
     # Systems that support set_domain() — can test on all domain variants
     graph_walker_configs = {
         "HEB": {
@@ -398,8 +402,7 @@ def main():
     # 2A FrozenLLM: constructor takes (seed, device), graph via set_graph()
     try:
         from m8_battery.systems.class2.frozen_llm import FrozenLLM
-        _llm_device = "mps" if torch.backends.mps.is_available() else "cpu"
-        _log(f"FrozenLLM device: {_llm_device}")
+        pass  # device set globally below
         def _make_llm(g, s):
             sys = FrozenLLM(seed=s, device=_llm_device)
             sys.set_graph(g)
@@ -446,7 +449,7 @@ def main():
     try:
         from m8_battery.systems.class3.foxworthy_f import FoxworthyF
         def _make_ff(g, s):
-            sys = FoxworthyF(seed=s)
+            sys = FoxworthyF(seed=s, device=_llm_device)
             sys.set_graph(g)
             return sys
         non_graph_configs["3C"] = {

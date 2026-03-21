@@ -1,5 +1,5 @@
 {
-  "commit": "6ed2e9f",
+  "commit": "954e02a",
   "n_steps": 500,
   "domains": {
     "edge_jaccard_b0": 0.0313,
@@ -24,7 +24,7 @@
       "structural_consistency": -0.0365,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "HEB",
@@ -43,7 +43,7 @@
       "structural_consistency": 0.012,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "HEB",
@@ -62,7 +62,7 @@
       "structural_consistency": 0.0492,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "HEB",
@@ -81,7 +81,7 @@
       "structural_consistency": -0.0272,
       "edge_jaccard": 0.0,
       "signal_type": "divergent_incoherent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "HEB",
@@ -100,7 +100,7 @@
       "structural_consistency": 0.0254,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "HEB",
@@ -119,7 +119,7 @@
       "structural_consistency": 0.0222,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3D",
@@ -138,7 +138,7 @@
       "structural_consistency": -0.1356,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3D",
@@ -157,7 +157,7 @@
       "structural_consistency": 0.05,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3D",
@@ -176,7 +176,7 @@
       "structural_consistency": -0.0405,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3D",
@@ -195,7 +195,7 @@
       "structural_consistency": -0.064,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3D",
@@ -214,7 +214,7 @@
       "structural_consistency": 0.159,
       "edge_jaccard": 0.0,
       "signal_type": "divergent_incoherent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3D",
@@ -233,7 +233,7 @@
       "structural_consistency": -0.0139,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3E",
@@ -252,7 +252,7 @@
       "structural_consistency": -0.0383,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3E",
@@ -271,7 +271,7 @@
       "structural_consistency": 0.0508,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3E",
@@ -290,7 +290,7 @@
       "structural_consistency": -0.0396,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3E",
@@ -309,7 +309,7 @@
       "structural_consistency": -0.0279,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3E",
@@ -328,7 +328,7 @@
       "structural_consistency": 0.1648,
       "edge_jaccard": 0.0,
       "signal_type": "divergent_incoherent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3E",
@@ -347,7 +347,7 @@
       "structural_consistency": -0.0199,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -366,7 +366,7 @@
       "structural_consistency": 0.5748,
       "edge_jaccard": 0.0313,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -385,7 +385,7 @@
       "structural_consistency": 0.673,
       "edge_jaccard": 0.0313,
       "signal_type": "divergent_incoherent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -404,7 +404,7 @@
       "structural_consistency": 0.6436,
       "edge_jaccard": 0.0313,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -423,7 +423,7 @@
       "structural_consistency": 0.5353,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -442,7 +442,7 @@
       "structural_consistency": 0.3987,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -461,7 +461,7 @@
       "structural_consistency": 0.4307,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -480,7 +480,7 @@
       "structural_consistency": 0.4942,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -499,7 +499,7 @@
       "structural_consistency": 0.8018,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC1",
@@ -518,7 +518,7 @@
       "structural_consistency": 0.7282,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -537,7 +537,7 @@
       "structural_consistency": -0.0346,
       "edge_jaccard": 0.0313,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -556,7 +556,7 @@
       "structural_consistency": 0.0901,
       "edge_jaccard": 0.0313,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -575,7 +575,7 @@
       "structural_consistency": 0.0349,
       "edge_jaccard": 0.0313,
       "signal_type": "degenerate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -594,7 +594,7 @@
       "structural_consistency": 0.2662,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -613,7 +613,7 @@
       "structural_consistency": 0.1909,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -632,7 +632,7 @@
       "structural_consistency": 0.0457,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -651,7 +651,7 @@
       "structural_consistency": -0.0075,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -670,7 +670,7 @@
       "structural_consistency": 0.0123,
       "edge_jaccard": 0.0,
       "signal_type": "candidate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "PC3",
@@ -689,7 +689,7 @@
       "structural_consistency": -0.0411,
       "edge_jaccard": 0.0,
       "signal_type": "degenerate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1A",
@@ -708,7 +708,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1A",
@@ -727,7 +727,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1A",
@@ -746,7 +746,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1B",
@@ -765,7 +765,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1B",
@@ -784,7 +784,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1B",
@@ -803,7 +803,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1C",
@@ -822,7 +822,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "degenerate",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1C",
@@ -841,7 +841,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "1C",
@@ -860,7 +860,121 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
+    },
+    {
+      "system_name": "2B",
+      "seed": 42,
+      "domain_variant": "B1",
+      "marginal_jsd": 0.0,
+      "transition_jsd": 0.0,
+      "marginal_coherence": 0.0,
+      "transition_coherence": 0.0,
+      "trained_self_transition": 0.0,
+      "fresh_self_transition": 0.0,
+      "trained_entropy": 0.0,
+      "fresh_entropy": 0.0,
+      "trained_visited": 1,
+      "fresh_visited": 1,
+      "structural_consistency": 0.0,
+      "edge_jaccard": 0.097,
+      "signal_type": "absent",
+      "commit": "954e02a"
+    },
+    {
+      "system_name": "2B",
+      "seed": 123,
+      "domain_variant": "B1",
+      "marginal_jsd": 0.0,
+      "transition_jsd": 0.0,
+      "marginal_coherence": 0.0,
+      "transition_coherence": 0.0,
+      "trained_self_transition": 0.0,
+      "fresh_self_transition": 0.0,
+      "trained_entropy": 0.0,
+      "fresh_entropy": 0.0,
+      "trained_visited": 1,
+      "fresh_visited": 1,
+      "structural_consistency": 0.0,
+      "edge_jaccard": 0.097,
+      "signal_type": "absent",
+      "commit": "954e02a"
+    },
+    {
+      "system_name": "2B",
+      "seed": 456,
+      "domain_variant": "B1",
+      "marginal_jsd": 0.0,
+      "transition_jsd": 0.0,
+      "marginal_coherence": 0.0,
+      "transition_coherence": 0.0,
+      "trained_self_transition": 0.0,
+      "fresh_self_transition": 0.0,
+      "trained_entropy": 0.0,
+      "fresh_entropy": 0.0,
+      "trained_visited": 1,
+      "fresh_visited": 1,
+      "structural_consistency": 0.0,
+      "edge_jaccard": 0.097,
+      "signal_type": "absent",
+      "commit": "954e02a"
+    },
+    {
+      "system_name": "2C",
+      "seed": 42,
+      "domain_variant": "B1",
+      "marginal_jsd": 0.0,
+      "transition_jsd": 0.0,
+      "marginal_coherence": 0.0,
+      "transition_coherence": 0.0,
+      "trained_self_transition": 0.0,
+      "fresh_self_transition": 0.0,
+      "trained_entropy": 0.0,
+      "fresh_entropy": 0.0,
+      "trained_visited": 1,
+      "fresh_visited": 1,
+      "structural_consistency": 0.0,
+      "edge_jaccard": 0.097,
+      "signal_type": "absent",
+      "commit": "954e02a"
+    },
+    {
+      "system_name": "2C",
+      "seed": 123,
+      "domain_variant": "B1",
+      "marginal_jsd": 0.685932,
+      "transition_jsd": 0.0,
+      "marginal_coherence": 1.0,
+      "transition_coherence": 0.0,
+      "trained_self_transition": 0.0,
+      "fresh_self_transition": 0.0,
+      "trained_entropy": 0.0,
+      "fresh_entropy": 0.0144,
+      "trained_visited": 1,
+      "fresh_visited": 1,
+      "structural_consistency": 0.0,
+      "edge_jaccard": 0.097,
+      "signal_type": "degenerate",
+      "commit": "954e02a"
+    },
+    {
+      "system_name": "2C",
+      "seed": 456,
+      "domain_variant": "B1",
+      "marginal_jsd": 0.0,
+      "transition_jsd": 0.0,
+      "marginal_coherence": 0.0,
+      "transition_coherence": 0.0,
+      "trained_self_transition": 0.0,
+      "fresh_self_transition": 0.0,
+      "trained_entropy": 0.0,
+      "fresh_entropy": 0.0,
+      "trained_visited": 1,
+      "fresh_visited": 1,
+      "structural_consistency": 0.0,
+      "edge_jaccard": 0.097,
+      "signal_type": "absent",
+      "commit": "954e02a"
     },
     {
       "system_name": "2A",
@@ -879,7 +993,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "2A",
@@ -898,7 +1012,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "2A",
@@ -917,7 +1031,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3A",
@@ -936,7 +1050,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3A",
@@ -955,7 +1069,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3A",
@@ -974,7 +1088,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3B",
@@ -993,7 +1107,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3B",
@@ -1012,7 +1126,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3B",
@@ -1031,7 +1145,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "potentially_confounded",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3C",
@@ -1050,7 +1164,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3C",
@@ -1069,7 +1183,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     },
     {
       "system_name": "3C",
@@ -1088,7 +1202,7 @@
       "structural_consistency": 0.0,
       "edge_jaccard": 0.097,
       "signal_type": "absent",
-      "commit": "6ed2e9f"
+      "commit": "954e02a"
     }
   ],
   "null_summary": {
@@ -1221,12 +1335,12 @@
     },
     "PC1_B2": {
       "p95": 0.031332,
-      "ci_lower": 0.026459,
+      "ci_lower": 0.026439,
       "ci_upper": 0.03369
     },
     "PC3_B1": {
       "p95": 0.032622,
-      "ci_lower": 0.028662,
+      "ci_lower": 0.028866,
       "ci_upper": 0.034732
     },
     "PC3_B2": {
@@ -1236,7 +1350,7 @@
     },
     "HEB_B1": {
       "p95": 0.02878,
-      "ci_lower": 0.025603,
+      "ci_lower": 0.02547,
       "ci_upper": 0.029766
     },
     "HEB_B2": {
@@ -1251,7 +1365,7 @@
     },
     "3D_B2": {
       "p95": 0.031332,
-      "ci_lower": 0.02646,
+      "ci_lower": 0.026459,
       "ci_upper": 0.03369
     },
     "3E_B1": {

@@ -106,8 +106,8 @@ def run_generativity_measurement(
     for _ in range(N_STEPS):
         output = system.step(None)
         # Some systems return dicts or tuples — extract node if hashable
-        if isinstance(output, (int, float, str)):
-            trained_seq.append(output)
+        if isinstance(output, (int, float, str, np.integer)):
+            trained_seq.append(int(output))
     trained_eng = system.get_engagement_distribution()
     trained_entropy = _engagement_entropy(trained_eng)
     trained_visited = _count_visited(trained_eng)
@@ -122,8 +122,8 @@ def run_generativity_measurement(
     fresh_seq = []
     for _ in range(N_STEPS):
         output = fresh_system.step(None)
-        if isinstance(output, (int, float, str)):
-            fresh_seq.append(output)
+        if isinstance(output, (int, float, str, np.integer)):
+            fresh_seq.append(int(output))
     fresh_eng = fresh_system.get_engagement_distribution()
     fresh_entropy = _engagement_entropy(fresh_eng)
     fresh_visited = _count_visited(fresh_eng)

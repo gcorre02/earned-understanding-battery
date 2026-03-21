@@ -364,12 +364,36 @@ def main():
     except ImportError:
         _log("SKIP 1C: FoxworthyA import failed")
 
-    # 2B FrozenGAT: requires specific constructor args + torch_geometric
-    # Skip in harmonised run — constructor expects feature count, not graph
-    _log("SKIP 2B: FrozenGAT requires feature-count constructor (not graph-first)")
+    try:
+        from m8_battery.systems.class2.frozen_gnn import FrozenGAT
+        def _make_gat(g, s):
+            n_feat = MEDIUM.n_node_features if hasattr(MEDIUM, 'n_node_features') else 8
+            n_comm = MEDIUM.n_communities
+            sys = FrozenGAT(n_features=n_feat, n_classes=n_comm, seed=s)
+            sys.set_domain(g)
+            return sys
+        non_graph_configs["2B"] = {
+            "factory": _make_gat,
+            "fresh": lambda g, s: _make_gat(g, s + 1000),
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 2B: FrozenGAT import failed (torch_geometric)")
 
-    # 2C FoxworthyC: constructor takes n_features not graph
-    _log("SKIP 2C: FoxworthyC requires feature-count constructor (not graph-first)")
+    try:
+        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+        def _make_fc(g, s):
+            n_feat = MEDIUM.n_node_features if hasattr(MEDIUM, 'n_node_features') else 8
+            sys = FoxworthyC(n_features=n_feat, seed=s)
+            sys.set_domain(g)
+            return sys
+        non_graph_configs["2C"] = {
+            "factory": _make_fc,
+            "fresh": lambda g, s: _make_fc(g, s + 1000),
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 2C: FoxworthyC import failed")
 
     # 2A FrozenLLM: constructor takes (seed, device), graph via set_graph()
     try:

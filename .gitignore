@@ -12,3 +12,4 @@ results/
 *.bin
 *.safetensors
 .pytest_cache/
+outputs/

@@ -31,9 +31,11 @@ from m8_battery.instruments.generativity import (
     _engagement_entropy,
     _js_divergence,
     _self_transition_rate,
+    _structural_consistency,
     _transition_entropy,
     _transition_jsd,
 )
+from m8_battery.instruments.role_utils import classify_all_nodes, compute_role_transition_matrix
 
 
 def _log(msg: str) -> None:
@@ -59,6 +61,7 @@ class GenerativityResult:
     fresh_entropy: float
     trained_visited: int
     fresh_visited: int
+    structural_consistency: float
     edge_jaccard: float
     signal_type: str
     commit: str
@@ -90,6 +93,7 @@ def run_generativity_measurement(
     domain_variant: str,
     ej: float,
     commit: str,
+    training_role_T: np.ndarray | None = None,
 ) -> GenerativityResult:
     """Run generativity protocol on a single system/domain/seed."""
     node_to_community = get_community_map(domain_graph)
@@ -150,6 +154,15 @@ def run_generativity_measurement(
         trained_st = _self_transition_rate(T_trained)
         fresh_st = _self_transition_rate(T_fresh)
 
+    # DN-30a: Role-aggregated structural consistency
+    sc = 0.0
+    if len(trained_seq) > 1 and len(fresh_seq) > 1:
+        node_to_role = classify_all_nodes(domain_graph)
+        T_role_trained_B = compute_role_transition_matrix(trained_seq, node_to_role)
+        T_role_fresh_B = compute_role_transition_matrix(fresh_seq, node_to_role)
+        if training_role_T is not None:
+            sc = _structural_consistency(training_role_T, T_role_trained_B, T_role_fresh_B)
+
     # Signal classification (simplified — confound based on edge Jaccard)
     signal = "candidate"
     if m_jsd < 1e-6 and t_jsd < 1e-6:
@@ -175,6 +188,7 @@ def run_generativity_measurement(
         fresh_entropy=round(fresh_entropy, 4),
         trained_visited=trained_visited,
         fresh_visited=fresh_visited,
+        structural_consistency=round(sc, 4),
         edge_jaccard=round(ej, 4),
         signal_type=signal,
         commit=commit,
@@ -225,12 +239,22 @@ def compute_null_pair(
         T_b = _compute_transition_matrix(seq_b, node_to_community, n_communities)
         t_jsd = _transition_jsd(T_a, T_b)
 
+    # Structural consistency null: use sys_a as "trained" reference
+    sc = 0.0
+    if len(seq_a) > 1 and len(seq_b) > 1:
+        node_to_role = classify_all_nodes(domain_b)
+        T_role_a = compute_role_transition_matrix(seq_a, node_to_role)
+        T_role_b = compute_role_transition_matrix(seq_b, node_to_role)
+        # For null: sys_a acts as "trained-on-A" reference, sys_b as "fresh"
+        sc = _structural_consistency(T_role_a, T_role_a, T_role_b)
+
     return {
         "system_type": system_type,
         "seed_a": seed_a,
         "seed_b": seed_b,
         "marginal_jsd": round(m_jsd, 6),
         "transition_jsd": round(t_jsd, 6),
+        "structural_consistency": round(sc, 6),
         "domain_variant": domain_variant,
     }
 
@@ -349,15 +373,28 @@ def main():
                 if cfg["train_steps"] > 0:
                     trained.train_on_domain(domain_a, n_steps=cfg["train_steps"])
 
+                # DN-30a: Capture training transition matrix (role-aggregated)
+                # Post-training recording phase on domain A (frozen)
+                trained.set_training(False)
+                trained.reset_engagement_tracking()
+                training_seq = []
+                for _ in range(N_STEPS):
+                    out = trained.step(None)
+                    if isinstance(out, (int, float, str, np.integer)):
+                        training_seq.append(int(out))
+                node_to_role_a = classify_all_nodes(domain_a)
+                training_role_T = compute_role_transition_matrix(training_seq, node_to_role_a)
+
                 fresh = cfg["fresh"](domain_a, seed)
 
                 result = run_generativity_measurement(
                     trained, fresh, domain_graph,
                     name, seed, domain_label, ej, commit,
+                    training_role_T=training_role_T,
                 )
                 all_results.append(result)
                 _log(f"    m_jsd={result.marginal_jsd:.4f} t_jsd={result.transition_jsd:.4f} "
-                     f"m_coh={result.marginal_coherence:.4f} t_coh={result.transition_coherence:.4f} "
+                     f"sc={result.structural_consistency:.4f} "
                      f"({time.monotonic()-t0:.1f}s)")
 
     # --- Phase B: Non-graph-walker systems on B₁ only ---
@@ -409,7 +446,7 @@ def main():
     with open(csv_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=[
             "system_type", "seed_a", "seed_b",
-            "marginal_jsd", "transition_jsd", "domain_variant",
+            "marginal_jsd", "transition_jsd", "structural_consistency", "domain_variant",
         ])
         writer.writeheader()
         writer.writerows(null_samples)
@@ -423,6 +460,7 @@ def main():
             samples = [s for s in null_samples if s["system_type"] == sys_type and s["domain_variant"] == dv]
             m_vals = [s["marginal_jsd"] for s in samples]
             t_vals = [s["transition_jsd"] for s in samples]
+            sc_vals = [s["structural_consistency"] for s in samples]
             null_summary[key] = {
                 "n": len(samples),
                 "marginal_mean": round(np.mean(m_vals), 4),
@@ -431,6 +469,9 @@ def main():
                 "transition_mean": round(np.mean(t_vals), 4),
                 "transition_p95": round(np.percentile(t_vals, 95), 4),
                 "transition_max": round(np.max(t_vals), 4),
+                "sc_mean": round(np.mean(sc_vals), 4),
+                "sc_p95": round(np.percentile(sc_vals, 95), 4),
+                "sc_max": round(np.max(sc_vals), 4),
             }
 
     # --- Output ---

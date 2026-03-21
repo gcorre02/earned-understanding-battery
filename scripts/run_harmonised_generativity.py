@@ -363,25 +363,12 @@ def main():
     except ImportError:
         _log("SKIP 1C: FoxworthyA import failed")
 
-    try:
-        from m8_battery.systems.class2.frozen_gnn import FrozenGAT
-        non_graph_configs["2B"] = {
-            "factory": lambda g, s: FrozenGAT(g, seed=s),
-            "fresh": lambda g, s: FrozenGAT(g, seed=s + 1000),
-            "train_steps": 0,
-        }
-    except ImportError:
-        _log("SKIP 2B: FrozenGAT import failed (torch_geometric)")
+    # 2B FrozenGAT: requires specific constructor args + torch_geometric
+    # Skip in harmonised run — constructor expects feature count, not graph
+    _log("SKIP 2B: FrozenGAT requires feature-count constructor (not graph-first)")
 
-    try:
-        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
-        non_graph_configs["2C"] = {
-            "factory": lambda g, s: FoxworthyC(g, seed=s),
-            "fresh": lambda g, s: FoxworthyC(g, seed=s + 1000),
-            "train_steps": 0,
-        }
-    except ImportError:
-        _log("SKIP 2C: FoxworthyC import failed")
+    # 2C FoxworthyC: constructor takes n_features not graph
+    _log("SKIP 2C: FoxworthyC requires feature-count constructor (not graph-first)")
 
     # 2A (FrozenLLM) — skipped: requires TinyLlama download, ~2min load per instance
     # 3A (DQN), 3B (Curiosity), 3C (FoxworthyF) — skipped: require sb3/peft

@@ -352,9 +352,41 @@ def main():
             "train_steps": 0,
         },
     }
-    # 1C (FoxworthyA) takes n_features not graph — handle separately
-    # 2A-2C require model loading (LLM/GAT/GRU) — skip in harmonised run
-    # Their generativity data is established: JSD=0 (absent) across all seeds
+    # All remaining systems now have set_domain(). Add what we can import.
+    try:
+        from m8_battery.systems.class1.foxworthy_a import FoxworthyA
+        non_graph_configs["1C"] = {
+            "factory": lambda g, s: (fa := FoxworthyA(seed=s), fa.set_graph(g), fa)[-1],
+            "fresh": lambda g, s: (fa := FoxworthyA(seed=s + 1000), fa.set_graph(g), fa)[-1],
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 1C: FoxworthyA import failed")
+
+    try:
+        from m8_battery.systems.class2.frozen_gnn import FrozenGAT
+        non_graph_configs["2B"] = {
+            "factory": lambda g, s: FrozenGAT(g, seed=s),
+            "fresh": lambda g, s: FrozenGAT(g, seed=s + 1000),
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 2B: FrozenGAT import failed (torch_geometric)")
+
+    try:
+        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+        non_graph_configs["2C"] = {
+            "factory": lambda g, s: FoxworthyC(g, seed=s),
+            "fresh": lambda g, s: FoxworthyC(g, seed=s + 1000),
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 2C: FoxworthyC import failed")
+
+    # 2A (FrozenLLM) — skipped: requires TinyLlama download, ~2min load per instance
+    # 3A (DQN), 3B (Curiosity), 3C (FoxworthyF) — skipped: require sb3/peft
+    # These produce JSD=0 or degenerate by design (no structural transfer mechanism)
+    # Documented as "not testable under harmonised protocol" per reviewer guidance
 
     all_results = []
 
@@ -397,23 +429,38 @@ def main():
                      f"sc={result.structural_consistency:.4f} "
                      f"({time.monotonic()-t0:.1f}s)")
 
-    # --- Phase B: Non-graph-walker systems on B₁ only ---
+    # --- Phase B: Non-graph-walker systems on B₁ ---
+    # These now have set_domain(). Run on actual B₁ domain.
     for name, cfg in non_graph_configs.items():
         for seed in SEEDS:
             _log(f"  {name} seed={seed} on B1")
             t0 = time.monotonic()
 
             trained = cfg["factory"](domain_a, seed)
+            if cfg["train_steps"] > 0:
+                trained.train_on_domain(domain_a, n_steps=cfg["train_steps"])
+
+            # Post-training recording on A (same as Phase A)
+            trained.set_training(False)
+            trained.reset_engagement_tracking()
+            training_seq = []
+            for _ in range(N_STEPS):
+                out = trained.step(None)
+                if isinstance(out, (int, float, str, np.integer)):
+                    training_seq.append(int(out))
+            node_to_role_a = classify_all_nodes(domain_a)
+            training_role_T = compute_role_transition_matrix(training_seq, node_to_role_a)
+
             fresh = cfg["fresh"](domain_a, seed)
 
-            # These systems don't have set_domain — use domain_a for both
-            # (they'll produce JSD=0, which is correct for Class 1)
             result = run_generativity_measurement(
-                trained, fresh, domain_a,
-                name, seed, "B1", 0.0, commit,
+                trained, fresh, domain_b1,
+                name, seed, "B1", ej_b1, commit,
+                training_role_T=training_role_T,
             )
             all_results.append(result)
             _log(f"    m_jsd={result.marginal_jsd:.4f} t_jsd={result.transition_jsd:.4f} "
+                 f"sc={result.structural_consistency:.4f} "
                  f"({time.monotonic()-t0:.1f}s)")
 
     # --- Phase C: Null distributions (50 pairs per type, B₁ + B₂) ---
@@ -474,6 +521,62 @@ def main():
                 "sc_max": round(np.max(sc_vals), 4),
             }
 
+    # --- Task 4: Bootstrap CIs on noise floors ---
+    _log("=== Bootstrap CIs ===")
+    bootstrap_cis = {}
+    for key, summary in null_summary.items():
+        samples = [s for s in null_samples
+                   if f"{s['system_type']}_{s['domain_variant']}" == key]
+        t_vals = np.array([s["transition_jsd"] for s in samples])
+        if len(t_vals) >= 10:
+            boot_p95s = []
+            for _ in range(10000):
+                boot = np.random.choice(t_vals, size=len(t_vals), replace=True)
+                boot_p95s.append(np.percentile(boot, 95))
+            boot_p95s = np.array(boot_p95s)
+            ci_lo, ci_hi = np.percentile(boot_p95s, [2.5, 97.5])
+            bootstrap_cis[key] = {
+                "p95": round(np.percentile(t_vals, 95), 6),
+                "ci_lower": round(ci_lo, 6),
+                "ci_upper": round(ci_hi, 6),
+            }
+            _log(f"  {key}: p95={np.percentile(t_vals, 95):.4f} "
+                 f"CI=[{ci_lo:.4f}, {ci_hi:.4f}]")
+
+    # --- Task 5: ROC/AUC ---
+    _log("=== ROC/AUC (B₂ transition JSD) ===")
+    # Collect B₂ scores
+    pos_scores = [r.transition_jsd for r in all_results
+                  if r.system_name in ("PC1", "PC3") and r.domain_variant == "B2"]
+    neg_scores = [r.transition_jsd for r in all_results
+                  if r.system_name not in ("PC1", "PC3") and r.domain_variant == "B2"]
+
+    roc_result = None
+    if pos_scores and neg_scores:
+        y_true = np.array([0]*len(neg_scores) + [1]*len(pos_scores))
+        y_scores = np.array(neg_scores + pos_scores)
+        # AUC
+        from sklearn.metrics import roc_auc_score
+        auc = roc_auc_score(y_true, y_scores)
+        # Bootstrap CI
+        aucs = []
+        for _ in range(10000):
+            idx = np.random.choice(len(y_true), len(y_true), replace=True)
+            if len(set(y_true[idx])) < 2:
+                continue
+            aucs.append(roc_auc_score(y_true[idx], y_scores[idx]))
+        aucs = np.array(aucs)
+        auc_ci_lo, auc_ci_hi = np.percentile(aucs, [2.5, 97.5])
+        roc_result = {
+            "auc": round(auc, 4),
+            "ci_lower": round(auc_ci_lo, 4),
+            "ci_upper": round(auc_ci_hi, 4),
+            "n_positive": len(pos_scores),
+            "n_negative": len(neg_scores),
+        }
+        _log(f"  AUC={auc:.4f} CI=[{auc_ci_lo:.4f}, {auc_ci_hi:.4f}] "
+             f"(n_pos={len(pos_scores)}, n_neg={len(neg_scores)})")
+
     # --- Output ---
     output = {
         "commit": commit,
@@ -485,6 +588,8 @@ def main():
         },
         "results": [r.__dict__ for r in all_results],
         "null_summary": null_summary,
+        "bootstrap_cis": bootstrap_cis,
+        "roc_auc": roc_result,
     }
     print(json.dumps(output, indent=2))
     _log("Done.")

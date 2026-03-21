@@ -96,6 +96,24 @@ class WordNetGraph(TestSystem):
             except Exception:
                 pass
 
+    def set_domain(self, graph: nx.DiGraph) -> None:
+        """Switch to a new graph domain (near re-init for Class 1).
+
+        Replaces the graph, rebuilds igraph cache and next-hop cache,
+        resets navigation state. No learned state to preserve.
+        """
+        self._original_graph = graph.copy()
+        self._graph = graph.copy()
+        self._structure_metric = self._compute_structure_metric()
+        self._ig_graph, self._nx_to_ig, self._ig_to_nx = _nx_to_igraph(self._graph)
+        self._next_hop_cache = {}
+        self._build_next_hop_cache()
+        # Reset navigation
+        nodes = list(self._graph.nodes())
+        self._current_node = nodes[0] if nodes else None
+        self._visit_counts = {}
+        self._step_count = 0
+
     def reset(self) -> None:
         """Restore to initial state."""
         self._graph = self._original_graph.copy()

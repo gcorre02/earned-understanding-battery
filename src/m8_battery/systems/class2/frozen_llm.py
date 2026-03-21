@@ -74,6 +74,19 @@ class FrozenLLM(TestSystem):
         self._tokenizer = None
         torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
+    def set_domain(self, graph) -> None:
+        """Switch to a new graph domain. Model weights preserved.
+
+        Swaps the graph, resets navigation state. Frozen LLM weights
+        and structure metric are untouched.
+        """
+        self._graph = graph
+        # Reset navigation
+        nodes = list(self._graph.nodes()) if self._graph else []
+        self._current_node = nodes[0] if nodes else None
+        self._visit_counts = {}
+        self._step_count = 0
+
     def reset(self) -> None:
         self._current_node = None
         self._step_count = 0

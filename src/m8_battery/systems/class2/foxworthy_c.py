@@ -69,6 +69,20 @@ class FoxworthyC(TestSystem):
         """Attach a graph for navigation."""
         self._graph = graph
 
+    def set_domain(self, graph) -> None:
+        """Switch to a new graph domain. GRU weights + hidden state preserved.
+
+        Swaps the graph, resets navigation state (position, visit counts).
+        GRU weights and current hidden state are NOT reset — preserved
+        for generativity testing.
+        """
+        self._graph = graph
+        # Reset navigation only
+        nodes = list(self._graph.nodes()) if self._graph else []
+        self._current_node = nodes[0] if nodes else None
+        self._visit_counts = {}
+        self._step_count = 0
+
     def reset(self) -> None:
         self._hidden = self._initial_hidden.clone()
         self._current_node = None

@@ -180,6 +180,20 @@ class CuriosityAgent(TestSystem):
     def set_graph(self, graph: nx.DiGraph) -> None:
         self._graph = graph
 
+    def set_domain(self, graph: nx.DiGraph) -> None:
+        """Switch to a new graph domain. RND predictor + policy preserved.
+
+        Delegates to set_graph() and resets navigation state.
+        The trained RL policy and RND predictor weights are NOT reset
+        — preserved for generativity testing.
+        """
+        self.set_graph(graph)
+        # Reset navigation
+        nodes = sorted(self._graph.nodes()) if self._graph else []
+        self._current_node = nodes[0] if nodes else None
+        self._visit_counts = {}
+        self._step_count = 0
+
     def reset(self) -> None:
         """Reset all learned and transient state.
 

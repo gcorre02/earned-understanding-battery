@@ -46,6 +46,17 @@ class FoxworthyA(TestSystem):
         import networkx as nx
         self._graph = graph
 
+    def set_domain(self, graph) -> None:
+        """Switch to a new graph domain (near re-init for Class 1).
+
+        Delegates to set_graph() and resets navigation state.
+        No learned state to preserve (MLP weights are frozen at init).
+        """
+        self.set_graph(graph)
+        self._current_node = None
+        self._step_count = 0
+        self._visit_counts = {}
+
     def reset(self) -> None:
         self._current_node = None
         self._step_count = 0

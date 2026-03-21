@@ -49,6 +49,21 @@ class RuleBasedNavigator(TestSystem):
         self._step_count = 0
         self._structure_metric = self._compute_structure_metric()
 
+    def set_domain(self, graph: nx.DiGraph) -> None:
+        """Switch to a new graph domain (near re-init for Class 1).
+
+        Replaces the graph, recomputes structure metric, resets
+        navigation state. No learned state to preserve.
+        """
+        self._original_graph = graph.copy()
+        self._graph = graph.copy()
+        self._structure_metric = self._compute_structure_metric()
+        # Reset navigation
+        nodes = list(self._graph.nodes())
+        self._current_node = nodes[0] if nodes else None
+        self._visit_counts = {}
+        self._step_count = 0
+
     def reset(self) -> None:
         self._graph = self._original_graph.copy()
         self._rng = np.random.default_rng(self._seed)

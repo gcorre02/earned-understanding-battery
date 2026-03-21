@@ -137,6 +137,20 @@ class FrozenGAT(TestSystem):
 
         return Data(x=x, edge_index=edge_index, y=y)
 
+    def set_domain(self, graph: nx.DiGraph) -> None:
+        """Switch to a new graph domain. GAT weights preserved (frozen).
+
+        Swaps the graph, rebuilds PyG data from the new graph, resets
+        navigation state. Conv1/conv2 weights are NOT reset.
+        """
+        self._graph = graph
+        self._pyg_data = self._graph_to_pyg(graph)
+        # Reset navigation
+        nodes = sorted(self._graph.nodes())
+        self._current_node = nodes[0] if nodes else None
+        self._visit_counts = {}
+        self._step_count = 0
+
     def reset(self) -> None:
         self._current_node = None
         self._step_count = 0

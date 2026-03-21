@@ -71,8 +71,8 @@ def _run_perturbation_protocol(
 
     pre_engagement = system.get_engagement_distribution()
 
-    if not pre_engagement:
-        return {"error": "no engagement distribution after wander"}
+    if not pre_engagement or all(v < 1e-10 for v in pre_engagement.values()):
+        return {"error": "degenerate engagement distribution after wander"}
 
     # Identify highest-engagement region to perturb
     target_region = max(pre_engagement, key=pre_engagement.get)

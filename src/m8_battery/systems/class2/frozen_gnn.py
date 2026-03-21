@@ -258,7 +258,7 @@ class FrozenGAT(TestSystem):
         # Copy weights
         new._conv1.load_state_dict(self._conv1.state_dict())
         new._conv2.load_state_dict(self._conv2.state_dict())
-        new._graph = self._graph
+        new._graph = self._graph.copy()
         new._pyg_data = self._pyg_data
         new._is_frozen = True
 
@@ -280,7 +280,7 @@ class FrozenGAT(TestSystem):
         )
         new._conv1.load_state_dict(self._conv1.state_dict())
         new._conv2.load_state_dict(self._conv2.state_dict())
-        new._graph = self._graph
+        new._graph = self._graph.copy()
         new._pyg_data = self._pyg_data
         new._is_frozen = True
 
@@ -307,7 +307,7 @@ class FrozenGAT(TestSystem):
         )
         new._conv1.load_state_dict(self._conv1.state_dict())
         new._conv2.load_state_dict(self._conv2.state_dict())
-        new._graph = self._graph
+        new._graph = self._graph.copy()
         new._pyg_data = self._pyg_data
         new._is_frozen = self._is_frozen
         return new

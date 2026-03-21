@@ -304,7 +304,7 @@ class TopologyNavigator(TestSystem):
 
     def _clone_internal(self) -> TopologyNavigator:
         new = TopologyNavigator.__new__(TopologyNavigator)
-        new._graph = self._graph
+        new._graph = self._graph.copy()
         new._seed = self._seed + self._step_count + 7919
         new._rng = np.random.default_rng(new._seed)
         new._lr = self._lr

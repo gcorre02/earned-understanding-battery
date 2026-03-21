@@ -66,6 +66,7 @@ class RNDRewardWrapper(gym.Wrapper):
 
         self.optimizer = torch.optim.Adam(self.predictor.parameters(), lr=lr)
         self.reward_scale = reward_scale
+        self.training_enabled = True
 
     def step(self, action):
         obs, reward, terminated, truncated, info = self.env.step(action)
@@ -80,20 +81,21 @@ class RNDRewardWrapper(gym.Wrapper):
             )
 
         # Train predictor (reduce prediction error over time)
-        obs_t = torch.tensor(obs, dtype=torch.float32).unsqueeze(0)
-        pred_out = self.predictor(obs_t)
-        with torch.no_grad():
-            target_out = self.target(obs_t)
-        loss = ((pred_out - target_out) ** 2).mean()
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
+        if self.training_enabled:
+            obs_t = torch.tensor(obs, dtype=torch.float32).unsqueeze(0)
+            pred_out = self.predictor(obs_t)
+            with torch.no_grad():
+                target_out = self.target(obs_t)
+            loss = ((pred_out - target_out) ** 2).mean()
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
 
         # Replace extrinsic reward with intrinsic
         total_reward = intrinsic_reward * self.reward_scale
 
         info["intrinsic_reward"] = intrinsic_reward
-        info["rnd_loss"] = float(loss.item())
+        info["rnd_loss"] = float(loss.item()) if self.training_enabled else 0.0
 
         return obs, total_reward, terminated, truncated, info
 
@@ -124,6 +126,7 @@ class CuriosityAgent(TestSystem):
         self._step_count = 0
         self._visit_counts: dict[int, int] = {}
         self._is_trained = False
+        self._training = True
 
     def train_on_domain(self, graph: nx.DiGraph) -> None:
         """Train curiosity agent on the graph."""
@@ -150,6 +153,16 @@ class CuriosityAgent(TestSystem):
         )
         self._model.learn(total_timesteps=self._total_timesteps)
         self._is_trained = True
+
+    def set_training(self, mode: bool) -> None:
+        """Enable/disable learning during step().
+
+        When mode=False, the RND predictor stops updating (no gradient
+        steps) and the RL policy is used for inference only.
+        """
+        self._training = mode
+        if self._wrapped_env is not None:
+            self._wrapped_env.training_enabled = mode
 
     def set_graph(self, graph: nx.DiGraph) -> None:
         self._graph = graph

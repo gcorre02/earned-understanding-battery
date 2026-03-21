@@ -212,5 +212,5 @@ class FoxworthyC(TestSystem):
         )
         new._gru.load_state_dict(self._gru.state_dict())
         new._output.load_state_dict(self._output.state_dict())
-        new._graph = self._graph
+        new._graph = self._graph.copy()
         return new

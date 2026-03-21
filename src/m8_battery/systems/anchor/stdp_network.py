@@ -199,18 +199,22 @@ class STDPNetwork(TestSystem):
         # When input_data is None (wander/recovery): only background + recurrent
         # Spike rates will depend on synaptic weight structure, not external drive
 
-        # Snapshot weights if frozen (T1-03)
+        # Snapshot weights and STDP traces if frozen (T1-03)
         if not self._training:
             w_before = np.array(S.w[:]).copy()
+            apre_before = np.array(S.apre[:]).copy()
+            apost_before = np.array(S.apost[:]).copy()
 
         # Advance simulation by 1 timestep
         spike_count_before = mon.num_spikes
         net.run(self._dt_ms * b2.ms)
         new_spikes = mon.num_spikes - spike_count_before
 
-        # Restore weights if frozen
+        # Restore weights and STDP traces if frozen
         if not self._training:
             S.w[:] = w_before
+            S.apre[:] = apre_before
+            S.apost[:] = apost_before
 
         # Update group spike counts from recent spikes
         if new_spikes > 0:

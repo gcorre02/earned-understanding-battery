@@ -308,7 +308,7 @@ class GNNNavigator(TestSystem):
 
     def _clone_internal(self) -> GNNNavigator:
         new = GNNNavigator.__new__(GNNNavigator)
-        new._graph = self._graph
+        new._graph = self._graph.copy()
         new._seed = self._seed + self._step_count + 7919
         new._rng = np.random.default_rng(new._seed)
         new._hidden_dim = self._hidden_dim

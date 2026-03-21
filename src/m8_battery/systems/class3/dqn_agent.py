@@ -49,6 +49,7 @@ class DQNAgent(TestSystem):
         self._step_count = 0
         self._visit_counts: dict[int, int] = {}
         self._is_trained = False
+        self._training = True
 
     def train_on_domain(self, graph: nx.DiGraph, target_node: int | None = None) -> None:
         """Train the RL agent on the graph environment."""
@@ -70,6 +71,15 @@ class DQNAgent(TestSystem):
         )
         self._model.learn(total_timesteps=self._total_timesteps)
         self._is_trained = True
+
+    def set_training(self, mode: bool) -> None:
+        """Enable/disable learning during step().
+
+        When mode=False, step() uses the trained policy for inference
+        but no model updates occur. (step() is inference-only; learning
+        happens in train_on_domain(), so this gates future train calls.)
+        """
+        self._training = mode
 
     def set_graph(self, graph: nx.DiGraph) -> None:
         self._graph = graph

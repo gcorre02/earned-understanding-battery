@@ -65,6 +65,8 @@ def _js_divergence(p: np.ndarray, q: np.ndarray) -> float:
 
 def _engagement_entropy(dist: dict[str, float]) -> float:
     """Shannon entropy of engagement distribution. Range: [0, ln(n_regions)]."""
+    if not dist or all(v <= 0 for v in dist.values()):
+        return 0.0
     vals = np.array(list(dist.values()), dtype=np.float64)
     vals = vals + 1e-10
     vals = vals / vals.sum()
@@ -238,9 +240,10 @@ def run_generativity(
                  f"Zero overlap between engagement distributions. "
                  f"Investigate before classifying. [PRELIMINARY]")
     elif passes_jsd and passes_coherence and signal_type == "candidate_generativity":
-        passed = True  # PROVISIONAL
+        # Rigour P1: no definitive classification with uncalibrated threshold
+        passed = None if THRESHOLD_STATUS != "CALIBRATED" else True
         failure_mode = "earned"
-        notes = (f"Candidate generativity (PRELIMINARY threshold): JSD={jsd:.4f}, "
+        notes = (f"Candidate generativity: JSD={jsd:.4f}, "
                  f"coherence={coherence:.4f}. [THRESHOLD={THRESHOLD_STATUS}]")
     elif passes_jsd and not passes_coherence:
         passed = False

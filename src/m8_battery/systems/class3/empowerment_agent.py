@@ -366,7 +366,7 @@ class EmpowermentAgent(TestSystem):
 
     def _clone_internal(self) -> EmpowermentAgent:
         new = EmpowermentAgent.__new__(EmpowermentAgent)
-        new._graph = self._graph
+        new._graph = self._graph.copy()
         new._seed = self._seed
         new._rng = np.random.default_rng(self._seed + self._step_count + 7919)
         new._recompute_interval = self._recompute_interval

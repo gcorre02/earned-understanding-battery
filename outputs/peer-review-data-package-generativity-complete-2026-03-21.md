@@ -410,7 +410,8 @@ All positive control code was reviewed against the instrument specification. Six
 - Base: natural logarithm (base e)
 - Smoothing: epsilon = 1e-10 added to both distributions before normalisation
 - Range: [0, ln(2)] = [0, 0.6931]
-- Engagement distribution: proportion of visits to each community during 500 autonomous steps on domain B
+- Engagement distribution: proportion of visits to each community during autonomous steps on domain B
+- Step count: 500 for B₀/B₁ data (this session's verification run). Prior B₂ data used N steps as determined by `len(domain_b_inputs)` in the battery runner. Step count may differ between datasets.
 
 ### 6.2 Coherence
 
@@ -439,7 +440,7 @@ A system visiting fewer than 3 communities (with > 1% engagement each) is flagge
 | maximum_divergence | JSD > 99% of ln(2) | Red flag — zero overlap between distributions |
 | potentially_confounded | Edge overlap > 5% | Signal may be from shared edges, not structure |
 | divergent_incoherent | Coherence <= 0 | Trained differs but is less structured |
-| candidate_generativity | All checks pass | Genuine signal candidate (still requires threshold calibration) |
+| candidate_generativity | All criteria met | Genuine signal candidate (still requires threshold calibration) |
 
 ### 6.5 Domain B Construction
 
@@ -462,7 +463,7 @@ A system visiting fewer than 3 communities (with > 1% engagement each) is flagge
 
 **PRELIMINARY.** No threshold is set from the positive distribution because no reliable positive distribution exists yet. This is the core question being submitted for review.
 
-The current pass rule requires: JSD > per-system-type p95 noise floor AND coherence > 0. The noise floor is empirically derived from 50 untrained seed pairs per system type. No positive threshold has been calibrated.
+The current acceptance criteria require: JSD > per-system-type p95 noise floor AND coherence > 0. The noise floor is empirically derived from 50 untrained seed pairs per system type. No positive threshold has been calibrated.
 
 ---
 
@@ -476,7 +477,7 @@ The role-based walker (PC1) produces consistent sub-threshold signal on all 3 se
 
 **(A) The instrument methodology is sound. The positive controls need strengthening.**
 
-The GNN's 1/3 pass demonstrates that sensitivity exists — the instrument *can* detect a signal above the noise floor when the underlying mechanism is strong enough. The role walker's consistent-but-sub-threshold signal confirms that genuine structural transfer occurs but at insufficient magnitude. A system that creates community-level preferences (rather than node-level role preferences or embeddings) might achieve consistent above-floor results.
+The GNN's 1/3 above-floor result demonstrates that sensitivity exists — the instrument *can* detect a signal above the noise floor when the underlying mechanism is strong enough. The role walker's consistent-but-sub-threshold signal confirms that genuine structural transfer occurs but at insufficient magnitude. A system that creates community-level preferences (rather than node-level role preferences or embeddings) might achieve consistent above-floor results.
 
 **(B) The engagement-JSD metric has inherently high noise for stochastic graph navigation systems.**
 
@@ -484,7 +485,7 @@ The noise floor (p95 = 0.34-0.43) is close to the maximum JSD (0.693), leaving l
 
 **(C) The evidence is sufficient given the stochastic nature of graph navigation.**
 
-The 1/3 seed pass for PC3, combined with PC1's consistent sub-threshold signal, may constitute adequate evidence of sensitivity. The threshold methodology (per-seed agreement) may be too strict for inherently stochastic systems. A threshold that accounts for variability — e.g., requiring the mean JSD across seeds to exceed a lower bar — might be more appropriate.
+The 1/3 above-floor result for PC3, combined with PC1's consistent sub-threshold signal, may constitute adequate evidence of sensitivity. The threshold methodology (per-seed agreement) may be too strict for inherently stochastic systems. A threshold that accounts for variability — e.g., requiring the mean JSD across seeds to exceed a lower bar — might be more appropriate.
 
 ### Specific Requests
 
@@ -508,7 +509,7 @@ All tuning was done to make the instrument *work correctly*, not to make any sys
 
 ### Reproducibility
 
-All results are deterministic with the stated seeds. SBM parameters are in Appendix A. All runs can be replayed from seed + configuration.
+All results are deterministic with the stated seeds. SBM parameters are in Appendix A. Code in m8-battery repo, commit `da038dd`. All runs can be replayed from seed + configuration.
 
 ---
 

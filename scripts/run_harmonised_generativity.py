@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from typing import Any, Callable
 
 import numpy as np
+import torch
 
 from m8_battery.domains.sbm_generator import generate_domain_family
 from m8_battery.domains.presets import MEDIUM
@@ -373,8 +374,10 @@ def main():
     # 2A FrozenLLM: constructor takes (seed, device), graph via set_graph()
     try:
         from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        _llm_device = "mps" if torch.backends.mps.is_available() else "cpu"
+        _log(f"FrozenLLM device: {_llm_device}")
         def _make_llm(g, s):
-            sys = FrozenLLM(seed=s)
+            sys = FrozenLLM(seed=s, device=_llm_device)
             sys.set_graph(g)
             return sys
         non_graph_configs["2A"] = {

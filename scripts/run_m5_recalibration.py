@@ -200,6 +200,7 @@ def run_single(system_id, seed):
         domain_a_inputs=nodes_a[:n_inputs],
         domain_a_prime_inputs=list(family["A_prime"].nodes())[:n_inputs],
         domain_b_inputs=list(family["B"].nodes())[:n_inputs],
+        domain_b_graph=family["B"],  # Issue 3: graph walkers need the actual graph
         probe_inputs=nodes_a[:10],
         measurement_interval=5,
         wander_steps=15,

@@ -118,6 +118,7 @@ def run_generativity(
     control_factory: Callable[[], TestSystem] | None = None,
     jsd_threshold: float = 0.05,
     edge_overlap: float | None = None,
+    domain_b_graph: Any = None,
 ) -> InstrumentResult:
     """Run the generativity instrument (DN-18 behavioural + DN-30 coherence).
 
@@ -144,11 +145,20 @@ def run_generativity(
         )
 
     # --- Trained system on domain B (already frozen by battery runner) ---
+    # Switch to domain B graph if provided (Issue 3 fix: graph walkers must
+    # navigate B's topology, not A's)
+    if domain_b_graph is not None:
+        system.set_domain(domain_b_graph)
+
     metric_before = system.get_structure_metric()
     system.reset_engagement_tracking()
 
     trajectory = [metric_before]
-    for i, inp in enumerate(domain_b_inputs):
+    n_steps = len(domain_b_inputs)
+    for i in range(n_steps):
+        # Autonomous navigation: step(None). The system navigates domain B
+        # using its frozen structure. No teleporting to input nodes.
+        inp = None
         provenance.log_input(inp, step_index=i)
         metric_pre = system.get_structure_metric()
         output = system.step(inp)
@@ -178,10 +188,12 @@ def run_generativity(
     if control_factory is not None:
         try:
             fresh = control_factory()
+            if domain_b_graph is not None:
+                fresh.set_domain(domain_b_graph)
             fresh.set_training(False)
             fresh.reset_engagement_tracking()
-            for inp in domain_b_inputs:
-                fresh.step(inp)
+            for _ in range(n_steps):
+                fresh.step(None)  # Autonomous navigation on domain B
             fresh_engagement = fresh.get_engagement_distribution()
             fresh_entropy = _engagement_entropy(fresh_engagement)
             fresh_visited = _count_visited(fresh_engagement)

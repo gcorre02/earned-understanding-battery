@@ -154,6 +154,23 @@ class RoleBasedWalker(TestSystem):
             result.append((nb, role))
         return result
 
+    def set_domain(self, graph) -> None:
+        """Switch to new graph, preserving learned role preferences.
+
+        Role preferences transfer directly — they're over roles (hub/bridge/
+        periphery/leaf), not specific nodes. The role classification recomputes
+        from the new graph's topology.
+        """
+        saved_prefs = self._role_preferences.copy()
+        saved_training = self._training
+
+        # Reinitialise on new graph (recomputes role cache)
+        self.__init__(graph, seed=self._seed, eta=self._eta, temperature=self._temperature)
+
+        # Restore learned preferences
+        self._role_preferences = saved_prefs
+        self._training = saved_training
+
     def set_training(self, mode: bool) -> None:
         self._training = mode
 

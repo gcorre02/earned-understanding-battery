@@ -124,6 +124,50 @@ class ActiveInferenceAgent(TestSystem):
 
         return G
 
+    def set_domain(self, graph) -> None:
+        """Switch to new graph, preserving learned pB (Dirichlet transition counts)."""
+        old_pB = self._pB.copy()
+
+        # Reinitialise on new graph
+        self._graph = graph
+        self._nodes = sorted(graph.nodes())
+        self._n_nodes = len(self._nodes)
+        self._node_to_idx = {n: i for i, n in enumerate(self._nodes)}
+
+        max_deg_old = self._max_deg
+        self._max_deg = max(dict(graph.degree()).values()) if self._n_nodes > 0 else 1
+        self._max_deg = max(self._max_deg, 1)
+
+        # Rebuild neighbour lookup
+        self._neighbours = {}
+        for node in self._nodes:
+            s = self._node_to_idx[node]
+            if graph.is_directed():
+                nbs = sorted(graph.successors(node))
+            else:
+                nbs = sorted(graph.neighbors(node))
+            self._neighbours[s] = [(i, self._node_to_idx[nb]) for i, nb in enumerate(nbs)]
+
+        # Rebuild community mapping
+        self._node_to_community = {}
+        for node in self._nodes:
+            data = graph.nodes[node]
+            features = data.get("features", {})
+            self._node_to_community[node] = features.get("community", data.get("block", 0))
+
+        # Transfer pB where dimensions match, reset otherwise
+        n = self._n_nodes
+        md = self._max_deg
+        if old_pB.shape == (n, n, md):
+            self._pB = old_pB
+        else:
+            self._pB = np.ones((n, n, md)) * self._alpha
+        self._initial_pB = np.ones((n, n, md)) * self._alpha
+
+        # Reset position
+        self._current_node = self._nodes[0] if self._nodes else 0
+        self._visit_counts = np.zeros(n, dtype=np.float64)
+
     def set_training(self, mode: bool) -> None:
         self._training = mode
 

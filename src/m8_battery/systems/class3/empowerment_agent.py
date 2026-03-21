@@ -164,6 +164,39 @@ class EmpowermentAgent(TestSystem):
             features = data.get("features", {})
             self._node_to_community[node] = features.get("community", data.get("block", 0))
 
+    def set_domain(self, graph) -> None:
+        """Switch to new graph, preserving learned empowerment landscape and transition model."""
+        old_empowerment = self._empowerment.copy()
+        old_observed_T = self._observed_T.copy()
+
+        # Reinitialise on new graph
+        self._graph = graph
+        self._nodes = sorted(graph.nodes())
+        self._n_nodes = len(self._nodes)
+        self._node_to_idx = {n: i for i, n in enumerate(self._nodes)}
+        self._T_true, self._max_deg = _build_transition_matrix(graph)
+
+        # Rebuild community mapping
+        self._node_to_community = {}
+        for node in self._nodes:
+            data = graph.nodes[node]
+            features = data.get("features", {})
+            self._node_to_community[node] = features.get("community", data.get("block", 0))
+
+        # Transfer empowerment for shared nodes, default for new
+        n_new = self._n_nodes
+        self._empowerment = np.ones(n_new) / n_new
+        for i, node in enumerate(self._nodes):
+            if i < len(old_empowerment):
+                self._empowerment[i] = old_empowerment[i]
+
+        # Reset transition model (new graph has different transitions)
+        self._observed_T = np.ones_like(self._T_true) * 0.01
+
+        # Reset position
+        self._current_node = self._nodes[0] if self._nodes else 0
+        self._visit_counts = np.zeros(n_new, dtype=np.float64)
+
     def set_training(self, mode: bool) -> None:
         self._training = mode
 

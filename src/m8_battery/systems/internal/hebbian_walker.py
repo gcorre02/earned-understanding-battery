@@ -90,6 +90,35 @@ class HebbianWalker(TestSystem):
             community = features.get("community", data.get("block", 0))
             self._node_to_community[node] = community
 
+    def set_domain(self, graph) -> None:
+        """Switch to a new graph, preserving learned edge weights where edges overlap.
+
+        Edges in the new graph that existed in the old graph keep their trained
+        weights. New edges get weight 1.0 (default). This allows the system to
+        navigate a novel topology with its frozen learned preferences.
+        """
+        old_weights = dict(self._weights)
+        self._graph = graph
+        self._original_graph = graph.copy()
+
+        # Rebuild community mapping
+        self._node_to_community = {}
+        for node in self._graph.nodes():
+            data = self._graph.nodes[node]
+            features = data.get("features", {})
+            self._node_to_community[node] = features.get("community", data.get("block", 0))
+
+        # Rebuild weights: transfer from old where edges overlap, default 1.0 otherwise
+        self._weights = {}
+        for u, v in self._graph.edges():
+            self._weights[(u, v)] = old_weights.get((u, v), 1.0)
+            self._weights[(v, u)] = old_weights.get((v, u), 1.0)
+
+        # Reset position to a node in the new graph
+        nodes = list(self._graph.nodes())
+        if nodes:
+            self._current_node = self._rng.choice(nodes)
+
     def reset_engagement_tracking(self) -> None:
         """Reset visit counts for windowed engagement measurement."""
         self._visit_counts = {}

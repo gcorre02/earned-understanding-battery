@@ -39,6 +39,7 @@ class BatteryConfig:
     domain_a_inputs: list[Any] = field(default_factory=list)
     domain_a_prime_inputs: list[Any] = field(default_factory=list)
     domain_b_inputs: list[Any] = field(default_factory=list)
+    domain_b_graph: Any = None  # Graph object for domain B (Issue 3: graph walkers need this)
     probe_inputs: list[Any] = field(default_factory=list)
 
     # Instrument parameters
@@ -409,12 +410,24 @@ def run_battery(
     system.set_training(False)
     _log("Phase 3: generativity (learning FROZEN)")
     t0 = _time.monotonic()
+    # Compute edge overlap for confound report (Issue 5)
+    gen_edge_overlap = None
+    if config.domain_b_graph is not None and hasattr(system, '_graph') and system._graph is not None:
+        try:
+            edges_a = set((min(u, v), max(u, v)) for u, v in system._graph.edges())
+            edges_b = set((min(u, v), max(u, v)) for u, v in config.domain_b_graph.edges())
+            gen_edge_overlap = len(edges_a & edges_b) / max(len(edges_a | edges_b), 1)
+        except Exception:
+            pass
+
     results["generativity"] = run_generativity(
         system=system,
         domain_b_inputs=config.domain_b_inputs,
         reference_metric=reference_metric,
         provenance=provenance,
         control_factory=control_factory,
+        domain_b_graph=config.domain_b_graph,
+        edge_overlap=gen_edge_overlap,
     )
     timings["generativity"] = _time.monotonic() - t0
     _log(f"  generativity: {timings['generativity']:.1f}s passed={results['generativity'].passed}")

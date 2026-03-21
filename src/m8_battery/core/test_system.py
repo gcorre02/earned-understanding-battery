@@ -106,6 +106,19 @@ class TestSystem(ABC):
         distribution is already instantaneous need not override).
         """
 
+    def set_domain(self, graph: Any) -> None:
+        """Switch the system's navigation domain while preserving learned state.
+
+        For graph-based systems: replaces the underlying graph topology.
+        Learned parameters (edge weights, preferences, policies) are preserved
+        where applicable. Edges/nodes that don't exist in the new graph get
+        default values.
+
+        Used by generativity instrument: train on domain A, switch to domain B,
+        navigate B with frozen A-trained structure. Default: no-op (systems that
+        don't navigate graphs need not override).
+        """
+
     def set_training(self, mode: bool) -> None:
         """Enable (True) or disable (False) learning during step().
 

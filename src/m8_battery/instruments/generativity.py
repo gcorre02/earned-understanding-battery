@@ -8,10 +8,11 @@ Metrics (peer reviewer #2 upgrade):
 - DIAGNOSTIC: Marginal engagement JSD (community visit proportions, retained)
 - Self-transition rate (community persistence, replaces autocorrelation)
 
-Pass condition (DN-29 strict + DN-30 + Rigour Principles):
-1. JSD > calibrated threshold (trained behaviour differs from fresh)
-2. Coherence > 0 (normalised entropy difference; trained more structured)
-3. Signal classified (not degenerate, not maximum-divergence, not confounded)
+Pass condition (DN-29 strict + DN-30a addendum + Rigour Principles):
+1. Transition JSD > calibrated noise floor (trained behaviour differs from fresh)
+2. Not degenerate (system visits >= 3 communities)
+3. Coherence metrics (entropy, structural consistency) reported as DIAGNOSTIC
+   — not gated on SBM domains (F-048/F-049: too homogeneous)
 
 Threshold status: PRELIMINARY until derived from positive/negative distributions.
 Results with preliminary thresholds are RAW DATA, not classifications.
@@ -374,8 +375,11 @@ def run_generativity(
     # --- Pass/fail: PRELIMINARY threshold (Rigour Principle 1) ---
     # These classifications are PROVISIONAL until threshold is calibrated
     passes_jsd = jsd > jsd_threshold
-    # DN-30a: coherence = structural consistency (replaces entropy comparison)
-    passes_coherence = structural_consistency_value > 0 if training_transition_matrix is not None else coherence > 0
+    # DN-30a addendum (F-048/F-049): coherence is DIAGNOSTIC on SBM domains.
+    # SBM's homogeneous role distributions make coherence metrics fragile at
+    # moderate preference strengths. Coherence gate deferred to Phase B
+    # (heterogeneous domains). Pass criterion: transition_jsd > floor + not degenerate.
+    passes_coherence = True  # Coherence not gated on SBM
 
     # Degeneracy overrides
     if signal_type.startswith("degenerate"):

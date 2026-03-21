@@ -50,6 +50,7 @@ class DQNAgent(TestSystem):
         self._visit_counts: dict[int, int] = {}
         self._is_trained = False
         self._training = True
+        self._deferred_model_bytes: bytes | None = None
 
     def train_on_domain(self, graph: nx.DiGraph, target_node: int | None = None) -> None:
         """Train the RL agent on the graph environment."""
@@ -71,6 +72,14 @@ class DQNAgent(TestSystem):
         )
         self._model.learn(total_timesteps=self._total_timesteps)
         self._is_trained = True
+
+        # Restore deferred model bytes from a prior set_state() call
+        if self._deferred_model_bytes is not None:
+            with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as f:
+                f.write(self._deferred_model_bytes)
+                f.flush()
+                self._model = MaskablePPO.load(f.name, env=self._env)
+            self._deferred_model_bytes = None
 
     def set_training(self, mode: bool) -> None:
         """Enable/disable learning during step().
@@ -158,11 +167,16 @@ class DQNAgent(TestSystem):
         self._current_node = state["current_node"]
         self._step_count = state["step_count"]
         self._visit_counts = state["visit_counts"]
-        if "model_bytes" in state and self._env is not None:
-            with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as f:
-                f.write(state["model_bytes"])
-                f.flush()
-                self._model = MaskablePPO.load(f.name, env=self._env)
+        if "model_bytes" in state:
+            if self._env is not None:
+                with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as f:
+                    f.write(state["model_bytes"])
+                    f.flush()
+                    self._model = MaskablePPO.load(f.name, env=self._env)
+                self._deferred_model_bytes = None
+            else:
+                # Stash for lazy restore when _env becomes available
+                self._deferred_model_bytes = state["model_bytes"]
 
     def get_structure_metric(self) -> float:
         """Policy entropy — changes as the agent learns."""

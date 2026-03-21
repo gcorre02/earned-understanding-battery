@@ -127,6 +127,8 @@ class CuriosityAgent(TestSystem):
         self._visit_counts: dict[int, int] = {}
         self._is_trained = False
         self._training = True
+        self._deferred_model_bytes: bytes | None = None
+        self._deferred_predictor_state: dict | None = None
 
     def train_on_domain(self, graph: nx.DiGraph) -> None:
         """Train curiosity agent on the graph."""
@@ -153,6 +155,17 @@ class CuriosityAgent(TestSystem):
         )
         self._model.learn(total_timesteps=self._total_timesteps)
         self._is_trained = True
+
+        # Restore deferred state from a prior set_state() call
+        if self._deferred_model_bytes is not None:
+            with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as f:
+                f.write(self._deferred_model_bytes)
+                f.flush()
+                self._model = MaskablePPO.load(f.name, env=self._wrapped_env)
+            self._deferred_model_bytes = None
+        if self._deferred_predictor_state is not None and self._wrapped_env is not None:
+            self._wrapped_env.predictor.load_state_dict(self._deferred_predictor_state)
+            self._deferred_predictor_state = None
 
     def set_training(self, mode: bool) -> None:
         """Enable/disable learning during step().
@@ -230,10 +243,30 @@ class CuriosityAgent(TestSystem):
         return pickle.dumps(state)
 
     def set_state(self, snapshot: bytes) -> None:
+        from sb3_contrib import MaskablePPO
         state = pickle.loads(snapshot)
         self._current_node = state["current_node"]
         self._step_count = state["step_count"]
         self._visit_counts = state["visit_counts"]
+
+        # Restore RND predictor state
+        if "predictor_state" in state:
+            if self._wrapped_env is not None:
+                self._wrapped_env.predictor.load_state_dict(state["predictor_state"])
+                self._deferred_predictor_state = None
+            else:
+                self._deferred_predictor_state = state["predictor_state"]
+
+        # Restore RL model weights
+        if "model_bytes" in state:
+            if self._wrapped_env is not None:
+                with tempfile.NamedTemporaryFile(suffix=".zip", delete=False) as f:
+                    f.write(state["model_bytes"])
+                    f.flush()
+                    self._model = MaskablePPO.load(f.name, env=self._wrapped_env)
+                self._deferred_model_bytes = None
+            else:
+                self._deferred_model_bytes = state["model_bytes"]
 
     def get_structure_metric(self) -> float:
         """RND prediction error — changes as agent learns to predict."""
@@ -322,4 +355,8 @@ class CuriosityAgent(TestSystem):
             seed=self._seed, total_timesteps=self._total_timesteps,
         )
         new.set_graph(self._graph)
+        # Copy RND predictor state and RL model weights
+        if self._wrapped_env is not None or self._model is not None:
+            snapshot = self.get_state()
+            new.set_state(snapshot)
         return new

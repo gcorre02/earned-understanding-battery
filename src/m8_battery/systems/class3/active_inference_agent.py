@@ -125,16 +125,13 @@ class ActiveInferenceAgent(TestSystem):
         return G
 
     def set_domain(self, graph) -> None:
-        """Switch to new graph, preserving learned pB (Dirichlet transition counts)."""
-        old_pB = self._pB.copy()
-
+        """Switch to new graph, resetting topology-dependent state."""
         # Reinitialise on new graph
         self._graph = graph
         self._nodes = sorted(graph.nodes())
         self._n_nodes = len(self._nodes)
         self._node_to_idx = {n: i for i, n in enumerate(self._nodes)}
 
-        max_deg_old = self._max_deg
         self._max_deg = max(dict(graph.degree()).values()) if self._n_nodes > 0 else 1
         self._max_deg = max(self._max_deg, 1)
 
@@ -155,13 +152,15 @@ class ActiveInferenceAgent(TestSystem):
             features = data.get("features", {})
             self._node_to_community[node] = features.get("community", data.get("block", 0))
 
-        # Transfer pB where dimensions match, reset otherwise
+        # Always reset pB to uniform prior when switching domains. The
+        # transition model learned on graph A is specific to A's topology
+        # (which edges exist, which transitions are possible). Even if
+        # dimensions happen to match, the learned counts encode A's
+        # structure and cannot transfer meaningfully to B (different
+        # edges = different transition dynamics). This is by design.
         n = self._n_nodes
         md = self._max_deg
-        if old_pB.shape == (n, n, md):
-            self._pB = old_pB
-        else:
-            self._pB = np.ones((n, n, md)) * self._alpha
+        self._pB = np.ones((n, n, md)) * self._alpha
         self._initial_pB = np.ones((n, n, md)) * self._alpha
 
         # Reset position

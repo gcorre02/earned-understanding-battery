@@ -165,10 +165,7 @@ class EmpowermentAgent(TestSystem):
             self._node_to_community[node] = features.get("community", data.get("block", 0))
 
     def set_domain(self, graph) -> None:
-        """Switch to new graph, preserving learned empowerment landscape and transition model."""
-        old_empowerment = self._empowerment.copy()
-        old_observed_T = self._observed_T.copy()
-
+        """Switch to new graph, resetting topology-dependent state."""
         # Reinitialise on new graph
         self._graph = graph
         self._nodes = sorted(graph.nodes())
@@ -183,12 +180,15 @@ class EmpowermentAgent(TestSystem):
             features = data.get("features", {})
             self._node_to_community[node] = features.get("community", data.get("block", 0))
 
-        # Transfer empowerment for shared nodes, default for new
+        # Reset empowerment to uniform. The empowerment landscape is
+        # topological — it depends on the connectivity structure of the
+        # specific graph (channel capacity at each node). Transferring
+        # values by index is semantically wrong because node ordering may
+        # differ, and transferring by node identity is still meaningless
+        # because a node's empowerment in graph A says nothing about its
+        # empowerment in graph B (different edges = different channels).
         n_new = self._n_nodes
         self._empowerment = np.ones(n_new) / n_new
-        for i, node in enumerate(self._nodes):
-            if i < len(old_empowerment):
-                self._empowerment[i] = old_empowerment[i]
 
         # Reset transition model (new graph has different transitions)
         self._observed_T = np.ones_like(self._T_true) * 0.01

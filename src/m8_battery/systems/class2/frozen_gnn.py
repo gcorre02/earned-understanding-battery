@@ -262,8 +262,13 @@ class FrozenGAT(TestSystem):
         new._pyg_data = self._pyg_data
         new._is_frozen = True
 
-        # Zero the attention head corresponding to the region
-        head_idx = int(region_id.split("_")[-1]) % self._n_heads
+        # Extract head index directly — no modulo wrapping.
+        # With modulo, head_8 silently ablates head_0 when n_heads=4.
+        head_idx = int(region_id.split("_")[-1])
+        if head_idx < 0 or head_idx >= self._n_heads:
+            raise ValueError(
+                f"head index {head_idx} out of range for {self._n_heads} heads"
+            )
         with torch.no_grad():
             # Zero the linear projection for this head
             h_dim = self._hidden_dim
@@ -284,7 +289,11 @@ class FrozenGAT(TestSystem):
         new._pyg_data = self._pyg_data
         new._is_frozen = True
 
-        head_idx = int(region_id.split("_")[-1]) % self._n_heads
+        head_idx = int(region_id.split("_")[-1])
+        if head_idx < 0 or head_idx >= self._n_heads:
+            raise ValueError(
+                f"head index {head_idx} out of range for {self._n_heads} heads"
+            )
         with torch.no_grad():
             h_dim = self._hidden_dim
             start = head_idx * h_dim

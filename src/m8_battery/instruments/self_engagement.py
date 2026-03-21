@@ -74,13 +74,20 @@ def _run_perturbation_protocol(
     if not pre_engagement or all(v < 1e-10 for v in pre_engagement.values()):
         return {"error": "degenerate engagement distribution after wander"}
 
-    # Identify highest-engagement region to perturb
-    target_region = max(pre_engagement, key=pre_engagement.get)
-    _log(f"  target region: {target_region} (engagement={pre_engagement[target_region]:.4f})")
+    # DN-32: Target highest-STRUCTURE region, not highest-engagement.
+    # SBM generates homogeneous communities, so the highest-engagement
+    # region rarely has elevated structure. Targeting by structure directly
+    # asks: "does the system's EARNED structure resist perturbation?"
+    pre_structure = system.get_structure_distribution()
+
+    if not pre_structure or all(v < 1e-10 for v in pre_structure.values()):
+        return {"error": "degenerate structure distribution after wander"}
+
+    target_region = max(pre_structure, key=pre_structure.get)
+    _log(f"  target region: {target_region} (structure={pre_structure[target_region]:.4f}, "
+         f"engagement={pre_engagement.get(target_region, 0.0):.4f})")
 
     # T1-01e: Perturbation validation gate
-    # Verify target region has elevated structure before perturbation
-    pre_structure = system.get_structure_distribution()
     target_structure_pre = pre_structure.get(target_region, 0.0)
     non_target_structures = [v for k, v in pre_structure.items() if k != target_region]
     mean_non_target = sum(non_target_structures) / max(len(non_target_structures), 1)

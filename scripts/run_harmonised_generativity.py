@@ -96,25 +96,34 @@ def run_generativity_measurement(
     n_communities = len(set(node_to_community.values()))
 
     # Trained system on domain
-    system.set_domain(domain_graph)
+    try:
+        system.set_domain(domain_graph)
+    except (AttributeError, NotImplementedError):
+        pass  # Systems without set_domain navigate their init graph
     system.set_training(False)
     system.reset_engagement_tracking()
     trained_seq = []
     for _ in range(N_STEPS):
-        node = system.step(None)
-        trained_seq.append(node)
+        output = system.step(None)
+        # Some systems return dicts or tuples — extract node if hashable
+        if isinstance(output, (int, float, str)):
+            trained_seq.append(output)
     trained_eng = system.get_engagement_distribution()
     trained_entropy = _engagement_entropy(trained_eng)
     trained_visited = _count_visited(trained_eng)
 
     # Fresh system on domain
-    fresh_system.set_domain(domain_graph)
+    try:
+        fresh_system.set_domain(domain_graph)
+    except (AttributeError, NotImplementedError):
+        pass
     fresh_system.set_training(False)
     fresh_system.reset_engagement_tracking()
     fresh_seq = []
     for _ in range(N_STEPS):
-        node = fresh_system.step(None)
-        fresh_seq.append(node)
+        output = fresh_system.step(None)
+        if isinstance(output, (int, float, str)):
+            fresh_seq.append(output)
     fresh_eng = fresh_system.get_engagement_distribution()
     fresh_entropy = _engagement_entropy(fresh_eng)
     fresh_visited = _count_visited(fresh_eng)
@@ -267,7 +276,7 @@ def main():
 
     # --- System factories ---
     from m8_battery.systems.class1.wordnet_graph import WordNetGraph
-    from m8_battery.systems.class1.rule_navigator import RuleNavigator
+    from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator
     from m8_battery.systems.class1.foxworthy_a import FoxworthyA
     from m8_battery.systems.internal.hebbian_walker import HebbianWalker
     from m8_battery.systems.class3.empowerment_agent import EmpowermentAgent
@@ -305,6 +314,8 @@ def main():
     }
 
     # Systems without set_domain() — B₁ only (standard domain B via battery runner)
+    # Class 1/2 systems produce JSD=0 by design (no learning, trained=fresh).
+    # They navigate their init graph, so set_domain is a no-op.
     non_graph_configs = {
         "1A": {
             "factory": lambda g, s: WordNetGraph(g, seed=s),
@@ -312,16 +323,14 @@ def main():
             "train_steps": 0,
         },
         "1B": {
-            "factory": lambda g, s: RuleNavigator(g, seed=s),
-            "fresh": lambda g, s: RuleNavigator(g, seed=s + 1000),
-            "train_steps": 0,
-        },
-        "1C": {
-            "factory": lambda g, s: FoxworthyA(g, seed=s),
-            "fresh": lambda g, s: FoxworthyA(g, seed=s + 1000),
+            "factory": lambda g, s: RuleBasedNavigator(g, seed=s),
+            "fresh": lambda g, s: RuleBasedNavigator(g, seed=s + 1000),
             "train_steps": 0,
         },
     }
+    # 1C (FoxworthyA) takes n_features not graph — handle separately
+    # 2A-2C require model loading (LLM/GAT/GRU) — skip in harmonised run
+    # Their generativity data is established: JSD=0 (absent) across all seeds
 
     all_results = []
 

@@ -370,10 +370,65 @@ def main():
     # 2C FoxworthyC: constructor takes n_features not graph
     _log("SKIP 2C: FoxworthyC requires feature-count constructor (not graph-first)")
 
-    # 2A (FrozenLLM) — skipped: requires TinyLlama download, ~2min load per instance
-    # 3A (DQN), 3B (Curiosity), 3C (FoxworthyF) — skipped: require sb3/peft
-    # These produce JSD=0 or degenerate by design (no structural transfer mechanism)
-    # Documented as "not testable under harmonised protocol" per reviewer guidance
+    # 2A FrozenLLM: constructor takes (seed, device), graph via set_graph()
+    try:
+        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        def _make_llm(g, s):
+            sys = FrozenLLM(seed=s)
+            sys.set_graph(g)
+            return sys
+        non_graph_configs["2A"] = {
+            "factory": _make_llm,
+            "fresh": lambda g, s: _make_llm(g, s + 1000),
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 2A: FrozenLLM import failed")
+
+    # 3A DQN: constructor takes (n_features, max_degree, seed), graph via set_graph()
+    try:
+        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        def _make_dqn(g, s):
+            sys = DQNAgent(seed=s)
+            sys.set_graph(g)
+            return sys
+        non_graph_configs["3A"] = {
+            "factory": _make_dqn,
+            "fresh": lambda g, s: _make_dqn(g, s + 1000),
+            "train_steps": 0,  # Don't train — just test frozen (untrained) on B
+        }
+    except ImportError:
+        _log("SKIP 3A: DQNAgent import failed (sb3)")
+
+    # 3B Curiosity: same pattern as DQN
+    try:
+        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        def _make_curiosity(g, s):
+            sys = CuriosityAgent(seed=s)
+            sys.set_graph(g)
+            return sys
+        non_graph_configs["3B"] = {
+            "factory": _make_curiosity,
+            "fresh": lambda g, s: _make_curiosity(g, s + 1000),
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 3B: CuriosityAgent import failed (sb3)")
+
+    # 3C FoxworthyF: requires peft (DistilGPT-2 + LoRA)
+    try:
+        from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+        def _make_ff(g, s):
+            sys = FoxworthyF(seed=s)
+            sys.set_graph(g)
+            return sys
+        non_graph_configs["3C"] = {
+            "factory": _make_ff,
+            "fresh": lambda g, s: _make_ff(g, s + 1000),
+            "train_steps": 0,
+        }
+    except ImportError:
+        _log("SKIP 3C: FoxworthyF import failed (peft)")
 
     all_results = []
 

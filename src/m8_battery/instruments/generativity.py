@@ -3,6 +3,11 @@
 Tests whether frozen earned structure produces coherent, differentiated
 responses on novel domains compared to a fresh system.
 
+Metrics (peer reviewer #2 upgrade):
+- PRIMARY: Transition-matrix JSD (community-to-community movement patterns)
+- DIAGNOSTIC: Marginal engagement JSD (community visit proportions, retained)
+- Self-transition rate (community persistence, replaces autocorrelation)
+
 Pass condition (DN-29 strict + DN-30 + Rigour Principles):
 1. JSD > calibrated threshold (trained behaviour differs from fresh)
 2. Coherence > 0 (normalised entropy difference; trained more structured)
@@ -24,6 +29,7 @@ import sys
 from typing import Any, Callable
 
 import numpy as np
+from scipy.spatial.distance import jensenshannon
 
 from m8_battery.core.test_system import TestSystem
 from m8_battery.core.types import InstrumentResult
@@ -87,6 +93,71 @@ def _coherence_normalised(trained_entropy: float, fresh_entropy: float) -> float
     """
     denom = fresh_entropy + trained_entropy + 1e-10
     return float((fresh_entropy - trained_entropy) / denom)
+
+
+def _compute_transition_matrix(
+    visit_sequence: list,
+    node_to_community: dict,
+    n_communities: int,
+) -> np.ndarray:
+    """Compute community-to-community transition matrix from visit sequence.
+
+    Returns (k x k) matrix where entry [i,j] = P(next community = j | current = i).
+    Row-normalised. Rows with no transitions are uniform.
+    """
+    T = np.zeros((n_communities, n_communities))
+    for t in range(len(visit_sequence) - 1):
+        c_from = node_to_community.get(visit_sequence[t], 0)
+        c_to = node_to_community.get(visit_sequence[t + 1], 0)
+        T[c_from, c_to] += 1
+    row_sums = T.sum(axis=1, keepdims=True)
+    row_sums = np.maximum(row_sums, 1e-10)
+    T = T / row_sums
+    return T
+
+
+def _transition_jsd(T_trained: np.ndarray, T_fresh: np.ndarray) -> float:
+    """Row-wise JSD between two transition matrices, weighted average.
+
+    Each row is a distribution over next-community. Rows where both systems
+    have transitions are included; rows where either has no transitions are
+    skipped. Weighted by min(row_count) for reliability.
+
+    Range: [0, ln(2)] (same as marginal JSD).
+    """
+    k = T_trained.shape[0]
+    row_jsds = []
+    weights = []
+    for i in range(k):
+        t_sum = T_trained[i].sum()
+        f_sum = T_fresh[i].sum()
+        if t_sum > 1e-10 and f_sum > 1e-10:
+            # scipy jensenshannon returns sqrt(JSD) with base e
+            jsd_sqrt = jensenshannon(T_trained[i], T_fresh[i])
+            row_jsds.append(jsd_sqrt ** 2)
+            weights.append(min(t_sum, f_sum))
+    if not row_jsds:
+        return 0.0
+    return float(np.clip(np.average(row_jsds, weights=np.array(weights)), 0.0, MAX_JSD))
+
+
+def _transition_entropy(T: np.ndarray) -> float:
+    """Average row entropy of transition matrix. Lower = more structured."""
+    row_entropies = []
+    for i in range(T.shape[0]):
+        if T[i].sum() > 1e-10:
+            row = T[i] + 1e-10
+            row = row / row.sum()
+            row_entropies.append(float(-np.sum(row * np.log(row))))
+    return float(np.mean(row_entropies)) if row_entropies else 0.0
+
+
+def _self_transition_rate(T: np.ndarray) -> float:
+    """Average diagonal of transition matrix. Higher = more community persistence."""
+    active_rows = [i for i in range(T.shape[0]) if T[i].sum() > 1e-10]
+    if not active_rows:
+        return 0.0
+    return float(np.mean([T[i, i] for i in active_rows]))
 
 
 def _classify_signal(
@@ -157,6 +228,7 @@ def run_generativity(
     system.reset_engagement_tracking()
 
     trajectory = [metric_before]
+    trained_visit_seq = []  # Node-by-node visit sequence for transition matrix
     n_steps = len(domain_b_inputs)
     for i in range(n_steps):
         # Autonomous navigation: step(None). The system navigates domain B
@@ -169,6 +241,7 @@ def run_generativity(
         provenance.log_state_change(metric_pre, metric_post, step_index=i)
         provenance.log_output(output, step_index=i)
         trajectory.append(metric_post)
+        trained_visit_seq.append(output)
 
     metric_after = system.get_structure_metric()
     trained_engagement = system.get_engagement_distribution()
@@ -187,6 +260,22 @@ def run_generativity(
     coherence = 0.0
     fresh_engagement = {}
     fresh_visited = 0
+    fresh_visit_seq = []
+    # Transition-matrix metrics (peer reviewer #2 recommendation)
+    t_jsd = 0.0
+    t_coherence = 0.0
+    trained_self_trans = 0.0
+    fresh_self_trans = 0.0
+
+    # Build community mapping from domain B graph for transition matrix
+    node_to_community: dict[Any, int] = {}
+    n_communities = 0
+    if domain_b_graph is not None:
+        for node in domain_b_graph.nodes():
+            data = domain_b_graph.nodes[node]
+            features = data.get("features", {})
+            node_to_community[node] = features.get("community", data.get("block", 0))
+        n_communities = len(set(node_to_community.values()))
 
     if control_factory is not None:
         try:
@@ -196,23 +285,36 @@ def run_generativity(
             fresh.set_training(False)
             fresh.reset_engagement_tracking()
             for _ in range(n_steps):
-                fresh.step(None)  # Autonomous navigation on domain B
+                output = fresh.step(None)  # Autonomous navigation on domain B
+                fresh_visit_seq.append(output)
             fresh_engagement = fresh.get_engagement_distribution()
             fresh_entropy = _engagement_entropy(fresh_engagement)
             fresh_visited = _count_visited(fresh_engagement)
 
-            # JS divergence (bounded [0, ln(2)])
+            # Marginal JS divergence (bounded [0, ln(2)]) — DIAGNOSTIC
             regions = sorted(set(list(trained_engagement.keys()) + list(fresh_engagement.keys())))
             trained_vec = np.array([trained_engagement.get(r, 0.0) for r in regions])
             fresh_vec = np.array([fresh_engagement.get(r, 0.0) for r in regions])
             jsd = _js_divergence(trained_vec, fresh_vec)
 
-            # DN-30 coherence: normalised difference (bounded [-1, 1])
+            # DN-30 coherence for marginal: normalised difference (bounded [-1, 1])
             coherence = _coherence_normalised(trained_entropy, fresh_entropy)
 
-            _log(f"  JSD={jsd:.4f} (max={MAX_JSD:.4f}) trained_H={trained_entropy:.4f} "
-                 f"fresh_H={fresh_entropy:.4f} coherence={coherence:.4f} "
-                 f"trained_visited={trained_visited} fresh_visited={fresh_visited}")
+            # --- Transition-matrix metrics (PRIMARY) ---
+            if n_communities > 0 and len(trained_visit_seq) > 1 and len(fresh_visit_seq) > 1:
+                T_trained = _compute_transition_matrix(trained_visit_seq, node_to_community, n_communities)
+                T_fresh = _compute_transition_matrix(fresh_visit_seq, node_to_community, n_communities)
+                t_jsd = _transition_jsd(T_trained, T_fresh)
+                trained_t_entropy = _transition_entropy(T_trained)
+                fresh_t_entropy = _transition_entropy(T_fresh)
+                t_coherence = _coherence_normalised(trained_t_entropy, fresh_t_entropy)
+                trained_self_trans = _self_transition_rate(T_trained)
+                fresh_self_trans = _self_transition_rate(T_fresh)
+
+            _log(f"  marginal_JSD={jsd:.4f} transition_JSD={t_jsd:.4f} "
+                 f"trained_H={trained_entropy:.4f} fresh_H={fresh_entropy:.4f} "
+                 f"coherence={coherence:.4f} t_coherence={t_coherence:.4f} "
+                 f"self_trans={trained_self_trans:.3f}/{fresh_self_trans:.3f}")
         except Exception as e:
             _log(f"  Fresh baseline failed: {e}")
     else:
@@ -266,17 +368,21 @@ def run_generativity(
         failure_mode = "absent"
         notes = f"No behavioural divergence: JSD={jsd:.6f}"
 
-    effect_size = float(jsd)
+    effect_size = float(t_jsd) if t_jsd > 0 else float(jsd)
 
     provenance.log_measurement("generativity", {
         "passed": passed,
-        "jsd": jsd,
+        "marginal_jsd": jsd,
+        "transition_jsd": t_jsd,
         "coherence": coherence,
+        "transition_coherence": t_coherence,
         "signal_type": signal_type,
         "trained_entropy": trained_entropy,
         "fresh_entropy": fresh_entropy,
         "trained_visited": trained_visited,
         "fresh_visited": fresh_visited,
+        "trained_self_transition": trained_self_trans,
+        "fresh_self_transition": fresh_self_trans,
         "threshold_status": THRESHOLD_STATUS,
     })
 
@@ -285,6 +391,7 @@ def run_generativity(
         passed=passed,
         effect_size=effect_size,
         raw_data={
+            # Marginal JSD (diagnostic, retained for comparability)
             "jsd": float(jsd),
             "jsd_max": float(MAX_JSD),
             "jsd_threshold": float(jsd_threshold),
@@ -297,6 +404,12 @@ def run_generativity(
             "fresh_visited": fresh_visited,
             "trained_engagement": trained_engagement,
             "fresh_engagement": fresh_engagement,
+            # Transition-matrix JSD (primary metric — peer reviewer #2)
+            "transition_jsd": float(t_jsd),
+            "transition_coherence": float(t_coherence),
+            "trained_self_transition_rate": float(trained_self_trans),
+            "fresh_self_transition_rate": float(fresh_self_trans),
+            # Diagnostics
             "edge_overlap": edge_overlap,
             "metric_before": float(metric_before),
             "metric_after": float(metric_after),

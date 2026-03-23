@@ -51,4 +51,4 @@ system_type, seed_a, seed_b, marginal_jsd, transition_jsd, structural_consistenc
 
 ## Paper 1
 
-DOI: 10.5281/zenodo.19011223
+DOI: https://doi.org/10.5281/zenodo.19178410 (v2)

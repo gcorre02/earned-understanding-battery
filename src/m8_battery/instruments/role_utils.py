@@ -19,10 +19,11 @@ ROLE_NAMES = ["hub", "bridge", "periphery", "leaf"]
 N_ROLES = len(ROLE_NAMES)
 
 
-def classify_node_role(graph: nx.DiGraph, node) -> int:
+def classify_node_role(graph: nx.DiGraph, node, mean_degree: float) -> int:
     """Classify a single node into a topological role.
 
     This is a TOPOLOGY computation, not learned. Works on any graph.
+    mean_degree is precomputed by classify_all_nodes() to avoid O(n²).
     """
     if graph.is_directed():
         degree = graph.in_degree(node) + graph.out_degree(node)
@@ -46,11 +47,6 @@ def classify_node_role(graph: nx.DiGraph, node) -> int:
     if cross_ratio > 0.3 and degree > 3:
         return 1  # bridge
 
-    mean_degree = sum(
-        (graph.in_degree(n) + graph.out_degree(n)) if graph.is_directed() else graph.degree(n)
-        for n in graph.nodes()
-    ) / max(graph.number_of_nodes(), 1)
-
     if degree > mean_degree * 1.5:
         return 0  # hub
 
@@ -62,7 +58,14 @@ def classify_all_nodes(graph: nx.DiGraph) -> dict:
 
     Returns: dict mapping node -> role_id (0-3).
     """
-    return {node: classify_node_role(graph, node) for node in graph.nodes()}
+    n = graph.number_of_nodes()
+    if n == 0:
+        return {}
+    if graph.is_directed():
+        mean_deg = sum(graph.in_degree(node) + graph.out_degree(node) for node in graph.nodes()) / n
+    else:
+        mean_deg = sum(graph.degree(node) for node in graph.nodes()) / n
+    return {node: classify_node_role(graph, node, mean_deg) for node in graph.nodes()}
 
 
 def compute_role_transition_matrix(

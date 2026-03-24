@@ -276,7 +276,8 @@ def run_generativity(
         provenance.log_state_change(metric_pre, metric_post, step_index=i)
         provenance.log_output(output, step_index=i)
         trajectory.append(metric_post)
-        trained_visit_seq.append(output)
+        if isinstance(output, (int, float, str, np.integer)):
+            trained_visit_seq.append(int(output))
 
     metric_after = system.get_structure_metric()
     trained_engagement = system.get_engagement_distribution()
@@ -323,7 +324,8 @@ def run_generativity(
             fresh.reset_engagement_tracking()
             for _ in range(n_steps):
                 output = fresh.step(None)  # Autonomous navigation on domain B
-                fresh_visit_seq.append(output)
+                if isinstance(output, (int, float, str, np.integer)):
+                    fresh_visit_seq.append(int(output))
             fresh_engagement = fresh.get_engagement_distribution()
             fresh_entropy = _engagement_entropy(fresh_engagement)
             fresh_visited = _count_visited(fresh_engagement)

@@ -101,6 +101,8 @@ class DQNAgent(TestSystem):
         generativity testing.
         """
         self.set_graph(graph)
+        # Invalidate stale environment (holds old graph reference)
+        self._env = None
         # Reset navigation
         nodes = sorted(self._graph.nodes()) if self._graph else []
         self._current_node = nodes[0] if nodes else None

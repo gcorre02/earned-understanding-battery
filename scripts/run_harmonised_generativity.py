@@ -240,13 +240,22 @@ def compute_null_pair(
         T_b = _compute_transition_matrix(seq_b, node_to_community, n_communities)
         t_jsd = _transition_jsd(T_a, T_b)
 
-    # Structural consistency null: use sys_a as "trained" reference
+    # Structural consistency null: both systems are untrained.
+    # _structural_consistency(T_trained_A, T_trained_B, T_fresh_B) expects:
+    #   arg1 = reference transition pattern from training domain
+    #   arg2 = trained system's pattern on novel domain
+    #   arg3 = fresh system's pattern on novel domain
+    # For null pairs: sys_a is arbitrarily designated as "reference/trained"
+    # and sys_b as "fresh". Since neither has trained, SC should be ≈ 0.
+    # Using T_role_a for both arg1 and arg2 means we're asking: does sys_a's
+    # B-pattern resemble its own B-pattern more than sys_b's does? This
+    # measures how much two independent untrained walkers diverge in their
+    # relationship to an arbitrary reference — i.e., seed noise in SC space.
     sc = 0.0
     if len(seq_a) > 1 and len(seq_b) > 1:
         node_to_role = classify_all_nodes(domain_b)
         T_role_a = compute_role_transition_matrix(seq_a, node_to_role)
         T_role_b = compute_role_transition_matrix(seq_b, node_to_role)
-        # For null: sys_a acts as "trained-on-A" reference, sys_b as "fresh"
         sc = _structural_consistency(T_role_a, T_role_a, T_role_b)
 
     return {

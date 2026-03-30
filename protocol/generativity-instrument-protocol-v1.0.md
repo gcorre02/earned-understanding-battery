@@ -378,3 +378,23 @@ The candidate does not satisfy the conjunction. The battery correctly classifies
 ### Scenario 6: Unexpected control pass
 
 If any Phase C ablation control (frozen, directed, OBSERVE-only) passes the conjunction, the battery cannot discriminate the candidate from its controls. STOP. Investigate. Do not report the candidate result without resolving the control anomaly.
+
+---
+
+## 17. Per-Instrument Discrimination (Phase A+ Addendum)
+
+Each instrument has demonstrated sensitivity with architecturally-grounded positive controls. Positive control sensitivity was measured at the instrument level; battery-level preconditions (which gate instruments based on prior results) were not applied to instrument-level validation.
+
+| Instrument | Positive Control | Method | Seeds | AUC | 95% CI |
+|------------|-----------------|--------|-------|-----|--------|
+| Generativity | PC1 (role walker), PC3 (GNN) | Battery (transition JSD, B₂) | 6 | 1.0 | [1.0, 1.0] |
+| Self-engagement | PC-SE (attractor-recovery walker) | Direct instrument | 3 | 1.0 | [1.0, 1.0] |
+| Integration | PC-INT (PageRank-Hebbian walker) + Class 1 (received) | Direct instrument + battery | 12 | 1.0 | [1.0, 1.0] |
+| Trajectory | STDP (Brian2 spiking) | Battery | 3 | 1.0 | [1.0, 1.0] |
+| Transfer | 3E (active inference) | Battery | 1 | 1.0 | [1.0, 1.0] |
+
+Caveats:
+- Transfer has a single true positive (3E). AUC=1.0 reflects strict separation, not statistical power.
+- Integration includes both received (Class 1) and earned (PC-INT) positives. The earned/received distinction is the conjunction's responsibility.
+- Self-engagement and integration positive controls were tested via direct instrument invocation because the trajectory precondition correctly identifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio ≈ 1.0). This is standard practice: diagnostic sensitivity is validated per test, not per test panel.
+- Battery-level (conjunction) ROC AUC is not computed. Gate F is the first test of conjunction discrimination.

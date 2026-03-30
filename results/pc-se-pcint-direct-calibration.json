@@ -1,0 +1,37 @@
+{
+  "date": "2026-03-31",
+  "method": "Direct instrument testing (Option 3, per owner decision)",
+  "pc_se": {
+    "system": "AttractorRecoveryWalker",
+    "instrument": "self_engagement",
+    "training_steps": 2000,
+    "wander_steps": 50,
+    "recovery_window": 20,
+    "trajectory_passed_override": true,
+    "results": [
+      {"seed": 42, "passed": true, "resistance_ratio": 1000000.0, "recovery_ratio": 1.304},
+      {"seed": 123, "passed": true, "resistance_ratio": 1000000.0, "recovery_ratio": 1.252},
+      {"seed": 456, "passed": true, "resistance_ratio": 1000000.0, "recovery_ratio": 2.337}
+    ],
+    "summary": "3/3 PASS. Architecturally guaranteed: node consolidation memory survives edge perturbation."
+  },
+  "pc_int": {
+    "system": "PageRankHebbianWalker",
+    "instrument": "integration",
+    "training_steps": 2000,
+    "results": [
+      {"seed": 42, "passed": true, "mode": "fragile", "gini": 0.359, "effect_size": 0.359},
+      {"seed": 123, "passed": true, "mode": "earned", "gini": 0.258, "effect_size": 0.258},
+      {"seed": 456, "passed": true, "mode": "earned", "gini": 0.237, "effect_size": 0.237}
+    ],
+    "summary": "3/3 PASS. PageRank redistribution after ablation causes global reorganisation.",
+    "bonus_self_engagement": {
+      "results": [
+        {"seed": 42, "passed": false, "resistance": 1.350, "recovery": 0.825},
+        {"seed": 123, "passed": true, "resistance": 1.521, "recovery": 1.528},
+        {"seed": 456, "passed": false, "resistance": 0.828, "recovery": 1.047}
+      ],
+      "summary": "1/3 PASS. Not a reliable self-engagement positive control."
+    }
+  }
+}

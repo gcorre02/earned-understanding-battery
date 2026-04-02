@@ -6,7 +6,7 @@
     "self_engagement": {"auc": 1.0, "ci_lower": 1.0, "ci_upper": 1.0, "n_pos": 3, "n_neg": 9, "positives": "PC-SE (direct, recovery ratio)", "negatives": "Class 1 + Class 2 + non-SE Class 3"},
     "integration": {"auc": 1.0, "ci_lower": 1.0, "ci_upper": 1.0, "n_pos": 12, "n_neg": 6, "positives": "PC-INT (direct, Gini) + Class 1 (received)", "negatives": "2A + 3A + 3B (no integration)"},
     "trajectory": {"auc": 1.0, "ci_lower": 1.0, "ci_upper": 1.0, "n_pos": 3, "n_neg": 9, "positives": "STDP (earned trajectory)", "negatives": "Class 1 (all 3, no learning)"},
-    "transfer": {"auc": 1.0, "ci_lower": 1.0, "ci_upper": 1.0, "n_pos": 1, "n_neg": 6, "positives": "3E active inference (41x earned ratio)", "negatives": "Class 1 + Class 2 (no learning)"}
+    "transfer": {"auc": 1.0, "ci_lower": 1.0, "ci_upper": 1.0, "n_pos": 1, "n_neg": 6, "positives": "3E active inference (~10x earned ratio)", "negatives": "Class 1 + Class 2 (no learning)"}
   },
   "caveats": {
     "integration": "Includes both received (Class 1) and earned (PC-INT) positives. The earned/received distinction is the conjunction's job.",

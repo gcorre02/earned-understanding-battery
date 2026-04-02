@@ -933,7 +933,7 @@ The following design choices were made during instrument development. Each is do
 
 | Item | Value |
 |------|-------|
-| Protocol version | 1.0 |
+| Protocol version | 2.0 |
 | Frozen at commit | 388a90f |
 | Freeze date | 2026-03-21 |
 | Data commit | 954e02a |
@@ -951,60 +951,9 @@ The protocol specification document (`outputs/protocol-specification-generativit
 
 ---
 
-### 8.16. Pre-Registered Null Result Interpretation Scenarios (DN-33)
+### 8.16. Generativity-Specific Registration Notes
 
-These interpretations are locked BEFORE Phase C data exists. They define how each plausible outcome on the Class 4 candidate will be reported, preventing post-hoc narrative fitting.
-
-### Scenario 1: Full conjunction pass (5/5 instruments positive under provenance)
-
-The candidate satisfies all five necessary properties. It is a verified Class 4 system under this framework. The further question of whether this constitutes "understanding" in a phenomenological sense remains open (Paper 1 §6).
-
-### Scenario 2: Near pass (4/5, one instrument fails)
-
-The candidate fails to satisfy the conjunction. The specific failing instrument identifies which architectural property is absent or insufficient. Report which instrument failed, the effect size, and the architectural interpretation. This is a publishable result: it narrows the gap and identifies the next engineering target.
-
-Sub-scenarios by failing instrument:
-- **Trajectory fails:** Structure doesn't develop (candidate may be more static than expected)
-- **Integration fails:** Structure is modular, not mutually constraining (candidate may aggregate without integrating)
-- **Generativity fails:** Structure doesn't transfer abstractly (candidate may memorise rather than abstract)
-- **Transfer fails:** No acceleration in isomorphic domains (candidate's learned structure may be domain-locked)
-- **Self-engagement fails:** No preferential return to consolidated structure (candidate may lack self-maintaining dynamics)
-
-### Scenario 3: Full pass with marginal effect sizes
-
-Distinct from strong pass. Report effect sizes with confidence intervals. If CIs overlap with Class 3 systems, the distinction is not salient. Discuss statistical power and whether larger-scale testing would resolve the ambiguity.
-
-### Scenario 4: Scale-dependent results
-
-The architectural properties may be present but fragile under scaling. Report the scale at which effects disappear. Publishable as a scaling boundary result.
-
-### Scenario 5: Full fail (0/5 or 1/5)
-
-The candidate does not satisfy the conjunction. The battery correctly classifies it alongside Class 1-3 systems. This is a null result — publishable under Paper 1 §10.1. The null result demonstrates that the battery is rigorous enough to reject its own designer's system.
-
-### Scenario 6: Unexpected control pass
-
-If any Phase C ablation control (frozen, directed, OBSERVE-only) passes the conjunction, the battery cannot discriminate the candidate from its controls. STOP. Investigate. Do not report the candidate result without resolving the control anomaly.
-
----
-
-### 8.17. Per-Instrument Discrimination (Phase A+ Addendum)
-
-Each instrument has demonstrated sensitivity with architecturally-grounded positive controls. Positive control sensitivity was measured at the instrument level; battery-level preconditions (which gate instruments based on prior results) were not applied to instrument-level validation.
-
-| Instrument | Positive Control | Method | Seeds | AUC | 95% CI |
-|------------|-----------------|--------|-------|-----|--------|
-| Generativity | PC1 (role walker), PC3 (GNN) | Battery (transition JSD, B₂) | 6 | 1.0 | [1.0, 1.0] |
-| Self-engagement | PC-SE (attractor-recovery walker) | Direct instrument | 3 | 1.0 | [1.0, 1.0] |
-| Integration | PC-INT (PageRank-Hebbian walker) + Class 1 (received) | Direct instrument + battery | 12 | 1.0 | [1.0, 1.0] |
-| Trajectory | STDP (Brian2 spiking) | Battery | 3 | 1.0 | [1.0, 1.0] |
-| Transfer | 3E (active inference) | Battery | 1 | 1.0 | [1.0, 1.0] |
-
-Caveats:
-- Transfer has a single true positive (3E). AUC=1.0 reflects strict separation, not statistical power.
-- Integration includes both received (Class 1) and earned (PC-INT) positives. The earned/received distinction is the conjunction's responsibility.
-- Self-engagement and integration positive controls were tested via direct instrument invocation because the trajectory precondition correctly identifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio ≈ 1.0). This is standard practice: diagnostic sensitivity is validated per test, not per test panel.
-- Battery-level (conjunction) ROC AUC is not computed. Gate F is the first test of conjunction discrimination.
+Pre-registered null result interpretation scenarios and per-instrument discrimination data are documented at the battery level in §15 and §13 respectively. Generativity-specific calibration values (noise floors, bootstrap CIs) are in §8.13 above.
 ## 9. Transfer
 
 ### 1. Purpose
@@ -1415,7 +1364,7 @@ Each of the five battery instruments achieves perfect separation between its pos
 | Self-Engagement  | 1.0 | [1.0, 1.0]  | 3     | 9     | PC-SE (direct, recovery ratio)                   |
 | Integration      | 1.0 | [1.0, 1.0]  | 12    | 6     | PC-INT (direct, Gini) + Class 1 (received)       |
 | Trajectory       | 1.0 | [1.0, 1.0]  | 3     | 9     | STDP (earned trajectory)                         |
-| Transfer         | 1.0 | [1.0, 1.0]  | 1     | 6     | 3E active inference (41x earned ratio)           |
+| Transfer         | 1.0 | [1.0, 1.0]  | 1     | 6     | 3E active inference (~10x earned ratio)           |
 
 Method: 10,000 bootstrap resamples. Source: `results/per-instrument-roc-auc.json`.
 
@@ -1660,7 +1609,7 @@ This protocol is frozen. No modifications may be made without a documented amend
 
 | Item | Value |
 |------|-------|
-| Protocol version | 1.0 |
+| Protocol version | 2.0 |
 | Frozen at commit | 388a90f |
 | Freeze date | 2026-03-21 |
 | Data commit | 954e02a |

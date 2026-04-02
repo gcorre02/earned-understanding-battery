@@ -29,13 +29,13 @@ for understanding-as-earned-structure:
 
 Plus **provenance** as an epistemic condition (see Section 5).
 
-The battery is a **Class 4 detector**, not a spectrum classifier (DN-26). It
+The battery is a **Class 4 detector**, not a spectrum classifier. It
 answers exactly one question: does the candidate satisfy all five necessary
 properties under the provenance constraint? It does not grade how much
 understanding a system possesses, nor does it rank candidates against one
 another.
 
-Capability and earning are orthogonal (DN-25). A system can be highly capable
+Capability and earning are orthogonal. A system can be highly capable
 -- producing correct answers, solving complex tasks -- without having earned its
 internal structure. The battery measures earning, not capability.
 
@@ -176,7 +176,7 @@ verified by regenerating from the same seed and confirming bitwise-identical
 adjacency matrices.
 ## 4. Baseline Methodology
 
-### The baseline requirement (DN-22)
+### The baseline requirement
 
 For every instrument in the battery, the trained system must outperform a fresh
 (untrained) system on the same metric. This is the minimum evidential bar: if a
@@ -376,9 +376,9 @@ earned_ratio = metric_range(trained) / metric_range(fresh)
 
 where `metric_range = max(trajectory) - min(trajectory)`.
 
-**DN-22 requirement:** earned_ratio must be > 1.0. If a fresh system shows the same trajectory magnitude, the structural development is architectural (topology-driven), not earned through interaction.
+**Baseline requirement:** All instruments require the trained system to outperform a matched fresh system, ensuring properties were operationally earned. Earned_ratio must be > 1.0. If a fresh system shows the same trajectory magnitude, the structural development is architectural (topology-driven), not earned through interaction.
 
-**DN-36 observation:** Topology-driven Hebbian walkers (e.g., HEB) correctly show earned_ratio >> 1.0 when tested through the battery (trained on domain A, fresh never exposed). However, when tested via direct instrument invocation with identical input sequences, systems whose learning is purely topology-driven show earned_ratio near 1.0 because the fresh system develops the same trajectory from the same topology. This is correct behaviour: the earned ratio correctly identifies that the trajectory is not path-dependent. PC-SE and PC-INT are tested via direct invocation precisely because the trajectory precondition correctly gates them.
+**Topology-driven walker observation:** Topology-driven Hebbian walkers (e.g., HEB) correctly show earned_ratio >> 1.0 when tested through the battery (trained on domain A, fresh never exposed). However, when tested via direct instrument invocation with identical input sequences, systems whose learning is purely topology-driven show earned_ratio near 1.0 because the fresh system develops the same trajectory from the same topology. This is correct behaviour: the earned ratio correctly identifies that the trajectory is not path-dependent. PC-SE and PC-INT are tested via direct invocation precisely because the trajectory precondition correctly gates them.
 
 ---
 
@@ -422,13 +422,13 @@ STDP shows consistent developmental trajectory across all seeds with earned rati
 
 **Foxworthy Variant F (3C) training phase.** During training, 3C shows adapter norm increase (+7 adapter norm), confirming that structural change occurs during training. However, the battery-measured trajectory is ambiguous (R-squared=0.37, monotonicity=0.50) because the structure metric does not capture adapter-space changes with sufficient resolution.
 
-**DN-36 validation.** Trajectory correctly detects path-dependent development (STDP, HEB in battery mode) and correctly identifies non-path-dependent development when systems are tested via direct invocation with identical inputs.
+**Topology-driven walker validation.** Trajectory correctly detects path-dependent development (STDP, HEB in battery mode) and correctly identifies non-path-dependent development when systems are tested via direct invocation with identical inputs.
 
 ---
 
 ### 9. Calibration Results
 
-Recalibration data from `results/recalibration_m5/`, medium scale (150 nodes), three seeds per system.
+Recalibration data, medium scale (150 nodes), three seeds per system.
 
 | System | Class | Seed 42 | Seed 123 | Seed 456 | Consensus |
 |--------|-------|---------|----------|----------|-----------|
@@ -452,7 +452,7 @@ Recalibration data from `results/recalibration_m5/`, medium scale (150 nodes), t
 
 ### 10. Known Limitations
 
-1. **DN-36 observation: topology-driven walkers.** Topology-driven Hebbian walkers show earned_ratio near 1.0 when tested via direct instrument invocation with identical input sequences. This is correct behaviour -- the trajectory is not path-dependent -- not an instrument flaw. The battery-mode earned ratio is higher because trained vs fresh systems receive different histories (trained on domain A, fresh never exposed).
+1. **Topology-driven walkers.** Topology-driven Hebbian walkers show earned_ratio near 1.0 when tested via direct instrument invocation with identical input sequences. This is correct behaviour -- the trajectory is not path-dependent -- not an instrument flaw. The battery-mode earned ratio is higher because trained vs fresh systems receive different histories (trained on domain A, fresh never exposed).
 
 2. **Input count.** The default 50 `domain_a_inputs` may be insufficient for slow learners. Systems that require hundreds or thousands of training steps to develop structure may show flat trajectories within the 50-step measurement window. Mitigation: system-specific training protocols can provide longer input sequences; the instrument accepts arbitrary-length input lists.
 
@@ -515,7 +515,7 @@ The earned ratio compares integration in the trained system against a fresh (unt
 earned_ratio = trained_gini / fresh_gini
 ```
 
-**DN-22 requirement:** earned_ratio must be > 1.0. If a fresh system shows the same integration pattern (same Gini from topology alone), the integration is "received" from the graph structure, not "earned" through training.
+**Baseline requirement:** All instruments require the trained system to outperform a matched fresh system, ensuring properties were operationally earned. Earned_ratio must be > 1.0. If a fresh system shows the same integration pattern (same Gini from topology alone), the integration is "received" from the graph structure, not "earned" through training.
 
 Class 1 systems (e.g., 1A WordNet, 1B Rule-Based Navigator) show high Gini values (0.29-0.81) from SBM topology alone. Their earned_ratio is exactly 1.00 because the fresh system has identical topology-derived integration. The instrument correctly classifies this as "not earned" -- the integration is received from the graph structure, not developed through operation.
 
@@ -551,7 +551,7 @@ The pass condition does not gate on reorganisation stability directly. Stability
 
 ### 8. Positive Control Evidence
 
-**PC-INT (PageRankHebbianWalker).** Tested via direct instrument invocation (DN-35). Three seeds, all PASS:
+**PC-INT (PageRankHebbianWalker).** Tested via direct instrument invocation (per positive control sensitivity validated at instrument level). Three seeds, all PASS:
 
 | Seed | Passed | Mode | Gini | Effect Size |
 |------|--------|------|------|-------------|
@@ -569,7 +569,7 @@ PC-INT uses PageRank redistribution after ablation, which causes global reorgani
 
 ### 9. Calibration Results
 
-Recalibration data from `results/recalibration_m5/`, medium scale (150 nodes), three seeds per system. PC-INT results from `results/pc-se-pcint-direct-calibration.json` (direct instrument invocation).
+Recalibration data, medium scale (150 nodes), three seeds per system. PC-INT results from direct instrument invocation.
 
 | System | Class | Seed 42 | Seed 123 | Seed 456 | Gini (s42) | Consensus |
 |--------|-------|---------|----------|----------|------------|-----------|
@@ -598,7 +598,7 @@ Recalibration data from `results/recalibration_m5/`, medium scale (150 nodes), t
 
 1. **Class 1 integration is received, not earned.** Class 1 systems (1A, 1B) show high Gini from SBM topology alone. The earned/received distinction is enforced by the earned-ratio gate within the integration instrument. However, the ultimate safeguard is the conjunction: Class 1 systems fail trajectory (no structural development), so even if integration were somehow mis-classified, the conjunction would reject them. The conjunction is the battery's defence in depth.
 
-2. **PC-INT tested directly, not through battery runner.** PC-INT was tested via direct instrument invocation (DN-35) because the trajectory precondition correctly identifies its topology-driven Hebbian learning as non-path-dependent (earned_ratio near 1.0 for trajectory). Running PC-INT through the battery would gate it out at the trajectory stage. Direct invocation is standard practice for instrument-level validation -- diagnostic sensitivity is validated per test, not per test panel.
+2. **PC-INT tested directly, not through battery runner.** PC-INT was tested via direct instrument invocation (positive control sensitivity validated at instrument level) because the trajectory precondition correctly identifies its topology-driven Hebbian learning as non-path-dependent (earned_ratio near 1.0 for trajectory). Running PC-INT through the battery would gate it out at the trajectory stage. Direct invocation is standard practice for instrument-level validation -- diagnostic sensitivity is validated per test, not per test panel.
 
 3. **Partition family limited to system.get_regions().** The current partition family is the set of communities returned by `system.get_regions()` (all SBM communities). No preregistered partition beyond this is defined. Alternative partitions (e.g., random bisections, hierarchical decompositions) might reveal integration patterns not visible at the community level. This is a known scope limitation for Phase A.
 
@@ -674,7 +674,7 @@ B2 is the primary test domain. The shifted node IDs guarantee zero edge overlap 
 | Node IDs | same range as A |
 | Edge Jaccard with A | **0.097** |
 
-B1 results carry the `potentially_confounded` signal classification because edge overlap (9.7%) cannot be ruled out as a contributor to divergence (F-040).
+B1 results carry the `potentially_confounded` signal classification because edge overlap (9.7%) cannot be ruled out as a contributor to divergence.
 
 ### Domain B0 (Diagnostic -- Isomorphic)
 
@@ -740,7 +740,7 @@ The primary metric is the Jensen-Shannon divergence (JSD) between the community-
 
 ### Why Transition JSD
 
-Transition JSD captures how a system moves between communities, not merely which communities it visits. This makes it sensitive to structural dynamics (navigation patterns) rather than just marginal preferences (where the system spends time). Finding F-045 established that transition JSD has a noise floor approximately 10x lower than marginal JSD, providing substantially greater sensitivity to genuine structural transfer signals.
+Transition JSD captures how a system moves between communities, not merely which communities it visits. This makes it sensitive to structural dynamics (navigation patterns) rather than just marginal preferences (where the system spends time). During calibration, transition JSD was found to have a noise floor approximately 10x lower than marginal JSD, providing substantially greater sensitivity to genuine structural transfer signals.
 
 ---
 
@@ -786,7 +786,7 @@ generativity = transition_jsd > per_type_noise_floor AND not degenerate
 
 **Seed replication (Rigour Principle 5):** At least 2 of 3 seeds must independently meet the above criteria. A single seed passing is insufficient -- it could reflect initialisation luck rather than systematic structural transfer.
 
-**Coherence NOT gated on SBM:** Structural consistency (DN-30a) is computed but does not enter the pass condition on SBM domains. Findings F-048 and F-049 established that SBM community homogeneity makes role-level transfer detection unreliable. Coherence gating is deferred to Phase B heterogeneous domains.
+**Coherence NOT gated on SBM:** Structural consistency (coherence operationalised as structural consistency) is computed but does not enter the pass condition on SBM domains. SBM domains were found to be too homogeneous for coherence metrics at moderate preferences, making role-level transfer detection unreliable. Coherence gating is deferred to Phase B heterogeneous domains.
 
 ---
 
@@ -796,11 +796,11 @@ The following metrics are computed and reported alongside the primary metric but
 
 ### Marginal JSD
 
-JSD of community visit distributions (fraction of steps in each community) between trained and fresh systems. Retained for comparability with earlier analyses. Finding F-045 established that marginal JSD has a noise floor approximately 10x higher than transition JSD, making it less sensitive to structural dynamics.
+JSD of community visit distributions (fraction of steps in each community) between trained and fresh systems. Retained for comparability with earlier analyses. During calibration, marginal JSD was found to have a noise floor approximately 10x higher than transition JSD, making it less sensitive to structural dynamics.
 
-### Structural Consistency (DN-30a)
+### Structural Consistency
 
-Cosine similarity of role-aggregated transition matrices between the training-domain frozen run and the novel-domain frozen run. Measures whether the pattern of community-to-community transitions is preserved across domains. Diagnostic only on SBM domains per F-048 and F-049: SBM communities are too homogeneous for meaningful role-level transfer detection.
+Cosine similarity of role-aggregated transition matrices between the training-domain frozen run and the novel-domain frozen run. Measures whether the pattern of community-to-community transitions is preserved across domains. Diagnostic only on SBM domains: SBM communities are too homogeneous for meaningful role-level transfer detection.
 
 ### Self-Transition Rate
 
@@ -823,7 +823,7 @@ Each system-seed-domain combination receives one of the following signal classif
 | `degenerate_fresh` | Fresh system visits <3 communities with >1% engagement | Baseline is degenerate. Comparison is unreliable. |
 | `maximum_divergence` | Transition JSD near ln(2) | Trained and fresh are maximally different. May indicate pathological behaviour rather than meaningful transfer. |
 | `potentially_confounded` | Edge Jaccard > 0 between A and B (applies to all B1 results) | Above-floor signal may be partially or wholly attributable to shared edges rather than structural transfer. |
-| `divergent_incoherent` | Transition JSD > noise floor but structural consistency is negative or near zero, AND coherence would have been expected | Signal is present but transferred dynamics are incoherent. On SBM this classification is diagnostic only (F-048/F-049). |
+| `divergent_incoherent` | Transition JSD > noise floor but structural consistency is negative or near zero, AND coherence would have been expected | Signal is present but transferred dynamics are incoherent. On SBM this classification is diagnostic only (SBM domains too homogeneous for coherence metrics at moderate preferences). |
 | `candidate` | Transition JSD > noise floor, not degenerate, not confounded (B2 only) | Genuine candidate for structural transfer. Subject to seed replication check. |
 
 ---
@@ -837,7 +837,7 @@ Each system-seed-domain combination receives one of the following signal classif
 - **B0** (isomorphic, Edge Jaccard = 0.0313): Tests transfer to identical structure under different labels. Useful for understanding whether the system has learned graph-level invariances. Results are informative but not gated.
 - **B1** (shared node space, Edge Jaccard = 0.097): Tests transfer in the presence of partial edge overlap. All B1 results carry the `potentially_confounded` classification. B1 is retained for diagnostic comparison with B2: if a system shows signal on B1 but not B2, edge leakage is the most likely explanation.
 
-This hierarchy was established by DN-32 after F-040 demonstrated that edge overlap on B1 produces confounded signals.
+This hierarchy was established after calibration demonstrated that edge overlap on B1 produces confounded signals, leading to the policy that perturbation targets the highest-structure region and B2 (zero overlap) is primary.
 
 ---
 
@@ -846,9 +846,9 @@ This hierarchy was established by DN-32 after F-040 demonstrated that edge overl
 SBM communities are structurally homogeneous -- all communities have the same internal density (p_within = 0.3) and the same inter-community connectivity pattern (p_between = 0.02). This means:
 
 1. **No role differentiation:** There are no hub communities, peripheral communities, or bridge communities. Every community is structurally equivalent to every other community.
-2. **Structural consistency unreliable (F-048):** Cosine similarity of role-aggregated transition matrices cannot detect role-level transfer because no roles exist to transfer.
-3. **Perturbation targeting limited (F-046):** Perturbation tests cannot probe role-specific responses for the same reason.
-4. **Fingerprint SC also fails (F-049):** Alternative formulations of structural consistency also fail on SBM for the same underlying reason.
+2. **Structural consistency unreliable:** Cosine similarity of role-aggregated transition matrices cannot detect role-level transfer because no roles exist to transfer.
+3. **Perturbation targeting limited:** Perturbation tests cannot probe role-specific responses for the same reason.
+4. **Alternative structural consistency formulations also fail:** Alternative formulations of structural consistency also fail on SBM for the same underlying reason.
 
 This limitation is intrinsic to the SBM domain family, not to the instrument. Coherence gating and perturbation-based validation are deferred to Phase B, which will introduce heterogeneous domains (real-world graphs or synthetic graphs with differentiated community structures).
 
@@ -856,7 +856,7 @@ This limitation is intrinsic to the SBM domain family, not to the instrument. Co
 
 ### 8.13. Calibrated Noise Floors
 
-All floors computed from 50 null pairs per cell. Bootstrap CIs from 10,000 resamples. Source data: `results/harmonised_results.json` at commit 954e02a.
+All floors computed from 50 null pairs per cell. Bootstrap CIs from 10,000 resamples. Source data at commit 954e02a.
 
 ### Transition JSD Noise Floors (Primary Metric)
 
@@ -903,7 +903,7 @@ Note: 3D and 3E share null distributions with PC1 because all three use the same
 
 The following design choices were made during instrument development. Each is documented here for transparency:
 
-1. **Transition JSD over marginal JSD as primary metric.** Marginal JSD measures where a system spends time; transition JSD measures how it moves. Transition JSD has a 10x lower noise floor (F-045) and better separates structural dynamics from visitation preferences. Decision documented in DN-18.
+1. **Transition JSD over marginal JSD as primary metric.** Marginal JSD measures where a system spends time; transition JSD measures how it moves. Transition JSD has a 10x lower noise floor and better separates structural dynamics from visitation preferences.
 
 2. **Row-wise weighted JSD over unweighted.** Weighting by visitation frequency ensures that communities the system actually navigates contribute more than communities it rarely visits. Unweighted averaging would give equal weight to rarely-visited communities where transition estimates are noisy.
 
@@ -917,15 +917,15 @@ The following design choices were made during instrument development. Each is do
 
 7. **2/3 seed replication over 3/3.** Requiring all three seeds to pass would be overly stringent given that one seed can be degenerate for system-specific reasons (e.g., PC3 seed 456 collapses to 2 communities). 2/3 ensures replication while tolerating seed-specific degeneracy.
 
-8. **B2-primary policy over B1-primary.** B2 has zero edge overlap, eliminating the confound discovered in F-040. B1 is retained as diagnostic only. Decision documented in DN-32.
+8. **B2-primary policy over B1-primary.** B2 has zero edge overlap, eliminating the confound discovered during calibration (edge overlap on B1 produces confounded signals). B1 is retained as diagnostic only.
 
-9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (F-048, F-049). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to Phase B heterogeneous domains. Decision documented in DN-30a.
+9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (SBM domains too homogeneous for coherence metrics at moderate preferences). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to Phase B heterogeneous domains.
 
 10. **500 steps fixed.** Sufficient for stable transition matrix estimation on 6-community graphs. Shorter windows (100-200 steps) produce noisier matrices; longer windows (1000+) provide diminishing returns. The window was not optimised -- it was set a priori and held constant.
 
 11. **Degeneracy threshold at 3 communities.** A system visiting <3 communities has insufficient transition diversity for meaningful JSD comparison. The threshold of 3 (out of 6) was chosen as the minimum for non-trivial dynamics.
 
-12. **step(None) for autonomous navigation.** Using `step(None)` rather than `step(random_input)` ensures the system navigates without external guidance. Finding F-042 established that `step(inp)` with arbitrary inputs can teleport graph walkers, confounding the measurement. `step(None)` avoids this.
+12. **step(None) for autonomous navigation.** Using `step(None)` rather than `step(random_input)` ensures the system navigates without external guidance. During calibration, autonomous navigation was found necessary for graph walkers because `step(inp)` with arbitrary inputs can teleport graph walkers, confounding the measurement. `step(None)` avoids this.
 
 ---
 
@@ -943,7 +943,7 @@ This protocol is frozen as of the date and commit above. No modifications may be
 
 1. **Amendment proposal** filed in the governance register with rationale.
 2. **Impact assessment** documenting which results (if any) would change under the amendment.
-3. **Decision note** (DN-series) recording the decision to accept or reject the amendment.
+3. **Decision note** (governance decision note) recording the decision to accept or reject the amendment.
 4. **Version increment** (v1.0 -> v1.1 for minor, v2.0 for major changes to pass condition or primary metric).
 5. **Re-run obligation:** If the amendment changes the pass condition, noise floor methodology, or primary metric, all results must be re-computed and the data package updated.
 
@@ -1010,7 +1010,7 @@ The advantage threshold of 0.1 (10% improvement over naive) prevents noise-level
 earned_ratio = trained_AUC / |naive_AUC|
 ```
 
-DN-22 requires `earned_ratio > 1.0`. This ensures the trained system's cumulative structural signal exceeds the naive system's -- not merely that the endpoint differs, but that the trained system maintained a structural advantage throughout exposure to A'.
+The baseline requirement (all instruments require the trained system to outperform a matched fresh system) requires `earned_ratio > 1.0`. This ensures the trained system's cumulative structural signal exceeds the naive system's -- not merely that the endpoint differs, but that the trained system maintained a structural advantage throughout exposure to A'.
 
 Edge cases:
 - When `|naive_AUC| < 1e-10` but `|trained_AUC| > 1e-10`: ratio is capped at `min(trained_AUC / 1e-10, 1e6)`.
@@ -1104,7 +1104,7 @@ The system gravitates toward its most significant material during unstructured t
 
 ### 3. Metric
 
-The instrument produces a two-metric output (DN-20).
+The instrument produces a two-metric output (redesigned self-engagement protocol with resistance and recovery ratios).
 
 **Disruption** (resistance measurement):
 
@@ -1182,14 +1182,14 @@ passed = trajectory_passed AND resistance_ratio > 1.0 AND recovery_ratio > 1.0
 | `no-resistance` | `resistance_ratio <= 1.0` | Trained system is no more resistant to perturbation than a fresh system. Earned structure does not provide perturbation resistance. |
 | `no-recovery` | `recovery_ratio <= 1.0` | Trained system does not recover its engagement pattern any more than a fresh system. Earned structure does not create preferential return dynamics. |
 | `topology-driven` | Both ratios fail AND `fresh_recovery > 0.8` | Both trained and fresh systems recover, suggesting recovery is driven by graph topology rather than earned structure. The SBM community structure itself creates attractor basins. |
-| `perturbation-precondition-failed` | DN-31 Option C: perturbation did not reduce target region structure, or target region not elevated | Indeterminate. Returns `passed=None`. The perturbation protocol could not meaningfully test the system because either (a) the target region's structure was not elevated above the non-target mean (nothing to perturb), or (b) the perturbation did not reduce target structure (perturbation ineffective). |
-| `decoy-drift` | T1-01f: `decoy_drift_ratio > original_recovery_ratio` | The system drifted toward the boosted decoy region instead of recovering its original engagement pattern. The apparent recovery (if any) is toward an artificial attractor, not the system's earned structure. |
+| `perturbation-precondition-failed` | Indeterminate result when perturbation preconditions fail: perturbation did not reduce target region structure, or target region not elevated | Indeterminate. Returns `passed=None`. The perturbation protocol could not meaningfully test the system because either (a) the target region's structure was not elevated above the non-target mean (nothing to perturb), or (b) the perturbation did not reduce target structure (perturbation ineffective). |
+| `decoy-drift` | False-attractor control: `decoy_drift_ratio > original_recovery_ratio` | The system drifted toward the boosted decoy region instead of recovering its original engagement pattern. The apparent recovery (if any) is toward an artificial attractor, not the system's earned structure. |
 
 ### 8. Positive Control Evidence
 
 **PC-SE (AttractorRecoveryWalker, Option A node consolidation).** The architectural ground truth for self-engagement: node-level consolidation memory is not perturbable by the edge perturbation protocol. The walker accumulates visit counts at nodes, and these counts survive edge-weight manipulation because they are stored in a separate data structure. When edges are flattened, the walker's node-level memory still directs it back to previously consolidated regions.
 
-Direct instrument testing results (DN-35, 3 seeds):
+Direct instrument testing results (positive control sensitivity validated at instrument level, 3 seeds):
 
 | Seed | Passed | Resistance Ratio | Recovery Ratio |
 |------|--------|------------------|----------------|
@@ -1201,7 +1201,7 @@ Direct instrument testing results (DN-35, 3 seeds):
 
 **Non-circularity.** The architecture guarantees recovery because node memory is structurally immune to edge perturbation. This is the positive control's purpose: to provide an architectural guarantee that the instrument can detect, not to simulate a realistic learning system. The positive control tests whether the measurement protocol works, not whether any particular learning mechanism is sufficient.
 
-**PC-SE tested via direct instrument invocation (Option 3, DN-35).** The trajectory precondition correctly identifies topology-driven walkers as not having path-dependent earned structure (`earned_ratio ~ 1.0`), so PC-SE cannot pass through the normal battery pipeline. Direct invocation with `trajectory_passed_override=True` is standard practice for instrument-level validation.
+**PC-SE tested via direct instrument invocation (positive control sensitivity validated at instrument level).** The trajectory precondition correctly identifies topology-driven walkers as not having path-dependent earned structure (`earned_ratio ~ 1.0`), so PC-SE cannot pass through the normal battery pipeline. Direct invocation with `trajectory_passed_override=True` is standard practice for instrument-level validation.
 
 ### 9. Calibration Results
 
@@ -1232,19 +1232,19 @@ Key observations:
 
 ### 10. Known Limitations
 
-1. **Trajectory precondition blocks most systems.** The precondition (`trajectory_passed = True`) prevents self-engagement from being assessed on any system that does not show earned developmental trajectory. In the Phase A calibration, this blocks 11/13 battery-pipeline systems. This is correct behaviour (DN-36) -- topology-driven walkers should not be tested for self-engagement -- but it means the instrument's discrimination power is primarily exercised in the conjunction, not in isolation.
+1. **Trajectory precondition blocks most systems.** The precondition (`trajectory_passed = True`) prevents self-engagement from being assessed on any system that does not show earned developmental trajectory. In the Phase A calibration, this blocks 11/13 battery-pipeline systems. This is correct behaviour -- topology-driven walkers should not be tested for self-engagement -- but it means the instrument's discrimination power is primarily exercised in the conjunction, not in isolation.
 
-2. **PC-SE tested via direct invocation, not battery runner.** The positive control cannot pass through the normal battery pipeline because the trajectory precondition correctly identifies its topology-driven dynamics as non-path-dependent. Direct invocation (DN-35) validates instrument sensitivity but does not test the full battery workflow for self-engagement. This gap is acceptable because the precondition is a feature, not a bug.
+2. **PC-SE tested via direct invocation, not battery runner.** The positive control cannot pass through the normal battery pipeline because the trajectory precondition correctly identifies its topology-driven dynamics as non-path-dependent. Direct invocation (positive control sensitivity validated at instrument level) validates instrument sensitivity but does not test the full battery workflow for self-engagement. This gap is acceptable because the precondition is a feature, not a bug.
 
 3. **Perturbation semantics.** The default perturbation method (`flatten_to_mean`) replaces edge weights in the target region with their mean value. This may be too aggressive for some architectures -- it destroys fine-grained weight structure entirely rather than degrading it. Alternative perturbation methods (noise injection, partial flattening) are not currently implemented.
 
-4. **SBM community homogeneity limits perturbation targeting.** SBM generates communities with identical internal structure, so DN-32's "target highest-structure region" heuristic depends on the system having developed differential structure across homogeneous communities. In the Phase A calibration, 9/21 system-seed combinations pass the perturbation precondition (T1-01e) after the DN-32 fix. The remaining 12/21 fail because no region has sufficiently elevated structure relative to the non-target mean.
+4. **SBM community homogeneity limits perturbation targeting.** SBM generates communities with identical internal structure, so the "perturbation targets highest-structure region" heuristic depends on the system having developed differential structure across homogeneous communities. In the Phase A calibration, 9/21 system-seed combinations pass the perturbation validation gate after this fix. The remaining 12/21 fail because no region has sufficiently elevated structure relative to the non-target mean.
 
 5. **Recovery horizon family is diagnostic, not gated.** The recovery curve is measured at [W/2, W, 2W, 4W] to provide diagnostic information about recovery dynamics (instant recovery suggests topology-driven, gradual recovery suggests genuine self-engagement, no recovery suggests destroyed structure). However, only the primary recovery at W enters the pass condition. The curve shape informs interpretation but does not determine pass/fail.
 
-6. **Perturbation protocol detail.** The full protocol sequence is: (1) free wander to establish engagement pattern, (2) target highest-structure region (DN-32), (3) validate perturbation precondition (T1-01e: target must be elevated, perturbation must reduce it), (4) perturb, (5) immediate measurement, (6) false-attractor control (T1-01f: boost a decoy region and check whether the system drifts toward it instead of recovering), (7) recovery horizon family [W/2, W, 2W, 4W]. Steps 3 and 6 are validation gates; step 7 is diagnostic.
+6. **Perturbation protocol detail.** The full protocol sequence is: (1) free wander to establish engagement pattern, (2) target the region with highest earned structure, (3) validate perturbation precondition (target must have elevated structure relative to non-targets, and perturbation must reduce it), (4) perturb, (5) immediate measurement, (6) false-attractor control (boost a decoy region and check whether the system drifts toward it instead of recovering), (7) recovery horizon family [W/2, W, 2W, 4W]. Steps 3 and 6 are validation gates; step 7 is diagnostic.
 
-7. **DN-31 Option C: indeterminate returns.** When perturbation preconditions fail (T1-01e), the instrument returns `passed=None` (indeterminate) rather than `passed=False`. The conjunction treats `None` as not-pass, so the practical effect is the same as failure, but the semantic distinction is preserved: the system was not tested, not shown to lack self-engagement.
+7. **Indeterminate returns when preconditions fail.** When perturbation preconditions fail (target region not elevated, or perturbation does not reduce structure), the instrument returns an indeterminate result rather than a definitive failure. The conjunction treats indeterminate as not-pass, so the practical effect is the same as failure, but the semantic distinction is preserved: the system was not tested, not shown to lack self-engagement.
 
 8. **Single reliable positive control.** PC-SE is the only architecturally guaranteed positive control. STDP passes reliably but its mechanism (spike-timing plasticity) is less precisely characterised than PC-SE's node consolidation. Expanding the positive control set would strengthen confidence in the instrument's sensitivity.
 
@@ -1306,7 +1306,7 @@ AMB = ambiguous (null result on that instrument, not a clear pass or fail).
 
 **Within-class consistency:**
 
-- **Class 1 (1A, 1B, 1C):** All three fail every instrument. No learning mechanism means no developmental trajectory, no earned structure, no generativity. Integration effects in 1A/1B are received (DN-22: earned_ratio = 1.00) and correctly excluded.
+- **Class 1 (1A, 1B, 1C):** All three fail every instrument. No learning mechanism means no developmental trajectory, no earned structure, no generativity. Integration effects in 1A/1B are received (earned_ratio = 1.00, indicating the property comes from graph topology rather than operational learning) and correctly excluded.
 - **Class 2 (2A, 2B, 2C):** All three fail the conjunction. Frozen weights preclude trajectory development. 2C shows transfer (earned_ratio = 1.26) but fails trajectory and generativity -- the conjunction catches it.
 - **Class 3 (3A-3E, HEB, STDP):** Variable per-instrument profiles but all fail the conjunction. HEB achieves the richest profile (trajectory + integration + transfer) but fails generativity and self-engagement. STDP passes trajectory, transfer, and self-engagement but fails integration and generativity. The conjunction requirement for all five instruments is the discriminative gate.
 
@@ -1321,8 +1321,8 @@ Five positive controls demonstrate that each instrument is individually sensitiv
 |---------|-------------------|--------|---------------|--------------|---------------------------|
 | PC1 (RoleBasedWalker) | Generativity | Battery (transition JSD, B2) | 3/3 | Role-aware walker with community-specific transition priors | Frozen priors produce systematic community-to-community divergence on novel domains by construction |
 | PC3 (GNNNavigator) | Generativity | Battery (transition JSD, B2) | 2/3 non-degenerate | GNN with learned node embeddings guiding navigation | Graph-learned representations transfer to structurally isomorphic but topologically distinct domains |
-| PC-SE (AttractorRecoveryWalker) | Self-Engagement | Direct instrument (DN-35) | 3/3 | Node-consolidation memory with attractor dynamics | Consolidation memory survives edge perturbation by construction; resistance_ratio = 1,000,000 |
-| PC-INT (PageRankHebbianWalker) | Integration | Direct instrument (DN-35) | 3/3 | PageRank redistribution + Hebbian edge reinforcement | PageRank ablation causes global reorganisation; Gini = 0.24-0.36 across seeds |
+| PC-SE (AttractorRecoveryWalker) | Self-Engagement | Direct instrument invocation | 3/3 | Node-consolidation memory with attractor dynamics | Consolidation memory survives edge perturbation by construction; resistance_ratio = 1,000,000 |
+| PC-INT (PageRankHebbianWalker) | Integration | Direct instrument invocation | 3/3 | PageRank redistribution + Hebbian edge reinforcement | PageRank ablation causes global reorganisation; Gini = 0.24-0.36 across seeds |
 | STDP (Brian2 Spiking) | Trajectory | Battery | 3/3 | 1000 LIF neurons, spike-timing-dependent plasticity | STDP weight changes are path-dependent; earned_ratio = 2.18 (seed 42) |
 
 ### Detailed Results
@@ -1331,9 +1331,9 @@ Five positive controls demonstrate that each instrument is individually sensitiv
 
 **PC3 (GNNNavigator) -- Generativity.** 3/3 seeds exceed the B2 noise floor. 2/3 are non-degenerate (seed 456 collapses to 2 communities with >1% engagement). Passes the 2/3 replication threshold. Demonstrates that GNN-learned structural representations produce measurable transfer to zero-overlap domains.
 
-**PC-SE (AttractorRecoveryWalker) -- Self-Engagement.** Tested via direct instrument invocation (Option 3, DN-35). Trajectory precondition bypassed because the instrument-level question is whether the measurement is sensitive, not whether this system would pass the full battery. Results: seed 42 recovery_ratio = 1.304, seed 123 recovery_ratio = 1.252, seed 456 recovery_ratio = 2.337. All three exceed the >1.0 threshold. Architecture guarantees self-engagement: node-consolidation memory creates attractors that survive perturbation.
+**PC-SE (AttractorRecoveryWalker) -- Self-Engagement.** Tested via direct instrument invocation, bypassing the battery's trajectory precondition. The instrument-level question is whether the measurement is sensitive, not whether this system would pass the full battery. Results: seed 42 recovery_ratio = 1.304, seed 123 recovery_ratio = 1.252, seed 456 recovery_ratio = 2.337. All three exceed the >1.0 threshold. Architecture guarantees self-engagement: node-consolidation memory creates attractors that survive perturbation.
 
-**PC-INT (PageRankHebbianWalker) -- Integration.** Tested via direct instrument invocation (Option 3, DN-35). Results: seed 42 Gini = 0.359 (fragile mode), seed 123 Gini = 0.258 (earned), seed 456 Gini = 0.237 (earned). All three show non-linear degradation under ablation. Bonus: 1/3 seeds also pass self-engagement, but this is unreliable (not a self-engagement positive control).
+**PC-INT (PageRankHebbianWalker) -- Integration.** Tested via direct instrument invocation. Results: seed 42 Gini = 0.359 (fragile mode), seed 123 Gini = 0.258 (earned), seed 456 Gini = 0.237 (earned). All three show non-linear degradation under ablation. Bonus: 1/3 seeds also pass self-engagement, but this is unreliable (not a self-engagement positive control).
 
 **STDP (Brian2 Spiking) -- Trajectory.** Not purpose-built as a positive control; identified empirically during calibration. Developmental trajectory: slope = 0.000476, R-squared = 0.8734, monotonicity = 0.67, earned_ratio = 2.18. The STDP learning rule creates path-dependent weight changes that are detectable as earned trajectory. Also passes transfer (advantage = 0.2689, earned_ratio = 1.27) and self-engagement (resistance_ratio = 478.21, recovery_ratio = inf).
 
@@ -1350,8 +1350,8 @@ This demonstrates that the conjunction is more discriminative than any single in
 
 ### Decision Notes
 
-- **DN-34:** Per-instrument positive control strategy. Each instrument validated independently with architecturally-grounded controls.
-- **DN-35:** Instrument-level validation policy. Battery preconditions (trajectory gating self-engagement, etc.) are not applied during instrument-level sensitivity testing. The preconditions gate the candidate, not the sensitivity measurement.
+- **Per-instrument positive control strategy.** Each instrument is validated independently with architecturally-grounded controls whose expected behaviour can be derived from their design.
+- **Instrument-level validation policy.** Battery preconditions (e.g., trajectory gating self-engagement) are not applied during instrument-level sensitivity testing. The preconditions gate the candidate, not the sensitivity measurement.
 ## 13. Per-Instrument Discrimination
 
 Each of the five battery instruments achieves perfect separation between its positive and negative controls, measured by ROC AUC with bootstrap confidence intervals.
@@ -1374,7 +1374,7 @@ Method: 10,000 bootstrap resamples. Source: `results/per-instrument-roc-auc.json
 
 **Integration includes both received and earned positives.** The 12 positives comprise 9 Class 1 systems (received integration -- topology-driven, not learning-driven) and 3 PC-INT seeds (earned integration via PageRank-Hebbian dynamics). The earned/received distinction is the conjunction's responsibility, not the integration instrument's. The instrument detects non-linear degradation under ablation regardless of origin.
 
-**Self-engagement and integration tested via direct instrument invocation.** PC-SE and PC-INT were tested using Option 3 (DN-35): direct instrument invocation bypassing battery preconditions. This is standard practice for instrument-level sensitivity validation. The trajectory precondition correctly classifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio approximately 1.0), which would gate them out of the full battery. Instrument sensitivity is validated per instrument, not per battery pipeline.
+**Self-engagement and integration tested via direct instrument invocation.** PC-SE and PC-INT were tested via direct instrument invocation, bypassing battery preconditions. This is standard practice for instrument-level sensitivity validation. The trajectory precondition correctly classifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio approximately 1.0), which would gate them out of the full battery. Instrument sensitivity is validated per instrument, not per battery pipeline.
 
 **Trajectory relies on a single architecture.** STDP is the sole architecturally-grounded trajectory positive. HEB was excluded due to variable results across seeds. Additional trajectory-positive architectures in Phase B would strengthen this instrument's validation.
 
@@ -1404,13 +1404,13 @@ Foxworthy's four persistence diagnostics were run on our 3C implementation to ve
 1. **Weight persistence after training:** PASS. LoRA adapter weights diverge from initialisation after training (L2 norm of delta > 0).
 2. **Weight stability after freeze:** PASS. No weight change occurs after `set_training(False)` is called.
 3. **Behavioural divergence from untrained:** PASS. Trained 3C produces measurably different navigation patterns from untrained 3C on domain A.
-4. **Causal pathway verification:** PASS. LoRA adapters are in the causal pathway of action selection (F-052). Zeroing the adapters changes navigation behaviour, confirming they are not vestigial.
+4. **Causal pathway verification:** PASS. LoRA adapters are in the causal pathway of action selection. Zeroing the adapters changes navigation behaviour, confirming they are not vestigial.
 
 All four diagnostics pass, confirming our Variant F implementation matches Foxworthy's published architecture.
 
-### Causal Pathway Detail (F-052)
+### Causal Pathway Detail
 
-Finding F-052 verified that LoRA adapters are causally upstream of action selection in system 3C. The test: zero all LoRA adapter weights after training, then run 500 navigation steps. The zeroed system produces a different visit distribution from the trained system (JSD > 0), confirming the adapters are in the causal pathway. This rules out the possibility that training modifies the base model's behaviour through a side channel that bypasses the adapters.
+A dedicated code review verified that LoRA adapters are causally upstream of action selection in system 3C. The test: zero all LoRA adapter weights after training, then run 500 navigation steps. The zeroed system produces a different visit distribution from the trained system (JSD > 0), confirming the adapters are in the causal pathway. This rules out the possibility that training modifies the base model's behaviour through a side channel that bypasses the adapters.
 
 ### Parameter-Behaviour Dissociation
 
@@ -1444,7 +1444,7 @@ The Foxworthy cross-validation serves two purposes:
 
 # Part IV: Registration
 
-## 15. Pre-Registered Null Result Interpretation Scenarios (DN-33)
+## 15. Pre-Registered Null Result Interpretation Scenarios
 
 These interpretations are locked BEFORE Phase C data exists. They define how each plausible outcome on the Class 4 candidate will be reported, preventing post-hoc narrative fitting.
 
@@ -1546,7 +1546,7 @@ The following analyses are pre-committed as supplementary work. They strengthen 
 
 ### 1. Ecological Domain Generality (Phase B)
 
-Test the battery on ecologically valid graph domains: citation networks, social networks, and other real-world topologies with heterogeneous community structure. The SBM domains used in Phase A have homogeneous communities (all communities structurally equivalent). Ecological domains will test whether the battery's instruments are sensitive to role-differentiated structure, and whether coherence gating (currently deferred per F-048/F-049) can be re-enabled.
+Test the battery on ecologically valid graph domains: citation networks, social networks, and other real-world topologies with heterogeneous community structure. The SBM domains used in Phase A have homogeneous communities (all communities structurally equivalent). Ecological domains will test whether the battery's instruments are sensitive to role-differentiated structure, and whether coherence gating (currently deferred due to SBM community homogeneity) can be re-enabled.
 
 ### 2. Cross-Machine Reproducibility
 
@@ -1568,7 +1568,7 @@ Vary the SBM parameters (p_between, modularity ratio p_within/p_between) and ver
 
 ### 5. Coherence Validation on Heterogeneous Domains
 
-Re-enter structural consistency (DN-30a) as a gating criterion when community roles are differentiated. On SBM domains, coherence is unreliable because all communities are structurally equivalent (F-048, F-049). Heterogeneous domains with hub, peripheral, and bridge communities should enable meaningful coherence measurement. If coherence gating is viable on heterogeneous domains, amend the protocol per S18 to include it.
+Re-enter structural consistency as a gating criterion when community roles are differentiated. On SBM domains, coherence is unreliable because all communities are structurally equivalent. Heterogeneous domains with hub, peripheral, and bridge communities should enable meaningful coherence measurement. If coherence gating is viable on heterogeneous domains, amend the protocol per S18 to include it.
 
 ### 6. Scale Validation
 
@@ -1597,7 +1597,7 @@ This protocol is frozen. No modifications may be made without a documented amend
    - Whether noise floors require recomputation.
    - Whether Phase C results (if they exist) would be affected.
 
-3. **Decision note** (DN-series) recording the decision to accept or reject the amendment. The decision note must include the rationale, the vote (if applicable), and any dissenting views. Rejected amendments remain in the governance register for transparency.
+3. **Decision note** (governance decision note) recording the decision to accept or reject the amendment. The decision note must include the rationale, the vote (if applicable), and any dissenting views. Rejected amendments remain in the governance register for transparency.
 
 4. **Version increment:**
    - **Minor** (v1.0 to v1.1): Changes to diagnostic metrics, reporting format, supplementary analyses, or clarifications that do not affect pass/fail decisions.
@@ -1617,6 +1617,6 @@ This protocol is frozen. No modifications may be made without a documented amend
 
 ### Governance Principles
 
-- Amendments are disclosed, not hidden. Every change to the protocol is traceable through the DN-series.
+- Amendments are disclosed, not hidden. Every change to the protocol is traceable through the governance decision register.
 - The pre-registration commitment means that Phase C results are interpreted under the frozen protocol version that was current when Phase C began. If an amendment is made after Phase C data exists, both the original and amended interpretations are reported.
 - No amendment may retroactively change the interpretation of Phase A/A+ calibration results without re-running the affected analyses.

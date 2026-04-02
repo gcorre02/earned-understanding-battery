@@ -164,7 +164,7 @@ seed. The function:
 After generation, the pipeline verifies domain quality:
 
 - **Spectral similarity**: eigenvalue spectra of A and A' must match within
-  tolerance (M-04 calibration). Confirms isomorphism is preserved.
+  tolerance (validated via spectral basin signature comparison using k=10 eigenvalues of the symmetrised Laplacian). Confirms isomorphism is preserved.
 - **Edge Jaccard computation**: pairwise Jaccard indices are computed for all
   domain pairs. B2 must have Jaccard = 0.000 with A. B1 Jaccard is recorded
   but not gated.
@@ -947,7 +947,7 @@ This protocol is frozen as of the date and commit above. No modifications may be
 4. **Version increment** (v1.0 -> v1.1 for minor, v2.0 for major changes to pass condition or primary metric).
 5. **Re-run obligation:** If the amendment changes the pass condition, noise floor methodology, or primary metric, all results must be re-computed and the data package updated.
 
-The protocol specification document (`outputs/protocol-specification-generativity-v2-2026-03-21.md`) contains the full technical specification from which this frozen protocol is derived.
+This section documents the generativity instrument as frozen at the time of registration. All parameters, thresholds, and procedures above are locked.
 
 ---
 
@@ -1072,7 +1072,7 @@ Results from the Phase A recalibration run (medium scale, seed 42 shown; multi-s
 
 Key observations:
 - **3E** is the designated positive control with a 10x earned ratio, stable across seeds.
-- **HEB** shows the highest earned ratio (~83x) but this reflects Hebbian weight accumulation rather than relational model transfer. HEB's transfer is mechanistically different from 3E's (weight magnitude vs. relational structure).
+- **HEB** shows the highest earned ratio (~84x) but this reflects Hebbian weight accumulation rather than relational model transfer. HEB's transfer is mechanistically different from 3E's (weight magnitude vs. relational structure).
 - **STDP** passes with modest earned ratios (~1.3x), consistent with spike-timing-dependent plasticity creating transferable edge-weight structure.
 - **2C** passes 2/3 seeds with marginal earned ratios (~1.2x). This is a borderline case worth monitoring in Phase C.
 - All Class 1 systems fail or return indeterminate. All pure Class 2 systems (2A, 2B) fail.
@@ -1081,7 +1081,7 @@ Key observations:
 
 1. **Single true positive for relational transfer.** 3E is the only system whose transfer is architecturally grounded in relational model generalisation. HEB and STDP pass via weight-based mechanisms. AUC = 1.0 for per-instrument ROC reflects strict separation between the positive and negative pools, not statistical power. Confidence in the instrument's sensitivity depends on expanding the positive control set in Phase C.
 
-2. **Domain A' construction quality.** A' preserves relational structure while destroying surface statistics. Spectral similarity between A and A' is verified by M-04 calibration (spectral basin signatures, k=10, full-basin, symmetrised Laplacian). However, the verification is internal to the battery -- it has not been independently audited. If A' inadvertently preserves surface statistics that a system can exploit, the instrument would produce false positives.
+2. **Domain A' construction quality.** A' preserves relational structure while destroying surface statistics. Spectral similarity between A and A' is verified by spectral basin signature comparison (k=10 eigenvalues, full-basin variant, symmetrised Laplacian). However, the verification is internal to the battery -- it has not been independently audited. If A' inadvertently preserves surface statistics that a system can exploit, the instrument would produce false positives.
 
 3. **Trajectory sampling.** `measurement_interval=5` means the structure metric trajectory is sampled every 5 steps, not recorded continuously. Rapid structural changes between measurement points are invisible. The AUC computed from sampled trajectories is an approximation of the true area under the continuous trajectory.
 
@@ -1092,7 +1092,7 @@ Key observations:
 
 ### 1. Purpose
 
-The self-engagement instrument tests whether earned structure creates preferential self-engagement -- the system resists perturbation to its consolidated structure and rebuilds its engagement pattern after disruption. A system that has genuinely developed structural organisation should gravitates toward its most significant material during unstructured time, and that gravitation should survive targeted perturbation. This is the empirical operationalisation of the stability property described in Paper 1 section 3.2.
+The self-engagement instrument tests whether earned structure creates preferential self-engagement -- the system resists perturbation to its consolidated structure and rebuilds its engagement pattern after disruption. A system that has genuinely developed structural organisation should gravitate toward its most significant material during unstructured time, and that gravitation should survive targeted perturbation. This is the empirical operationalisation of the stability property described in Paper 1 section 3.2.
 
 ### 2. Construct Definition
 
@@ -1187,7 +1187,7 @@ passed = trajectory_passed AND resistance_ratio > 1.0 AND recovery_ratio > 1.0
 
 ### 8. Positive Control Evidence
 
-**PC-SE (AttractorRecoveryWalker, Option A node consolidation).** The architectural ground truth for self-engagement: node-level consolidation memory is not perturbable by the edge perturbation protocol. The walker accumulates visit counts at nodes, and these counts survive edge-weight manipulation because they are stored in a separate data structure. When edges are flattened, the walker's node-level memory still directs it back to previously consolidated regions.
+**PC-SE (AttractorRecoveryWalker with node-level consolidation memory).** The architectural ground truth for self-engagement: node-level consolidation memory is not perturbable by the edge perturbation protocol. The walker accumulates visit counts at nodes, and these counts survive edge-weight manipulation because they are stored in a separate data structure. When edges are flattened, the walker's node-level memory still directs it back to previously consolidated regions.
 
 Direct instrument testing results (positive control sensitivity validated at instrument level, 3 seeds):
 
@@ -1310,7 +1310,7 @@ AMB = ambiguous (null result on that instrument, not a clear pass or fail).
 - **Class 2 (2A, 2B, 2C):** All three fail the conjunction. Frozen weights preclude trajectory development. 2C shows transfer (earned_ratio = 1.26) but fails trajectory and generativity -- the conjunction catches it.
 - **Class 3 (3A-3E, HEB, STDP):** Variable per-instrument profiles but all fail the conjunction. HEB achieves the richest profile (trajectory + integration + transfer) but fails generativity and self-engagement. STDP passes trajectory, transfer, and self-engagement but fails integration and generativity. The conjunction requirement for all five instruments is the discriminative gate.
 
-**Generativity is the universal blocker.** Every calibration system produces delta = 0.000000 on the generativity instrument (no response to novel domain). This is the instrument that most consistently separates the calibration panel from a hypothetical Class 4 system. The positive controls (S12) confirm that the instrument is sensitive when genuine structural transfer is present.
+**Generativity is the universal blocker.** Every calibration system produces delta = 0.000000 on the generativity instrument (no response to novel domain). This is the instrument that most consistently separates the calibration panel from a hypothetical Class 4 system. The positive controls (Section 12) confirm that the instrument is sensitive when genuine structural transfer is present.
 ## 12. Positive Controls
 
 Five positive controls demonstrate that each instrument is individually sensitive -- capable of detecting its target property when architecturally present. Each positive control is purpose-built (or empirically identified) to satisfy one instrument, providing non-circular ground truth that the instrument measures what it claims to measure.
@@ -1568,7 +1568,7 @@ Vary the SBM parameters (p_between, modularity ratio p_within/p_between) and ver
 
 ### 5. Coherence Validation on Heterogeneous Domains
 
-Re-enter structural consistency as a gating criterion when community roles are differentiated. On SBM domains, coherence is unreliable because all communities are structurally equivalent. Heterogeneous domains with hub, peripheral, and bridge communities should enable meaningful coherence measurement. If coherence gating is viable on heterogeneous domains, amend the protocol per S18 to include it.
+Re-enter structural consistency as a gating criterion when community roles are differentiated. On SBM domains, coherence is unreliable because all communities are structurally equivalent. Heterogeneous domains with hub, peripheral, and bridge communities should enable meaningful coherence measurement. If coherence gating is viable on heterogeneous domains, amend the protocol per Section 18 to include it.
 
 ### 6. Scale Validation
 
@@ -1582,7 +1582,7 @@ Priority systems for scale validation: 1A, 2A, 3C, HEB, STDP, PC1, PC3.
 
 ### Relationship to Registered Protocol
 
-These supplementary analyses strengthen but do not change the registered protocol. If any supplementary analysis reveals a flaw in the battery's discrimination (e.g., a calibration system spuriously passing at a different scale), the finding will be documented and an amendment proposed per S18. The Phase C candidate evaluation proceeds under the frozen protocol regardless of supplementary analysis status.
+These supplementary analyses strengthen but do not change the registered protocol. If any supplementary analysis reveals a flaw in the battery's discrimination (e.g., a calibration system spuriously passing at a different scale), the finding will be documented and an amendment proposed per Section 18. The Phase C candidate evaluation proceeds under the frozen protocol regardless of supplementary analysis status.
 ## 18. Version Control and Amendment Procedure
 
 This protocol is frozen. No modifications may be made without a documented amendment following this procedure:

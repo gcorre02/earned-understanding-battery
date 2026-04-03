@@ -202,6 +202,7 @@ fresh control system on demand. This ensures:
 - Each instrument gets a fresh instance, avoiding cross-contamination.
 - The factory encapsulates architecture and domain details, keeping instruments
   decoupled from system construction.
+- The fresh system starts at the SAME initial graph position as the trained system, ensuring the only difference is training history, not starting conditions. This is achieved by passing the trained system's initial position to the fresh system's constructor.
 
 ### Two-window reporting
 
@@ -660,7 +661,7 @@ All domains use the Stochastic Block Model (SBM) with the MEDIUM configuration p
 | Node ID offset | +150 (no shared IDs with A) |
 | Edge Jaccard with A | **0.0** |
 
-B2 is the primary test domain. The shifted node IDs guarantee zero edge overlap between A and B2 (Edge Jaccard = 0.0). Any above-floor signal on B2 is unambiguously from structural transfer, not residual topological similarity.
+B2 is the primary test domain. The shifted node IDs guarantee zero edge overlap between A and B2 (Edge Jaccard = 0.0). Any above-floor signal on B2 is unambiguously from structural transfer, not residual topological similarity. The zero edge overlap also excludes in-context learning as a confound: no edges, nodes, or features from A appear in B2, so a system cannot exploit familiarity with training-domain content when navigating the evaluation domain.
 
 ### Domain B1 (Diagnostic -- Shared Node Space)
 
@@ -1579,6 +1580,10 @@ Run representative systems at SMALL (50 nodes) and LARGE (500 nodes) scales. Ver
 - Noise floors scale predictably (tighter or wider, but not inverted).
 
 Priority systems for scale validation: 1A, 2A, 3C, HEB, STDP, PC1, PC3.
+
+### 7. Multi-Domain Training Protocol (Planned Second Registration)
+
+Should the candidate pass the single-domain conjunction, a planned second registration will assess multi-domain training protocols to test whether the system discovers cross-domain relational invariants — the distinction between earning concrete structure (domain-specific paths) and earning abstract structure (domain-general patterns).
 
 ### Relationship to Registered Protocol
 

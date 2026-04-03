@@ -45,14 +45,12 @@ SEED = 42
 N_FEATURES = MEDIUM.n_node_features
 N_COMMUNITIES = MEDIUM.n_communities
 
-
 def _get_device() -> str:
     if torch.backends.mps.is_available():
         return "mps"
     elif torch.cuda.is_available():
         return "cuda"
     return "cpu"
-
 
 def make_system(system_id: str, graph: nx.DiGraph):
     """Instantiate and prepare a system for stepping."""
@@ -113,7 +111,6 @@ def make_system(system_id: str, graph: nx.DiGraph):
 
     raise ValueError(f"Unknown system: {system_id}")
 
-
 def run_traversal(system, n_steps: int) -> list[int]:
     """Run a system for n_steps, returning list of visited node IDs."""
     system.reset()
@@ -126,7 +123,6 @@ def run_traversal(system, n_steps: int) -> list[int]:
         else:
             path.append(-1)
     return path
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -252,7 +248,6 @@ def main():
     out_path = RESULTS_DIR / "traversal_data.json"
     out_path.write_text(json.dumps(output, indent=2))
     print(f"\nExported: {out_path} ({out_path.stat().st_size / 1024:.1f} KB)")
-
 
 if __name__ == "__main__":
     main()

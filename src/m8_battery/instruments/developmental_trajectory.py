@@ -18,7 +18,6 @@ from m8_battery.core.test_system import TestSystem
 from m8_battery.core.types import InstrumentResult
 from m8_battery.core.provenance import ProvenanceLog
 
-
 def run_developmental_trajectory(
     system: TestSystem,
     inputs: list[Any],
@@ -75,7 +74,6 @@ def run_developmental_trajectory(
 
     return result
 
-
 def _collect_trajectory(
     system: TestSystem,
     inputs: list[Any],
@@ -104,7 +102,6 @@ def _collect_trajectory(
             trajectory.append(system.get_structure_metric())
 
     return trajectory
-
 
 def _analyse_trajectory(
     trajectory: list[float],
@@ -162,7 +159,7 @@ def _analyse_trajectory(
         else:
             effect_size = 0.0
 
-    # DN-22 earned ratio: trained metric_range vs fresh metric_range
+    # earned ratio: trained metric_range vs fresh metric_range
     # If fresh also develops trajectory, the signal may not be earned.
     earned_ratio = None
     if control_trajectory is not None and len(control_trajectory) >= 3:
@@ -176,13 +173,13 @@ def _analyse_trajectory(
         else:
             earned_ratio = 1.0  # Neither changes
 
-    # Decision logic (DN-22: earned ratio required if control available)
+    # Decision logic (earned ratio required if control available)
     has_trend = abs(slope) > 1e-6 and r_squared > 0.3
     has_monotonicity = monotonicity > 0.6
     # Earned ratio > 1.0 means trained develops MORE than fresh
     passes_earned = earned_ratio is None or earned_ratio > 1.0
 
-    # T1-05: Failure mode classification
+    # Failure mode classification
     if has_trend and has_monotonicity and passes_earned:
         passed = True
         failure_mode = "earned"
@@ -192,7 +189,7 @@ def _analyse_trajectory(
     elif has_trend and has_monotonicity and not passes_earned:
         passed = False
         failure_mode = "architectural"  # Fresh shows same → structure is architectural
-        notes = (f"Trajectory present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
+        notes = (f"Trajectory present but not earned: earned_ratio={earned_ratio:.2f}. "
                  f"Fresh system shows similar development.")
     elif has_trend or has_monotonicity:
         passed = None
@@ -219,7 +216,6 @@ def _analyse_trajectory(
         notes=notes,
         failure_mode=failure_mode,
     )
-
 
 def compute_trajectory_compression(trajectory: list[float]) -> dict[str, float]:
     """Compute Lempel-Ziv compression ratio of structure metric time series.

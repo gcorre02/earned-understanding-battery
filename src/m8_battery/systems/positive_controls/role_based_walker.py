@@ -27,15 +27,12 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 def _log(msg: str) -> None:
     print(f"[role_walker] {msg}", file=sys.stderr, flush=True)
-
 
 # Role classification thresholds (from topology)
 ROLE_NAMES = ["hub", "bridge", "periphery", "leaf"]
 N_ROLES = len(ROLE_NAMES)
-
 
 def _classify_node_role(graph: nx.DiGraph, node: int) -> int:
     """Classify a node into a topological role based on local features.
@@ -84,7 +81,6 @@ def _classify_node_role(graph: nx.DiGraph, node: int) -> int:
         return 0  # hub
 
     return 2  # periphery
-
 
 class RoleBasedWalker(TestSystem):
     """Role-based graph walker (Positive Control 1).
@@ -325,7 +321,7 @@ class RoleBasedWalker(TestSystem):
         return result
 
     def get_representation_state(self):
-        """Role preferences for CKA (T1-02)."""
+        """Role preferences for CKA."""
         return self._role_preferences.reshape(1, -1)
 
     def ablate(self, region_id: str) -> TestSystem:

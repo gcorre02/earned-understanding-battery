@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-
 class SystemClass(Enum):
     """Antikythera spectrum classification."""
     CLASS_1 = 1  # Fixed mechanism — no learning
@@ -14,13 +13,11 @@ class SystemClass(Enum):
     CLASS_3 = 3  # Learns with external semantic objective
     CLASS_4 = 4  # Understanding-generating substrate (candidate)
 
-
 @dataclass(frozen=True)
 class Snapshot:
     """Serialised system state."""
     data: bytes
     metadata: dict[str, Any] = field(default_factory=dict)
-
 
 @dataclass
 class Region:
@@ -28,7 +25,6 @@ class Region:
     id: str
     description: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
-
 
 @dataclass
 class InstrumentResult:
@@ -40,8 +36,7 @@ class InstrumentResult:
     p_value: float | None = None
     raw_data: dict[str, Any] = field(default_factory=dict)
     notes: str = ""
-    failure_mode: str = ""  # T1-05: named failure classification (e.g., "absent", "architectural")
-
+    failure_mode: str = ""  # named failure classification (e.g., "absent", "architectural")
 
 @dataclass
 class BatteryResult:
@@ -64,14 +59,12 @@ class BatteryResult:
             return None
         return all(r.passed for r in results) and self.provenance_passed
 
-
 @dataclass
 class ProvenanceEvent:
     """A single logged event in the provenance chain."""
     timestamp: float
     event_type: str  # "input", "state_change", "output", "measurement"
     data: dict[str, Any] = field(default_factory=dict)
-
 
 @dataclass
 class DomainConfig:

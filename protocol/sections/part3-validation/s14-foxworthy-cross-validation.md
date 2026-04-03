@@ -17,13 +17,13 @@ Foxworthy's four persistence diagnostics were run on our 3C implementation to ve
 1. **Weight persistence after training:** PASS. LoRA adapter weights diverge from initialisation after training (L2 norm of delta > 0).
 2. **Weight stability after freeze:** PASS. No weight change occurs after `set_training(False)` is called.
 3. **Behavioural divergence from untrained:** PASS. Trained 3C produces measurably different navigation patterns from untrained 3C on domain A.
-4. **Causal pathway verification:** PASS. LoRA adapters are in the causal pathway of action selection (F-052). Zeroing the adapters changes navigation behaviour, confirming they are not vestigial.
+4. **Causal pathway verification:** PASS. LoRA adapters are in the causal pathway of action selection. Zeroing the adapters changes navigation behaviour, confirming they are not vestigial.
 
 All four diagnostics pass, confirming our Variant F implementation matches Foxworthy's published architecture.
 
-### Causal Pathway Detail (F-052)
+### Causal Pathway Detail
 
-Finding F-052 verified that LoRA adapters are causally upstream of action selection in system 3C. The test: zero all LoRA adapter weights after training, then run 500 navigation steps. The zeroed system produces a different visit distribution from the trained system (JSD > 0), confirming the adapters are in the causal pathway. This rules out the possibility that training modifies the base model's behaviour through a side channel that bypasses the adapters.
+Finding verified that LoRA adapters are causally upstream of action selection in system 3C. The test: zero all LoRA adapter weights after training, then run 500 navigation steps. The zeroed system produces a different visit distribution from the trained system (JSD > 0), confirming the adapters are in the causal pathway. This rules out the possibility that training modifies the base model's behaviour through a side channel that bypasses the adapters.
 
 ### Parameter-Behaviour Dissociation
 

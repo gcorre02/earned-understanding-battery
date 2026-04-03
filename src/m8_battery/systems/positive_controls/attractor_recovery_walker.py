@@ -24,7 +24,7 @@ Option A selected. Node consolidation gated by training mode.
 
 Literature:
 - Hebb DO (1949). The Organization of Behavior. Wiley.
-- DN-21: Self-engagement sufficiency + positive anchor strategy
+- Self-engagement sufficiency + positive anchor strategy
 """
 
 from __future__ import annotations
@@ -36,7 +36,6 @@ import networkx as nx
 import numpy as np
 
 from m8_battery.core.test_system import TestSystem
-
 
 class AttractorRecoveryWalker(TestSystem):
     """Hebbian graph walker with node-level consolidation memory (PC-SE).
@@ -287,7 +286,7 @@ class AttractorRecoveryWalker(TestSystem):
         return new
 
     def boost(self, region_id: str) -> TestSystem:
-        """Strengthen edge weights in target community (T1-01f decoy)."""
+        """Strengthen edge weights in target community (decoy)."""
         new = self._clone_internal()
         community_id = int(region_id.replace("community_", ""))
         community_nodes = {n for n, c in new._node_to_community.items() if c == community_id}

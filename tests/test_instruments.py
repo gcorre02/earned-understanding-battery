@@ -6,7 +6,6 @@ from m8_battery.domains.presets import SMALL
 from m8_battery.instruments.developmental_trajectory import run_developmental_trajectory
 from m8_battery.systems.class1.wordnet_graph import WordNetGraph
 
-
 class TestDevelopmentalTrajectory:
     """Tests for the developmental trajectory instrument."""
 
@@ -88,7 +87,6 @@ class TestDevelopmentalTrajectory:
 
         # Only 2 measurements (initial + after 1 step) — insufficient
         assert result.passed is None or result.passed is False
-
 
 class TestWordNetGraph:
     """Tests for the WordNet (static graph) Class 1 adapter."""

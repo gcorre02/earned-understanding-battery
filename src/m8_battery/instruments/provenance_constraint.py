@@ -14,7 +14,6 @@ from m8_battery.core.test_system import TestSystem
 from m8_battery.core.types import InstrumentResult
 from m8_battery.core.provenance import ProvenanceLog
 
-
 def check_provenance(
     system: TestSystem,
     provenance_log: ProvenanceLog,

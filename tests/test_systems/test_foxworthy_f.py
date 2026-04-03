@@ -15,7 +15,6 @@ from m8_battery.domains.sbm_generator import generate_domain
 from m8_battery.domains.presets import SMALL
 from m8_battery.systems.class3.foxworthy_f import FoxworthyF
 
-
 def _make_system(theta: float = 0.0, **kwargs) -> tuple:
     """Helper: create Foxworthy F + domain graph.
 
@@ -26,7 +25,6 @@ def _make_system(theta: float = 0.0, **kwargs) -> tuple:
     system.set_graph(G)
     nodes = list(G.nodes())
     return system, G, nodes
-
 
 class TestFoxworthyF:
 

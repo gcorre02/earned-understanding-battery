@@ -7,7 +7,6 @@ import numpy as np
 
 from m8_battery.core.types import DomainConfig
 
-
 def generate_domain(config: DomainConfig) -> nx.DiGraph:
     """Generate a directed graph from a Stochastic Block Model.
 
@@ -64,7 +63,6 @@ def generate_domain(config: DomainConfig) -> nx.DiGraph:
 
     return G
 
-
 def generate_domain_family(config: DomainConfig) -> dict[str, nx.DiGraph]:
     """Generate a full domain family: A, A', B, C.
 
@@ -113,7 +111,6 @@ def generate_domain_family(config: DomainConfig) -> dict[str, nx.DiGraph]:
         "B": domain_b,
         "C": domain_c,
     }
-
 
 def _create_isomorphic(
     G: nx.DiGraph, config: DomainConfig, rng: np.random.Generator

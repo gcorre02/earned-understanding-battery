@@ -8,7 +8,6 @@ from m8_battery.domains.presets import SMALL
 from m8_battery.domains.encoders.text_encoder import encode_neighbourhood, encode_domain_as_text
 from m8_battery.instruments.developmental_trajectory import run_developmental_trajectory
 
-
 class TestFrozenGAT:
     def test_train_and_freeze(self):
         from m8_battery.systems.class2.frozen_gnn import FrozenGAT
@@ -63,7 +62,6 @@ class TestFrozenGAT:
         system.step(list(G.nodes())[0])
         clone = system.clone()
         assert clone._step_count == 0
-
 
 class TestFoxworthyC:
     def test_basic_step(self):
@@ -122,7 +120,6 @@ class TestFoxworthyC:
         clone = system.clone()
         assert clone._step_count == 0
 
-
 class TestFrozenLLM:
     """Tests for TinyLlama adapter. These load the model (~1.1B params)."""
 
@@ -173,7 +170,6 @@ class TestFrozenLLM:
         clone = system.clone()
         assert clone._model is None  # Lazy — not loaded until needed
         assert clone._graph is G
-
 
 class TestTextEncoder:
     def test_encode_neighbourhood(self):

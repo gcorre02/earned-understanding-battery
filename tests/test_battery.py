@@ -20,7 +20,6 @@ from m8_battery.instruments.battery_runner import run_battery, run_reset_discrim
 from m8_battery.systems.class1.wordnet_graph import WordNetGraph
 from m8_battery.core.provenance import ProvenanceLog
 
-
 def _make_system_and_inputs():
     """Helper: create a Class 1 system + domain family inputs."""
     family = generate_domain_family(SMALL)
@@ -29,7 +28,6 @@ def _make_system_and_inputs():
     nodes_a_prime = list(family["A_prime"].nodes())
     nodes_b = list(family["B"].nodes())
     return system, family, nodes_a, nodes_a_prime, nodes_b
-
 
 class TestIntegration:
     def test_class1_integration(self):
@@ -47,7 +45,6 @@ class TestIntegration:
         # Result may be True or False depending on graph topology
         assert result.passed is not None or result.passed is None
         assert "gini" in result.raw_data or "ablation_results" in result.raw_data
-
 
 class TestGenerativity:
     def test_class1_no_generativity(self):
@@ -77,7 +74,6 @@ class TestGenerativity:
         result = run_generativity(system, [], reference_metric=1.0)
         assert result.passed is None
 
-
 class TestTransfer:
     def test_class1_no_transfer(self):
         """Class 1: trained and naive produce identical metrics → no transfer."""
@@ -100,7 +96,6 @@ class TestTransfer:
         # Class 1: both systems have constant metric → no transfer advantage → FAIL
         assert result.passed is False
 
-
 class TestSelfEngagement:
     def test_class1_self_engagement_precondition_fail(self):
         """Class 1: trajectory absent → self-engagement precondition FAIL."""
@@ -121,7 +116,6 @@ class TestSelfEngagement:
         assert result.name == "self_engagement"
         assert result.passed is False  # Precondition fail
         assert result.raw_data.get("precondition") == "fail"
-
 
 class TestProvenanceConstraint:
     def test_complete_log_passes(self):
@@ -155,7 +149,6 @@ class TestProvenanceConstraint:
 
         result = check_provenance(system, prov)
         assert result.passed is False
-
 
 class TestBatteryRunner:
     def test_full_battery_class1_fails(self):
@@ -311,7 +304,6 @@ class TestBatteryRunner:
         assert "generativity" in cls
         # Class 1 generativity should be absent (neither trained nor fresh passes)
         assert cls["generativity"] == "absent"
-
 
 class TestBaselineProtocol:
     """Tests for the fresh-system baseline protocol.
@@ -473,7 +465,6 @@ class TestBaselineProtocol:
         assert cls["generativity"] in ("absent", "anomalous", "received"), (
             f"3C generativity should be absent/anomalous/received after learning freeze, got {cls['generativity']}"
         )
-
 
 class TestResetDiscrimination:
     """Tests for the reset discrimination diagnostic (§6.7)."""

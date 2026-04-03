@@ -19,7 +19,6 @@ GREEN_DIM = "#1a5028"
 GREEN_GLOW = "#90ffa0"
 BG = "#06060f"
 
-
 def community_positions(graph_data, width=12.5, height=6.8):
     """3x2 grid communities, grid nodes within. Returns {nid: [x, y, 0]}."""
     comms = {}
@@ -49,7 +48,6 @@ def community_positions(graph_data, width=12.5, height=6.8):
                 0,
             ]
     return positions
-
 
 def get_meaningful_events(traversal, positions):
     """Extract events where new nodes/edges appear. Group into waves."""
@@ -93,7 +91,6 @@ def get_meaningful_events(traversal, positions):
         waves.append({"nodes": wave_nodes, "edges": wave_edges, "current": last_current})
 
     return waves
-
 
 class GrowingGraph3B(Scene):
     def construct(self):

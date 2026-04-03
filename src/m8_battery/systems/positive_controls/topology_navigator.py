@@ -25,13 +25,10 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 def _log(msg: str) -> None:
     print(f"[topo_nav] {msg}", file=sys.stderr, flush=True)
 
-
 N_FEATURES = 4  # degree, clustering, avg_neighbour_degree, community_edge_ratio
-
 
 def _compute_node_features(graph: nx.DiGraph, node: int) -> np.ndarray:
     """Compute topology features for a node.
@@ -82,7 +79,6 @@ def _compute_node_features(graph: nx.DiGraph, node: int) -> np.ndarray:
         f_cross = 0.0
 
     return np.array([f_degree, f_clustering, f_avg_nb_deg, f_cross], dtype=np.float64)
-
 
 class TopologyNavigator(TestSystem):
     """Topology-aware navigator with learned MLP (Positive Control 2).

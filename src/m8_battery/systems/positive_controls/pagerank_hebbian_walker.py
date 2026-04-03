@@ -24,9 +24,7 @@ Published precedent:
 - PageRank: Brin & Page (1998)
 - Hebbian learning: Hebb (1949)
 - ACO: Dorigo et al. (1992)
-Zero moat exposure.
-
-Design decision: pc-se-redesign-decision-integration-note-2026-03-30.md
+Published precedent only — no novel theoretical exposure.
 """
 
 from __future__ import annotations
@@ -38,7 +36,6 @@ import networkx as nx
 import numpy as np
 
 from m8_battery.core.test_system import TestSystem
-
 
 class PageRankHebbianWalker(TestSystem):
     """Hebbian graph walker with PageRank-biased traversal (PC-INT).
@@ -317,7 +314,7 @@ class PageRankHebbianWalker(TestSystem):
         return new
 
     def boost(self, region_id: str) -> TestSystem:
-        """Strengthen edge weights in target community (T1-01f decoy)."""
+        """Strengthen edge weights in target community (decoy)."""
         new = self._clone_internal()
         community_id = int(region_id.replace("community_", ""))
         community_nodes = {n for n, c in new._node_to_community.items() if c == community_id}

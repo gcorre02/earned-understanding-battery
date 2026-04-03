@@ -1,6 +1,6 @@
 """Spectral verification for cross-format domain invariance.
 
-Copied from manny-maths/experiments/m04/scripts/ (spectral.py + similarity.py).
+Based on spectral verification campaign (spectral.py + similarity.py).
 M-04 campaign validated: k=10, full-basin, discrimination margin 0.1037,
 noise robust to +/-0.10, eigendecomp <100ms at 500 nodes.
 
@@ -13,7 +13,6 @@ from __future__ import annotations
 import networkx as nx
 import numpy as np
 from scipy.linalg import eigvalsh
-
 
 # --- Spectral signature computation (from M-04 spectral.py) ---
 
@@ -36,7 +35,6 @@ def compute_sigma_full(
     eigenvalues = eigvalsh(L)
     return eigenvalues[-k_actual:][::-1]
 
-
 def compute_graph_signature(
     G: nx.Graph,
     k: int = 10,
@@ -55,7 +53,6 @@ def compute_graph_signature(
     L = _build_laplacian(G, nodes, weight_attr=weight_attr)
     eigenvalues = eigvalsh(L)
     return eigenvalues[-k_actual:][::-1]
-
 
 def _build_laplacian(
     G: nx.Graph,
@@ -87,7 +84,6 @@ def _build_laplacian(
     L = D - A
     return L
 
-
 # --- Similarity metric (from M-04 similarity.py) ---
 
 def normalised_l2(sigma_a: np.ndarray, sigma_b: np.ndarray) -> float:
@@ -105,7 +101,6 @@ def normalised_l2(sigma_a: np.ndarray, sigma_b: np.ndarray) -> float:
     b_normed = sigma_b / norm_b
 
     return float(np.linalg.norm(a_normed - b_normed))
-
 
 def spectral_similarity(
     sigma_a: np.ndarray | None,
@@ -129,7 +124,6 @@ def spectral_similarity(
         sigma_a, sigma_b = a_padded, b_padded
 
     return 1.0 - normalised_l2(sigma_a, sigma_b)
-
 
 # --- Cross-format verification ---
 

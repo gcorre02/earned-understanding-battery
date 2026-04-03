@@ -7,7 +7,6 @@ from dataclasses import dataclass
 import networkx as nx
 import numpy as np
 
-
 @dataclass
 class GraphDomain:
     """A domain encoded as native graph structures."""
@@ -15,7 +14,6 @@ class GraphDomain:
     node_features: np.ndarray  # (n_nodes, n_features)
     node_labels: list[str]
     edge_types: list[str]  # unique edge type labels
-
 
 def encode_graph(G: nx.DiGraph) -> GraphDomain:
     """Encode a generated SBM graph as a GraphDomain.

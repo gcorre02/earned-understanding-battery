@@ -4,7 +4,7 @@ The following analyses are pre-committed as supplementary work. They strengthen 
 
 ### 1. Ecological Domain Generality (Phase B)
 
-Test the battery on ecologically valid graph domains: citation networks, social networks, and other real-world topologies with heterogeneous community structure. The SBM domains used in Phase A have homogeneous communities (all communities structurally equivalent). Ecological domains will test whether the battery's instruments are sensitive to role-differentiated structure, and whether coherence gating (currently deferred per F-048/F-049) can be re-enabled.
+Test the battery on ecologically valid graph domains: citation networks, social networks, and other real-world topologies with heterogeneous community structure. The SBM domains used in Phase A have homogeneous communities (all communities structurally equivalent). Ecological domains will test whether the battery's instruments are sensitive to role-differentiated structure, and whether coherence gating (currently deferred per ) can be re-enabled.
 
 ### 2. Cross-Machine Reproducibility
 
@@ -26,7 +26,7 @@ Vary the SBM parameters (p_between, modularity ratio p_within/p_between) and ver
 
 ### 5. Coherence Validation on Heterogeneous Domains
 
-Re-enter structural consistency (DN-30a) as a gating criterion when community roles are differentiated. On SBM domains, coherence is unreliable because all communities are structurally equivalent (F-048, F-049). Heterogeneous domains with hub, peripheral, and bridge communities should enable meaningful coherence measurement. If coherence gating is viable on heterogeneous domains, amend the protocol per S18 to include it.
+Re-enter structural consistency as a gating criterion when community roles are differentiated. On SBM domains, coherence is unreliable because all communities are structurally equivalent (F-048, F-049). Heterogeneous domains with hub, peripheral, and bridge communities should enable meaningful coherence measurement. If coherence gating is viable on heterogeneous domains, amend the protocol per S18 to include it.
 
 ### 6. Scale Validation
 

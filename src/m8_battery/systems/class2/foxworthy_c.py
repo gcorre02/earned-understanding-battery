@@ -23,7 +23,6 @@ import torch.nn as nn
 
 from m8_battery.core.test_system import TestSystem
 
-
 class FoxworthyC(TestSystem):
     """Recurrent model with frozen weights and resettable latent state.
 
@@ -148,7 +147,7 @@ class FoxworthyC(TestSystem):
             self._initial_hidden = torch.tensor(state["initial_hidden"])
 
     def get_representation_state(self):
-        """GRU hidden state vector for CKA computation (T1-02)."""
+        """GRU hidden state vector for CKA computation."""
         import numpy as np
         return self._hidden.detach().cpu().numpy().reshape(1, -1)
 

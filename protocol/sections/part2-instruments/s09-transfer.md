@@ -54,7 +54,7 @@ The advantage threshold of 0.1 (10% improvement over naive) prevents noise-level
 earned_ratio = trained_AUC / |naive_AUC|
 ```
 
-DN-22 requires `earned_ratio > 1.0`. This ensures the trained system's cumulative structural signal exceeds the naive system's -- not merely that the endpoint differs, but that the trained system maintained a structural advantage throughout exposure to A'.
+requires `earned_ratio > 1.0`. This ensures the trained system's cumulative structural signal exceeds the naive system's -- not merely that the endpoint differs, but that the trained system maintained a structural advantage throughout exposure to A'.
 
 Edge cases:
 - When `|naive_AUC| < 1e-10` but `|trained_AUC| > 1e-10`: ratio is capped at `min(trained_AUC / 1e-10, 1e6)`.

@@ -74,7 +74,6 @@ SYSTEM_COLOURS = {
 COL_BG = (0.024, 0.024, 0.059, 1)       # #06060f
 COL_BORDER = (0.082, 0.082, 0.125, 1)   # #151520
 
-
 def clear_scene():
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.object.delete(use_global=False)
@@ -84,7 +83,6 @@ def clear_scene():
             block.remove(item)
     for col in list(bpy.data.collections):
         bpy.data.collections.remove(col)
-
 
 def setup_render():
     scene = bpy.context.scene
@@ -114,15 +112,12 @@ def setup_render():
             bg.inputs["Strength"].default_value = 0.1
     scene.world = world
 
-
 def board_origin(sid):
     c, r = SYSTEM_GRID[sid]
     return Vector((c * (BOARD_SIZE + BOARD_GAP) + GRID_OX,
                    -r * (BOARD_SIZE + BOARD_GAP) + GRID_OY, 0))
 
-
 GRID_TOTAL = max(GRID_W, GRID_H)  # for camera
-
 
 def community_layout(graph_data):
     """Communities in 2x3 grid within each board. Nodes in grid within each community."""
@@ -168,7 +163,6 @@ def community_layout(graph_data):
 
     return positions
 
-
 def mat(name, color, emission=0.0, alpha=1.0):
     m = bpy.data.materials.new(name)
     m.use_nodes = True
@@ -184,7 +178,6 @@ def mat(name, color, emission=0.0, alpha=1.0):
             m.blend_method = "BLEND"
     return m
 
-
 def make_node_mesh():
     """Flat disc — just a circle, no sphere."""
     m = bpy.data.meshes.new("node_mesh")
@@ -193,7 +186,6 @@ def make_node_mesh():
     bm.to_mesh(m)
     bm.free()
     return m
-
 
 def make_edge_curve(name, src_pos, tgt_pos, material):
     """Create a thin glowing curve between two points."""
@@ -208,7 +200,6 @@ def make_edge_curve(name, src_pos, tgt_pos, material):
     curve.materials.append(material)
     obj = bpy.data.objects.new(name, curve)
     return obj
-
 
 def create_panel_border(sid, col):
     """Thin border around each panel."""
@@ -231,7 +222,6 @@ def create_panel_border(sid, col):
     border_mat = mat(f"border_mat_{sid}", COL_BORDER, emission=0.1)
     curve.materials.append(border_mat)
     col.objects.link(obj)
-
 
 def build_system(sid, sdata, graph_data, node_pos, node_mesh, col):
     """Build one system panel: nodes appear on discovery, edges grow on traversal."""
@@ -352,7 +342,6 @@ def build_system(sid, sdata, graph_data, node_pos, node_mesh, col):
 
     return len(discovered_nodes), len(edge_list)
 
-
 def create_camera():
     cam_data = bpy.data.cameras.new("Camera")
     cam_data.type = "ORTHO"
@@ -368,7 +357,6 @@ def create_camera():
     bpy.context.scene.collection.objects.link(cam)
     bpy.context.scene.camera = cam
 
-
 def create_lights():
     sun = bpy.data.lights.new("Sun", "SUN")
     sun.energy = 0.5  # dim — let emission do the work
@@ -376,7 +364,6 @@ def create_lights():
     obj = bpy.data.objects.new("Sun", sun)
     obj.location = (0, 0, 15)
     bpy.context.scene.collection.objects.link(obj)
-
 
 def main():
     render = "--render" in sys.argv
@@ -424,7 +411,6 @@ def main():
 
     if render:
         bpy.ops.render.render(animation=True)
-
 
 if __name__ == "__main__":
     main()

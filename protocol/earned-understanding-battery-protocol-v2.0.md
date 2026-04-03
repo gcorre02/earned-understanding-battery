@@ -610,7 +610,7 @@ Recalibration data, medium scale (150 nodes), three seeds per system. PC-INT res
 
 **Status:** FROZEN
 **Date:** 2026-03-21
-**Commit:** ab507d7
+**Commit:** 72c9f6d
 **Instrument:** Generativity (structural transfer to novel domains)
 
 ---
@@ -857,7 +857,7 @@ This limitation is intrinsic to the SBM domain family, not to the instrument. Co
 
 ### 8.13. Calibrated Noise Floors
 
-All floors computed from 50 null pairs per cell. Bootstrap CIs from 10,000 resamples. Source data at commit ab507d7.
+All floors computed from 50 null pairs per cell. Bootstrap CIs from 10,000 resamples. Source data at commit 72c9f6d.
 
 ### Transition JSD Noise Floors (Primary Metric)
 
@@ -935,9 +935,9 @@ The following design choices were made during instrument development. Each is do
 | Item | Value |
 |------|-------|
 | Protocol version | 2.0 |
-| Frozen at commit | ab507d7 |
+| Frozen at commit | 72c9f6d |
 | Freeze date | 2026-03-21 |
-| Data commit | ab507d7 |
+| Data commit | 72c9f6d |
 | Author | Guilherme C. T. Ribeiro |
 
 This protocol is frozen as of the date and commit above. No modifications may be made without a documented amendment following this procedure:
@@ -1615,9 +1615,9 @@ This protocol is frozen. No modifications may be made without a documented amend
 | Item | Value |
 |------|-------|
 | Protocol version | 2.0 |
-| Frozen at commit | ab507d7 |
+| Frozen at commit | 72c9f6d |
 | Freeze date | 2026-03-21 |
-| Data commit | ab507d7 |
+| Data commit | 72c9f6d |
 | Author | Guilherme C. T. Ribeiro |
 
 ### Governance Principles

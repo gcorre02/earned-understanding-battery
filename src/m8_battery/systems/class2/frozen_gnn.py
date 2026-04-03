@@ -22,7 +22,6 @@ import torch.nn.functional as F
 
 from m8_battery.core.test_system import TestSystem
 
-
 class FrozenGAT(TestSystem):
     """Frozen Graph Attention Network for graph navigation.
 

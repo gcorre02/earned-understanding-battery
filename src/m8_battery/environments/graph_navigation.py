@@ -14,7 +14,6 @@ import networkx as nx
 import numpy as np
 from gymnasium import spaces
 
-
 class GraphNavigationEnv(gym.Env):
     """Graph navigation environment for RL agents.
 

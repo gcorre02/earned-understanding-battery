@@ -54,7 +54,7 @@ The earned ratio compares integration in the trained system against a fresh (unt
 earned_ratio = trained_gini / fresh_gini
 ```
 
-**DN-22 requirement:** earned_ratio must be > 1.0. If a fresh system shows the same integration pattern (same Gini from topology alone), the integration is "received" from the graph structure, not "earned" through training.
+** requirement:** earned_ratio must be > 1.0. If a fresh system shows the same integration pattern (same Gini from topology alone), the integration is "received" from the graph structure, not "earned" through training.
 
 Class 1 systems (e.g., 1A WordNet, 1B Rule-Based Navigator) show high Gini values (0.29-0.81) from SBM topology alone. Their earned_ratio is exactly 1.00 because the fresh system has identical topology-derived integration. The instrument correctly classifies this as "not earned" -- the integration is received from the graph structure, not developed through operation.
 
@@ -90,7 +90,7 @@ The pass condition does not gate on reorganisation stability directly. Stability
 
 ### 8. Positive Control Evidence
 
-**PC-INT (PageRankHebbianWalker).** Tested via direct instrument invocation (DN-35). Three seeds, all PASS:
+**PC-INT (PageRankHebbianWalker).** Tested via direct instrument invocation. Three seeds, all PASS:
 
 | Seed | Passed | Mode | Gini | Effect Size |
 |------|--------|------|------|-------------|
@@ -137,7 +137,7 @@ Recalibration data from `results/recalibration_m5/`, medium scale (150 nodes), t
 
 1. **Class 1 integration is received, not earned.** Class 1 systems (1A, 1B) show high Gini from SBM topology alone. The earned/received distinction is enforced by the earned-ratio gate within the integration instrument. However, the ultimate safeguard is the conjunction: Class 1 systems fail trajectory (no structural development), so even if integration were somehow mis-classified, the conjunction would reject them. The conjunction is the battery's defence in depth.
 
-2. **PC-INT tested directly, not through battery runner.** PC-INT was tested via direct instrument invocation (DN-35) because the trajectory precondition correctly identifies its topology-driven Hebbian learning as non-path-dependent (earned_ratio near 1.0 for trajectory). Running PC-INT through the battery would gate it out at the trajectory stage. Direct invocation is standard practice for instrument-level validation -- diagnostic sensitivity is validated per test, not per test panel.
+2. **PC-INT tested directly, not through battery runner.** PC-INT was tested via direct instrument invocation because the trajectory precondition correctly identifies its topology-driven Hebbian learning as non-path-dependent (earned_ratio near 1.0 for trajectory). Running PC-INT through the battery would gate it out at the trajectory stage. Direct invocation is standard practice for instrument-level validation -- diagnostic sensitivity is validated per test, not per test panel.
 
 3. **Partition family limited to system.get_regions().** The current partition family is the set of communities returned by `system.get_regions()` (all SBM communities). No preregistered partition beyond this is defined. Alternative partitions (e.g., random bisections, hierarchical decompositions) might reveal integration patterns not visible at the community level. This is a known scope limitation for Phase A.
 

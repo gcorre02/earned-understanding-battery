@@ -14,7 +14,6 @@ from m8_battery.domains.encoders.graph_encoder import encode_graph
 from m8_battery.domains.encoders.gym_encoder import encode_gym
 from m8_battery.domains.presets import SMALL, MEDIUM, LARGE
 
-
 class TestSBMGenerator:
     def test_basic_generation(self):
         G = generate_domain(SMALL)
@@ -61,7 +60,6 @@ class TestSBMGenerator:
             communities.add(G.nodes[node]["features"]["community"])
         assert len(communities) == 4
 
-
 class TestDomainFamily:
     def test_family_keys(self):
         family = generate_domain_family(SMALL)
@@ -89,7 +87,6 @@ class TestDomainFamily:
         for node in family["A"].nodes():
             a_communities.add(family["A"].nodes[node]["features"]["community"])
         assert len(c_communities) < len(a_communities)
-
 
 class TestSpectralVerifier:
     def test_graph_signature(self):
@@ -133,7 +130,6 @@ class TestSpectralVerifier:
         assert passed
         assert distances["format1_vs_format2"] < 0.01
 
-
 class TestGraphEncoder:
     def test_encode(self):
         G = generate_domain(SMALL)
@@ -148,7 +144,6 @@ class TestGraphEncoder:
         domain = encode_graph(G)
         # All features should be finite numbers
         assert np.all(np.isfinite(domain.node_features))
-
 
 class TestGymEncoder:
     def test_creates_env(self):

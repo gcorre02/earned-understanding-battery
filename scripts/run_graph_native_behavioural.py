@@ -32,7 +32,6 @@ from m8_battery.systems.class2.frozen_gnn import FrozenGAT
 from m8_battery.systems.class3.dqn_agent import DQNAgent
 from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
 
-
 SCALES_BASE = [
     ("SMALL", 50, 4),
     ("MEDIUM", 150, 6),
@@ -51,7 +50,6 @@ N_STEPS = 50
 P_INTRA = 0.3
 P_INTER = 0.01
 
-
 def visit_entropy(trace: BehaviourTrace) -> float:
     if not trace.visit_distribution:
         return 0.0
@@ -64,7 +62,6 @@ def visit_entropy(trace: BehaviourTrace) -> float:
         if p > 0:
             ent -= p * log2(p)
     return ent
-
 
 def make_system(system_id, graph, seed):
     """Create a system instance attached to a graph."""
@@ -91,7 +88,6 @@ def make_system(system_id, graph, seed):
         return sys
     else:
         raise ValueError(f"Unknown system: {system_id}")
-
 
 def run_single(system_id, scale_name, n_nodes, n_communities, seed):
     """Run a single behavioural generativity test."""
@@ -195,7 +191,6 @@ def run_single(system_id, scale_name, n_nodes, n_communities, seed):
         },
     }
 
-
 def main():
     all_results = []
     systems = ["1A", "1B", "1C", "2A", "2B", "3A", "3B"]
@@ -287,7 +282,6 @@ def main():
             majority = max(set(classes), key=classes.count)
             n_nodes = runs[0]["n_nodes"]
             print(f"{system_id:6s} {scale_name:8s} {n_nodes:4d} {mean_js:8.4f} {majority:>15s}")
-
 
 if __name__ == "__main__":
     main()

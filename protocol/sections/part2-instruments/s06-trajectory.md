@@ -54,9 +54,9 @@ earned_ratio = metric_range(trained) / metric_range(fresh)
 
 where `metric_range = max(trajectory) - min(trajectory)`.
 
-**DN-22 requirement:** earned_ratio must be > 1.0. If a fresh system shows the same trajectory magnitude, the structural development is architectural (topology-driven), not earned through interaction.
+** requirement:** earned_ratio must be > 1.0. If a fresh system shows the same trajectory magnitude, the structural development is architectural (topology-driven), not earned through interaction.
 
-**DN-36 observation:** Topology-driven Hebbian walkers (e.g., HEB) correctly show earned_ratio >> 1.0 when tested through the battery (trained on domain A, fresh never exposed). However, when tested via direct instrument invocation with identical input sequences, systems whose learning is purely topology-driven show earned_ratio near 1.0 because the fresh system develops the same trajectory from the same topology. This is correct behaviour: the earned ratio correctly identifies that the trajectory is not path-dependent. PC-SE and PC-INT are tested via direct invocation precisely because the trajectory precondition correctly gates them.
+** observation:** Topology-driven Hebbian walkers (e.g., HEB) correctly show earned_ratio >> 1.0 when tested through the battery (trained on domain A, fresh never exposed). However, when tested via direct instrument invocation with identical input sequences, systems whose learning is purely topology-driven show earned_ratio near 1.0 because the fresh system develops the same trajectory from the same topology. This is correct behaviour: the earned ratio correctly identifies that the trajectory is not path-dependent. PC-SE and PC-INT are tested via direct invocation precisely because the trajectory precondition correctly gates them.
 
 ---
 
@@ -100,7 +100,7 @@ STDP shows consistent developmental trajectory across all seeds with earned rati
 
 **Foxworthy Variant F (3C) training phase.** During training, 3C shows adapter norm increase (+7 adapter norm), confirming that structural change occurs during training. However, the battery-measured trajectory is ambiguous (R-squared=0.37, monotonicity=0.50) because the structure metric does not capture adapter-space changes with sufficient resolution.
 
-**DN-36 validation.** Trajectory correctly detects path-dependent development (STDP, HEB in battery mode) and correctly identifies non-path-dependent development when systems are tested via direct invocation with identical inputs.
+** validation.** Trajectory correctly detects path-dependent development (STDP, HEB in battery mode) and correctly identifies non-path-dependent development when systems are tested via direct invocation with identical inputs.
 
 ---
 
@@ -130,7 +130,7 @@ Recalibration data from `results/recalibration_m5/`, medium scale (150 nodes), t
 
 ### 10. Known Limitations
 
-1. **DN-36 observation: topology-driven walkers.** Topology-driven Hebbian walkers show earned_ratio near 1.0 when tested via direct instrument invocation with identical input sequences. This is correct behaviour -- the trajectory is not path-dependent -- not an instrument flaw. The battery-mode earned ratio is higher because trained vs fresh systems receive different histories (trained on domain A, fresh never exposed).
+1. ** observation: topology-driven walkers.** Topology-driven Hebbian walkers show earned_ratio near 1.0 when tested via direct instrument invocation with identical input sequences. This is correct behaviour -- the trajectory is not path-dependent -- not an instrument flaw. The battery-mode earned ratio is higher because trained vs fresh systems receive different histories (trained on domain A, fresh never exposed).
 
 2. **Input count.** The default 50 `domain_a_inputs` may be insufficient for slow learners. Systems that require hundreds or thousands of training steps to develop structure may show flat trajectories within the 50-step measurement window. Mitigation: system-specific training protocols can provide longer input sequences; the instrument accepts arbitrary-length input lists.
 

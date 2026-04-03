@@ -28,7 +28,6 @@ import torch.nn as nn
 from m8_battery.core.test_system import TestSystem
 from m8_battery.environments.graph_navigation import GraphNavigationEnv
 
-
 class RNDRewardWrapper(gym.Wrapper):
     """Adds RND intrinsic reward to a Gymnasium environment.
 
@@ -98,7 +97,6 @@ class RNDRewardWrapper(gym.Wrapper):
         info["rnd_loss"] = float(loss.item()) if self.training_enabled else 0.0
 
         return obs, total_reward, terminated, truncated, info
-
 
 class CuriosityAgent(TestSystem):
     """RND-driven curiosity agent on GraphNavigationEnv.

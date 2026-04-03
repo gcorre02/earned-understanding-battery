@@ -14,7 +14,6 @@ import sys
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-
 def _log(msg: str) -> None:
     """Log battery progress to stderr (visible during long runs)."""
     print(f"[battery] {msg}", file=sys.stderr, flush=True)
@@ -30,7 +29,6 @@ from m8_battery.instruments.generativity import run_generativity
 from m8_battery.instruments.transfer import run_transfer
 from m8_battery.instruments.self_engagement import run_self_engagement
 from m8_battery.instruments.provenance_constraint import check_provenance
-
 
 @dataclass
 class BatteryConfig:
@@ -50,7 +48,6 @@ class BatteryConfig:
 
     # Region partitions for integration (None = use system default)
     partition_families: list[list[str]] | None = None
-
 
 def run_reset_discrimination(
     system: TestSystem,
@@ -96,7 +93,6 @@ def run_reset_discrimination(
         "regrowth_rate": regrowth_rate,
     }
 
-
 def _collect_baseline(
     system: TestSystem,
     control_factory: Callable[[], TestSystem] | None = None,
@@ -135,7 +131,6 @@ def _collect_baseline(
         "fresh_distribution": fresh_distribution,
         "post_training_distribution": post_training_distribution,
     }
-
 
 def _run_baseline_instruments(
     control_factory: Callable[[], TestSystem] | None,
@@ -208,7 +203,7 @@ def _run_baseline_instruments(
     except Exception:
         baseline_results["transfer"] = {"passed": None, "effect_size": None}
 
-    # Self-engagement (DN-20: fresh system has no trajectory → precondition fail)
+    # Self-engagement (fresh system has no trajectory → precondition fail)
     try:
         se = run_self_engagement(
             system=fresh, wander_steps=config.wander_steps,
@@ -223,7 +218,6 @@ def _run_baseline_instruments(
         baseline_results["self_engagement"] = {"passed": None, "effect_size": None}
 
     return baseline_results
-
 
 def _classify_instruments(
     trained_results: dict[str, InstrumentResult],
@@ -245,7 +239,6 @@ def _classify_instruments(
         else:
             classifications[name] = "unknown"
     return classifications
-
 
 def run_battery(
     system: TestSystem,
@@ -292,7 +285,7 @@ def run_battery(
     _log(f"  baseline: {timings['baseline']:.1f}s")
 
     # --- Phase 1: Train on domain A + measure developmental trajectory ---
-    # T1-02: Collect early representation snapshot for CKA
+    # Collect early representation snapshot for CKA
     early_repr = system.get_representation_state()
 
     _log("Phase 1: developmental trajectory")
@@ -307,7 +300,7 @@ def run_battery(
     timings["developmental_trajectory"] = _time.monotonic() - t0
     _log(f"  dev_trajectory: {timings['developmental_trajectory']:.1f}s passed={results['developmental_trajectory'].passed}")
 
-    # T1-02: Collect late representation snapshot and compute CKA
+    # Collect late representation snapshot and compute CKA
     late_repr = system.get_representation_state()
     if early_repr is not None and late_repr is not None:
         from m8_battery.analysis.cka import linear_cka, snapshot_hash
@@ -389,7 +382,7 @@ def run_battery(
         }
         _log(f"  integration earned ratio: {earned_ratio:.4f}")
 
-        # DN-22: Wire earned ratio into pass condition. If integration passed
+        # Wire earned ratio into pass condition. If integration passed
         # but earned ratio <= 1.0, the signal is received (topology), not earned.
         integ_result = results["integration"]
         if integ_result.passed and earned_ratio <= 1.0:
@@ -398,7 +391,7 @@ def run_battery(
                 passed=False,
                 effect_size=integ_result.effect_size,
                 raw_data={**(integ_result.raw_data or {}), "earned_ratio": earned_ratio},
-                notes=(f"Integration present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
+                notes=(f"Integration present but not earned: earned_ratio={earned_ratio:.2f}. "
                        f"Fresh system shows similar reorganisation. {integ_result.notes}"),
             )
             _log(f"  integration DOWNGRADED: earned_ratio={earned_ratio:.2f} <= 1.0")
@@ -406,7 +399,7 @@ def run_battery(
             integ_result.raw_data["earned_ratio"] = earned_ratio
 
     # --- Phase 3: Generativity (novel domain B) ---
-    # T1-03: Freeze learning during measurement. Generativity measures structural
+    # Freeze learning during measurement. Generativity measures structural
     # influence from domain A, not online adaptation on domain B.
     system.set_training(False)
     _log("Phase 3: generativity (learning FROZEN)")
@@ -516,16 +509,16 @@ def run_battery(
     # --- Phase 8: Baseline instruments (all 5 on fresh system) ---
     skip_label = "SKIP (Class 1)" if system_class == SystemClass.CLASS_1 else "running"
     _log(f"Phase 8: baseline instruments ({skip_label})")
-    # Option C (F-020): For Class 1 static systems, the baseline IS the trained
+    # Option C: For Class 1 static systems, the baseline IS the trained
     # system — no training occurs, fresh = trained. Skip redundant instrument runs
     # and use trained results directly. Baseline result = trained result, explicitly
-    # recorded (not omitted). See F-020 governance.
+    # recorded (not omitted). See governance documentation.
     t0 = _time.monotonic()
     instrument_results_for_classify = {
         k: v for k, v in results.items() if k != "provenance_constraint"
     }
     if system_class == SystemClass.CLASS_1:
-        # Baseline skip for static systems — see F-020 governance.
+        # Baseline skip for static systems — see governance documentation.
         # Fresh = trained for Class 1 (no learning). Record trained results
         # as baseline to maintain identical output format.
         baseline_instrument_results = {

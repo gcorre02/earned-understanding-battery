@@ -18,13 +18,11 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 class NavigationStrategy(Enum):
     """Fixed navigation strategies — no learning involved."""
     GREEDY = "greedy"              # Always follow highest-weight edge
     SHORTEST_PATH = "shortest_path"  # Pre-computed shortest path to target
     RANDOM_FIXED = "random_fixed"    # Pseudo-random walk with fixed seed
-
 
 class RuleBasedNavigator(TestSystem):
     """Rule-based graph navigator with deterministic strategies.

@@ -5,8 +5,7 @@ This is what Paper 1 defines as generativity: "coherent responses in unseen
 but structurally related domains, consistent with the system's consolidated
 organisation."
 
-The structural-metric instrument has a confound for pre-trained components
-(DN-18). This behavioural test measures what the system DOES, not what a
+The structural-metric instrument has a confound for pre-trained components. This behavioural test measures what the system DOES, not what a
 number does.
 
 Usage:
@@ -32,7 +31,6 @@ from m8_battery.core.test_system import TestSystem
 from m8_battery.core.types import DomainConfig
 from m8_battery.domains.sbm_generator import generate_domain
 
-
 @dataclass
 class BehaviourTrace:
     """Raw behavioural trace from operating a system on a domain."""
@@ -45,7 +43,6 @@ class BehaviourTrace:
     unique_edges: int = 0
     outputs: list[dict] = field(default_factory=list)
 
-
 @dataclass
 class DivergenceResult:
     """Behavioural divergence between fresh and trained systems."""
@@ -54,7 +51,6 @@ class DivergenceResult:
     path_diversity_delta: float = 0.0
     edge_jaccard: float = 0.0
     sequence_similarity: float = 0.0
-
 
 def generate_paired_domains(
     n_nodes: int,
@@ -82,7 +78,6 @@ def generate_paired_domains(
         seed=200,
     )
     return generate_domain(config_a), generate_domain(config_b)
-
 
 def record_behaviour(
     system: TestSystem,
@@ -130,7 +125,6 @@ def record_behaviour(
 
     return trace
 
-
 def _jensen_shannon_divergence(
     dist_a: dict[Any, int],
     dist_b: dict[Any, int],
@@ -157,7 +151,6 @@ def _jensen_shannon_divergence(
     js = 0.5 * np.sum(p * np.log(p / m)) + 0.5 * np.sum(q * np.log(q / m))
     return float(js)
 
-
 def _jaccard_similarity(set_a: set, set_b: set) -> float:
     """Jaccard similarity between two sets."""
     if not set_a and not set_b:
@@ -165,7 +158,6 @@ def _jaccard_similarity(set_a: set, set_b: set) -> float:
     intersection = len(set_a & set_b)
     union = len(set_a | set_b)
     return intersection / union if union > 0 else 0.0
-
 
 def _normalised_edit_distance(seq_a: list, seq_b: list) -> float:
     """Normalised Levenshtein distance (0 = identical, 1 = completely different)."""
@@ -191,7 +183,6 @@ def _normalised_edit_distance(seq_a: list, seq_b: list) -> float:
     max_len = max(n, m)
     return dp[n][m] / max_len if max_len > 0 else 0.0
 
-
 def compute_behavioural_divergence(
     fresh: BehaviourTrace,
     trained: BehaviourTrace,
@@ -216,7 +207,6 @@ def compute_behavioural_divergence(
         ),
     )
 
-
 def classify_divergence(div: DivergenceResult) -> str:
     """Classify divergence as earned, absent, or ambiguous."""
     if div.visit_js_divergence > 0.1 and div.edge_jaccard < 0.5:
@@ -225,7 +215,6 @@ def classify_divergence(div: DivergenceResult) -> str:
         return "absent"
     else:
         return "ambiguous"
-
 
 def run_behavioural_generativity(
     system_factory: Callable[[int], TestSystem],

@@ -18,13 +18,13 @@ for understanding-as-earned-structure:
 
 Plus **provenance** as an epistemic condition (see Section 5).
 
-The battery is a **Class 4 detector**, not a spectrum classifier (DN-26). It
+The battery is a **Class 4 detector**, not a spectrum classifier. It
 answers exactly one question: does the candidate satisfy all five necessary
 properties under the provenance constraint? It does not grade how much
 understanding a system possesses, nor does it rank candidates against one
 another.
 
-Capability and earning are orthogonal (DN-25). A system can be highly capable
+Capability and earning are orthogonal. A system can be highly capable
 -- producing correct answers, solving complex tasks -- without having earned its
 internal structure. The battery measures earning, not capability.
 

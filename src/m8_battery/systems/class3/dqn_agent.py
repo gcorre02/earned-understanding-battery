@@ -23,7 +23,6 @@ import numpy as np
 from m8_battery.core.test_system import TestSystem
 from m8_battery.environments.graph_navigation import GraphNavigationEnv
 
-
 class DQNAgent(TestSystem):
     """RL agent using MaskablePPO on GraphNavigationEnv.
 

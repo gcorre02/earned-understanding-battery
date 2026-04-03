@@ -1,6 +1,6 @@
 ## 4. Baseline Methodology
 
-### The baseline requirement (DN-22)
+### The baseline requirement
 
 For every instrument in the battery, the trained system must outperform a fresh
 (untrained) system on the same metric. This is the minimum evidential bar: if a

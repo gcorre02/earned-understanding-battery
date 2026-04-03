@@ -53,7 +53,7 @@
 | Review: numbers vs source data | **done** (4 discrepancies found + fixed) |
 | Review: positive control coverage | **done** (all 5 instruments verified) |
 | Fix: transfer earned ratio 41x → ~10x | **done** (commit dfe6ffc) |
-| Fix: remove duplicated DN-33 from §8.16 | **done** |
+| Fix: remove duplicated from §8.16 | **done** |
 | Fix: remove duplicated ROC from §8.17 | **done** |
 | Fix: version tables 1.0 → 2.0 | **done** |
 | **Scrub internal references (DN-/F-/T1-)** | **IN PROGRESS — 53 refs to replace** |
@@ -67,7 +67,7 @@
 
 ---
 
-## Outstanding Work (Pre-OSF, per DN-37)
+## Outstanding Work (Pre-OSF, per )
 
 | # | Task | Status | Blocking? |
 |---|------|--------|-----------|

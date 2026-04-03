@@ -10,7 +10,6 @@ from m8_battery.domains.sbm_generator import generate_domain
 from m8_battery.domains.presets import SMALL
 from m8_battery.systems.class3.foxworthy_f import FoxworthyF
 
-
 def _make_trained_system(n_steps: int = 15) -> tuple:
     """Helper: create and train a Foxworthy F system."""
     G = generate_domain(SMALL)
@@ -20,7 +19,6 @@ def _make_trained_system(n_steps: int = 15) -> tuple:
     for i in range(n_steps):
         system.step(nodes[i % len(nodes)])
     return system, G, nodes
-
 
 class TestFoxworthyCrossValidation:
     """Foxworthy (2026) four persistence diagnostics."""

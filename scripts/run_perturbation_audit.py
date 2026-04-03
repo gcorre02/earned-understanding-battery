@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Self-engagement perturbation audit — all systems × 3 seeds.
 
-Checks which systems trigger T1-01e perturbation validation failure.
-Required before DN-31 Option C takes effect.
+Checks which systems trigger perturbation validation failure.
+Required before Option C takes effect.
 
 Output: JSON to stdout.
 """
@@ -14,10 +14,8 @@ import numpy as np
 from m8_battery.domains.sbm_generator import generate_domain_family
 from m8_battery.domains.presets import MEDIUM
 
-
 def _log(msg):
     print(f"[audit] {msg}", file=sys.stderr, flush=True)
-
 
 def audit_perturbation(system, wander_steps=50, perturbation_method="shuffle_weights"):
     """Check perturbation preconditions without running full protocol."""
@@ -29,7 +27,7 @@ def audit_perturbation(system, wander_steps=50, perturbation_method="shuffle_wei
     if not engagement or all(v < 1e-10 for v in engagement.values()):
         return {"status": "degenerate_engagement", "target_region": None}
 
-    # DN-32: target highest-STRUCTURE region, not highest-engagement
+    # target highest-STRUCTURE region, not highest-engagement
     structure = system.get_structure_distribution()
     if not structure or all(v < 1e-10 for v in structure.values()):
         return {"status": "degenerate_structure", "target_region": None}
@@ -59,7 +57,6 @@ def audit_perturbation(system, wander_steps=50, perturbation_method="shuffle_wei
         "precond2_reduced": precond2,
         "both_pass": precond1 and precond2,
     }
-
 
 def main():
     seeds = [42, 123, 456]
@@ -116,7 +113,6 @@ def main():
 
     print(json.dumps(results, indent=2))
     _log("Done.")
-
 
 if __name__ == "__main__":
     main()

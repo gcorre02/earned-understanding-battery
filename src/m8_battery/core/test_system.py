@@ -5,7 +5,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-
 class TestSystem(ABC):
     """Base class for all systems under test.
 
@@ -79,7 +78,7 @@ class TestSystem(ABC):
         Returns None if not supported (Class 1 static, Class 2 frozen).
         Returns np.ndarray for systems with computable representations.
 
-        Used by T1-02 metric bundle: CKA between early and late snapshots
+        Used by metric bundle: CKA between early and late snapshots
         measures whether internal representations changed during operation.
         """
         return None  # Default: not supported
@@ -87,7 +86,7 @@ class TestSystem(ABC):
     def boost(self, region_id: str) -> TestSystem:
         """Return new system instance with boosted structure in target region.
 
-        Used by T1-01f false-attractor control: after perturbation of the
+        Used by false-attractor control: after perturbation of the
         target region, boost a non-target region to create a decoy attractor.
         If the system reconstructs the ORIGINAL pattern instead of drifting
         to the decoy, that's stronger evidence of earned self-engagement.

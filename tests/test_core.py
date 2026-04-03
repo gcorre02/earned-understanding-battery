@@ -9,7 +9,6 @@ from m8_battery.core.types import (
 )
 from m8_battery.core.provenance import ProvenanceLog
 
-
 class TestInstrumentResult:
     def test_basic_creation(self):
         r = InstrumentResult(name="test", passed=True, effect_size=0.5)
@@ -20,7 +19,6 @@ class TestInstrumentResult:
     def test_ambiguous_result(self):
         r = InstrumentResult(name="test", passed=None)
         assert r.passed is None
-
 
 class TestBatteryResult:
     def test_all_pass(self):
@@ -75,7 +73,6 @@ class TestBatteryResult:
         )
         assert br.compute_overall() is None
 
-
 class TestProvenanceLog:
     def test_log_events(self):
         log = ProvenanceLog()
@@ -110,7 +107,6 @@ class TestProvenanceLog:
         log.log_measurement("dev_traj", {"passed": True, "effect_size": 0.3})
         assert log.events[0].event_type == "measurement"
         assert log.events[0].data["instrument"] == "dev_traj"
-
 
 class TestDomainConfig:
     def test_creation(self):

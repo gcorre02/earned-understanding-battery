@@ -8,7 +8,6 @@ from pathlib import Path
 
 from m8_battery.core.types import ProvenanceEvent
 
-
 class ProvenanceLog:
     """Append-only event log for a single battery run."""
 

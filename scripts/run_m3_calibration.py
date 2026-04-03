@@ -34,7 +34,6 @@ from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
 
 PRESETS = {"small": SMALL, "medium": MEDIUM, "large": LARGE}
 
-
 RESULTS_DIR = Path(__file__).parent.parent / "results" / "calibration"
 
 SYSTEM_NAMES = {
@@ -50,11 +49,9 @@ SYSTEM_CLASSES = {
 SEEDS = [42, 123, 456]
 SYSTEMS = ["2A", "3C"]
 
-
 def _count_communities(graph) -> int:
     return len({graph.nodes[n].get("features", {}).get("community", 0)
                 for n in graph.nodes()})
-
 
 def _get_device() -> str:
     import torch
@@ -63,7 +60,6 @@ def _get_device() -> str:
     elif torch.cuda.is_available():
         return "cuda"
     return "cpu"
-
 
 def make_system(system_id: str, graph, seed: int, n_features: int):
     """Instantiate system. Uses MPS on Apple Silicon, CUDA if available, else CPU."""
@@ -85,20 +81,17 @@ def make_system(system_id: str, graph, seed: int, n_features: int):
     else:
         raise ValueError(f"This script only runs 2A and 3C, got: {system_id}")
 
-
 def _make_llm_control(seed, graph):
     from m8_battery.systems.class2.frozen_llm import FrozenLLM
     s = FrozenLLM(seed=seed, device=_get_device())
     s.set_graph(graph)
     return s
 
-
 def _make_foxworthy_control(seed, graph):
     from m8_battery.systems.class3.foxworthy_f import FoxworthyF
     s = FoxworthyF(seed=seed, device=_get_device(), theta=0.0)
     s.set_graph(graph)
     return s
-
 
 def run_single(system_id: str, seed: int, preset=None, scale_name: str = "medium") -> dict:
     """Run full battery on one system with one seed."""
@@ -191,7 +184,6 @@ def run_single(system_id: str, seed: int, preset=None, scale_name: str = "medium
 
     return result_dict
 
-
 def main():
     import argparse
     parser = argparse.ArgumentParser()
@@ -272,7 +264,6 @@ def main():
     print(f"\nResults in: {RESULTS_DIR}")
     print(f"Summary: {summary_path}")
     print(f"Flag: {flag_path}")
-
 
 if __name__ == "__main__":
     main()

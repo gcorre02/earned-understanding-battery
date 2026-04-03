@@ -33,10 +33,8 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 def _log(msg: str) -> None:
     print(f"[active_inference] {msg}", file=sys.stderr, flush=True)
-
 
 class ActiveInferenceAgent(TestSystem):
     """Active inference agent on discrete SBM graph (System 3E).
@@ -275,7 +273,7 @@ class ActiveInferenceAgent(TestSystem):
         return result
 
     def get_representation_state(self):
-        """pB reshaped for CKA (T1-02). Uses (n_states, n_states*n_actions) layout."""
+        """pB reshaped for CKA. Uses (n_states, n_states*n_actions) layout."""
         return self._pB.reshape(self._n_nodes, -1)
 
     def ablate(self, region_id: str) -> TestSystem:

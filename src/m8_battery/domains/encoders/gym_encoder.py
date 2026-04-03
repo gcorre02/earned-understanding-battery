@@ -6,7 +6,6 @@ import networkx as nx
 
 from m8_battery.environments.graph_navigation import GraphNavigationEnv
 
-
 def encode_gym(
     G: nx.DiGraph,
     n_features: int = 8,

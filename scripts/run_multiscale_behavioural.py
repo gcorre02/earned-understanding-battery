@@ -27,7 +27,6 @@ from m8_battery.analysis.behavioural_generativity import (
 from m8_battery.systems.class3.foxworthy_f import FoxworthyF
 from m8_battery.systems.class2.foxworthy_c import FoxworthyC
 
-
 # Scale ladder
 SCALES = [
     ("XS",   30,  3),
@@ -48,7 +47,6 @@ N_STEPS = 50
 P_INTRA = 0.3
 P_INTER = 0.01
 
-
 def visit_entropy(trace: BehaviourTrace) -> float:
     """Shannon entropy of visit distribution (bits)."""
     if not trace.visit_distribution:
@@ -63,11 +61,9 @@ def visit_entropy(trace: BehaviourTrace) -> float:
             ent -= p * log2(p)
     return ent
 
-
 def top_n_nodes(trace: BehaviourTrace, n: int = 5) -> list[tuple]:
     """Top N most visited nodes."""
     return Counter(trace.nodes_visited).most_common(n)
-
 
 def run_single(system_id, scale_name, n_nodes, n_communities, seed, p_intra, p_inter):
     """Run a single behavioural generativity test with diagnostics."""
@@ -128,7 +124,6 @@ def run_single(system_id, scale_name, n_nodes, n_communities, seed, p_intra, p_i
         },
     }
     return result
-
 
 def main():
     all_results = []
@@ -215,7 +210,6 @@ def main():
             )
 
     print(f"\nTotal time: {sum(r['time_s'] for r in all_results):.0f}s")
-
 
 if __name__ == "__main__":
     main()

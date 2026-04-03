@@ -11,7 +11,6 @@ from m8_battery.domains.domain_verification import (
     check_leakage_channels,
 )
 
-
 class TestStructuralPreservation:
     def test_a_vs_a_prime_preserves_structure(self):
         """A' should preserve community count, node count, spectral signature."""
@@ -38,7 +37,6 @@ class TestStructuralPreservation:
         # C has fewer communities
         assert result["community_match"] == 0.0 or result["spectral_similarity"] < 0.9
 
-
 class TestSurfaceDestruction:
     def test_a_vs_a_prime_labels_destroyed(self):
         """A' should have different labels from A."""
@@ -59,7 +57,6 @@ class TestSurfaceDestruction:
         family = generate_domain_family(SMALL)
         result = verify_surface_destruction(family["A"], family["B"])
         assert result["edge_jaccard"] < 0.3
-
 
 class TestDomainFamily:
     def test_full_verification(self):

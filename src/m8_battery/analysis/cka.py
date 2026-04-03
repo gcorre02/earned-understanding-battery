@@ -8,7 +8,6 @@ import hashlib
 
 import numpy as np
 
-
 def linear_cka(X: np.ndarray, Y: np.ndarray) -> float:
     """Centered Kernel Alignment between two representation matrices.
 
@@ -31,7 +30,6 @@ def linear_cka(X: np.ndarray, Y: np.ndarray) -> float:
     if denom < 1e-10:
         return 0.0
     return float(hsic_xy / denom)
-
 
 def snapshot_hash(matrix: np.ndarray) -> str:
     """SHA256 hash of a numpy array for reproducibility verification."""

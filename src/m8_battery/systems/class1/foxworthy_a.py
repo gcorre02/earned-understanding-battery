@@ -16,7 +16,6 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 class FoxworthyA(TestSystem):
     """Stateless frozen MLP navigator.
 

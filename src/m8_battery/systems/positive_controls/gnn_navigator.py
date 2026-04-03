@@ -23,10 +23,8 @@ import torch.nn.functional as F
 
 from m8_battery.core.test_system import TestSystem
 
-
 def _log(msg: str) -> None:
     print(f"[gnn_nav] {msg}", file=sys.stderr, flush=True)
-
 
 class SimpleGCN(torch.nn.Module):
     """2-layer GCN for node embedding."""
@@ -39,7 +37,6 @@ class SimpleGCN(torch.nn.Module):
     def forward(self, x: torch.Tensor, adj: torch.Tensor) -> torch.Tensor:
         h = F.relu(self.w1(adj @ x))
         return self.w2(adj @ h)
-
 
 def _build_adjacency(graph: nx.DiGraph) -> torch.Tensor:
     """Normalised adjacency matrix from graph."""
@@ -56,7 +53,6 @@ def _build_adjacency(graph: nx.DiGraph) -> torch.Tensor:
     D_inv_sqrt = torch.diag(1.0 / torch.sqrt(A.sum(dim=1).clamp(min=1)))
     return D_inv_sqrt @ A @ D_inv_sqrt
 
-
 def _build_features(graph: nx.DiGraph) -> torch.Tensor:
     """Node feature matrix from graph metadata."""
     nodes = sorted(graph.nodes())
@@ -69,7 +65,6 @@ def _build_features(graph: nx.DiGraph) -> torch.Tensor:
         feat_list.append(vals)
     return torch.tensor(feat_list, dtype=torch.float32)
 
-
 def _build_labels(graph: nx.DiGraph) -> torch.Tensor:
     """Community labels for supervised training."""
     nodes = sorted(graph.nodes())
@@ -79,7 +74,6 @@ def _build_labels(graph: nx.DiGraph) -> torch.Tensor:
         features = data.get("features", {})
         labels.append(features.get("community", data.get("block", 0)))
     return torch.tensor(labels, dtype=torch.long)
-
 
 class GNNNavigator(TestSystem):
     """Frozen GNN navigator (Positive Control 3).

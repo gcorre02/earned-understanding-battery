@@ -30,10 +30,8 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 def _log(msg: str) -> None:
     print(f"[empowerment] {msg}", file=sys.stderr, flush=True)
-
 
 def _build_transition_matrix(graph: nx.DiGraph) -> tuple[np.ndarray, int]:
     """Build transition matrix from graph adjacency.
@@ -61,7 +59,6 @@ def _build_transition_matrix(graph: nx.DiGraph) -> tuple[np.ndarray, int]:
             T[s, i, s] = 1.0
 
     return T, max_deg
-
 
 def _compute_empowerment(T: np.ndarray, n_iterations: int = 100) -> np.ndarray:
     """Blahut-Arimoto channel capacity for each state.
@@ -112,7 +109,6 @@ def _compute_empowerment(T: np.ndarray, n_iterations: int = 100) -> np.ndarray:
         empowerment[s] = max(mi, 0.0)
 
     return empowerment
-
 
 class EmpowermentAgent(TestSystem):
     """Empowerment-maximising agent on discrete SBM graph (System 3D).
@@ -327,7 +323,7 @@ class EmpowermentAgent(TestSystem):
         return result
 
     def get_representation_state(self):
-        """Empowerment landscape for CKA (T1-02)."""
+        """Empowerment landscape for CKA."""
         return self._empowerment.reshape(1, -1)
 
     def ablate(self, region_id: str) -> TestSystem:

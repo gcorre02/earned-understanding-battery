@@ -20,7 +20,6 @@ import torch
 
 from m8_battery.core.test_system import TestSystem
 
-
 class FrozenLLM(TestSystem):
     """Frozen TinyLlama adapter for the Earned Understanding Battery.
 

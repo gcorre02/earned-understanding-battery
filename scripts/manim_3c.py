@@ -25,7 +25,6 @@ BORDER = "#151520"
 MAX_STEPS = 120  # enough to see exploration + some consolidation
 STEP_DURATION = 0.3  # seconds per step
 
-
 def community_layout_2d(graph_data, width=12, height=7):
     """Communities in 3x2 grid, nodes in grid within. Centered at origin."""
     comms = {}
@@ -66,7 +65,6 @@ def community_layout_2d(graph_data, width=12, height=7):
             positions[nid] = (px, py)
 
     return positions
-
 
 class GrowingGraph3C(Scene):
     def construct(self):

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import networkx as nx
 
-
 def encode_neighbourhood(G: nx.DiGraph, node: int, max_neighbours: int = 10) -> str:
     """Encode a node's local neighbourhood as structured text.
 
@@ -40,7 +39,6 @@ def encode_neighbourhood(G: nx.DiGraph, node: int, max_neighbours: int = 10) -> 
             lines.append(f"    -> {s_label} ({etype}, weight={weight:.2f})")
 
     return "\n".join(lines)
-
 
 def encode_domain_as_text(G: nx.DiGraph, max_nodes: int = 50) -> list[str]:
     """Encode an entire domain as a list of text descriptions.

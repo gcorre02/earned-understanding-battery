@@ -16,17 +16,14 @@ ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = ROOT / "results" / "recalibration_m5"
 OUTPUT_CSV = ROOT / "results" / "t109_calibration_data.csv"
 
-
 def extract_earned_ratio(notes: str) -> str:
     """Extract earned_ratio from notes string if present."""
     m = re.search(r"earned_ratio=([\d]+\.[\d]+)", notes)
     return m.group(1) if m else ""
 
-
 def extract_failure_mode(classifications: dict, instrument: str) -> str:
     """Get failure mode from classifications dict."""
     return classifications.get(instrument, "")
-
 
 def main():
     json_files = sorted(glob.glob(str(RESULTS_DIR / "*.json")))
@@ -98,7 +95,6 @@ def main():
     print("  Standard systems: 50 (nodes_b[:50])")
     print("  STDP:             160")
     print("  LLM systems:      20")
-
 
 if __name__ == "__main__":
     main()

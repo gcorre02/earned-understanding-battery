@@ -25,7 +25,6 @@ import torch.nn.functional as F
 
 from m8_battery.core.test_system import TestSystem
 
-
 class FoxworthyF(TestSystem):
     """DistilGPT-2 + LoRA with surprise-gated learning and viability control.
 
@@ -90,7 +89,7 @@ class FoxworthyF(TestSystem):
             maxlen=replay_buffer_size
         )
 
-        # Training mode flag (T1-03: freeze during generativity measurement)
+        # Training mode flag (freeze during generativity measurement)
         self._training = True
 
     def set_training(self, mode: bool) -> None:
@@ -99,7 +98,7 @@ class FoxworthyF(TestSystem):
         When False, surprise-gated learning and consolidation are skipped.
         The system navigates using only existing LoRA adapter weights.
         Used by generativity instrument to measure structural influence
-        without online adaptation (T1-03).
+        without online adaptation.
         """
         self._training = mode
 
@@ -233,7 +232,7 @@ class FoxworthyF(TestSystem):
         exp_arg = max(-500.0, min(500.0, exp_arg))  # clamp to avoid overflow
         gate = 1.0 / (1.0 + math.exp(exp_arg))
 
-        # Surprise-gated learning (frozen when self._training is False — T1-03)
+        # Surprise-gated learning (frozen when self._training is False)
         if self._training and gate > 0.01:
             self._learning_step(context, gate)
 
@@ -458,7 +457,7 @@ class FoxworthyF(TestSystem):
             self._optimizer.load_state_dict(state["optimizer_state"])
 
     def get_representation_state(self):
-        """LoRA adapter weight matrix for CKA computation (T1-02)."""
+        """LoRA adapter weight matrix for CKA computation."""
         if self._model is None:
             return None
         import numpy as np

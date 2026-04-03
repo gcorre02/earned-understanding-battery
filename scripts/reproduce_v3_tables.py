@@ -32,14 +32,11 @@ from m8_battery.instruments.role_utils import classify_all_nodes, compute_role_t
 
 import networkx as nx
 
-
 def _log(msg):
     print(f"[reproduce] {msg}", file=sys.stderr, flush=True)
 
-
 N_STEPS = 500
 SEEDS = [42, 123, 456]
-
 
 def get_community_map(graph):
     return {
@@ -48,7 +45,6 @@ def get_community_map(graph):
         )
         for node in graph.nodes()
     }
-
 
 def navigate_and_record(system, graph, n_steps):
     """Navigate frozen system on graph, return visit sequence."""
@@ -65,7 +61,6 @@ def navigate_and_record(system, graph, n_steps):
             seq.append(int(out))
     return seq
 
-
 def compute_transition_jsd(seq_a, seq_b, graph):
     """Compute transition JSD between two visit sequences."""
     n2c = get_community_map(graph)
@@ -75,7 +70,6 @@ def compute_transition_jsd(seq_a, seq_b, graph):
     T_a = _compute_transition_matrix(seq_a, n2c, nc)
     T_b = _compute_transition_matrix(seq_b, n2c, nc)
     return _transition_jsd(T_a, T_b)
-
 
 def main():
     _log("=== Reproduction Script for v3 Data Package ===")
@@ -218,7 +212,6 @@ def main():
 
     _log("")
     _log("Reproduction complete. Compare tables above to v3 data package.")
-
 
 if __name__ == "__main__":
     main()

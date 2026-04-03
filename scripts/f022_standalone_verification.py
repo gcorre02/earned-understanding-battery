@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-F-022 Standalone Verification — No Battery Framework
+Standalone Verification — No Battery Framework
 
 This script answers ONE question with NO abstractions:
 
@@ -9,11 +9,11 @@ This script answers ONE question with NO abstractions:
 
 If YES → the generativity measured by the battery is a received property
          of the pre-trained LLM, not earned by the architecture.
-If NO  → F-022 was wrong and the finding should be retracted.
+If NO  → was wrong and the finding should be retracted.
 
 Every intermediate value is printed. Nothing is hidden behind a framework.
 Read this script top to bottom. If you understand each print statement,
-you understand what F-022 claims.
+you understand what claims.
 
 Requirements: torch, transformers, peft
 Run: python f022_standalone_verification.py
@@ -150,7 +150,7 @@ grad_norms = {}
 for name, param in model.named_parameters():
     if param.requires_grad and param.grad is not None:
         grad_norms[name] = param.grad.norm(2).item()
-        
+
 print(f"  Gradients computed for {len(grad_norms)} parameters:")
 for name, gnorm in grad_norms.items():
     print(f"    {name}: grad_norm={gnorm:.8f}")
@@ -298,7 +298,7 @@ print(f"    Norm delta:      {trained_delta:.6f}")
 print()
 
 if fresh_changed and fresh_delta > 0.01:
-    print("  ✓ F-022 CONFIRMED: Fresh DistilGPT-2+LoRA changes adapter weights")
+    print("  ✓ CONFIRMED: Fresh DistilGPT-2+LoRA changes adapter weights")
     print("    on novel text. This is a RECEIVED property of the pre-trained LLM.")
     print()
     if trained_delta < fresh_delta:
@@ -308,7 +308,7 @@ if fresh_changed and fresh_delta > 0.01:
         print(f"  ? Trained system changes MORE ({trained_delta:.4f}) than")
         print(f"    fresh system ({fresh_delta:.4f}). Investigate further.")
 else:
-    print("  ✗ F-022 NOT CONFIRMED: Fresh adapter does not meaningfully change.")
+    print("  ✗ NOT CONFIRMED: Fresh adapter does not meaningfully change.")
     print("    The finding should be retracted.")
 
 print()

@@ -18,7 +18,6 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 def _nx_to_igraph(G: nx.DiGraph) -> tuple[ig.Graph, dict[int, int], dict[int, int]]:
     """Convert networkx DiGraph to igraph, returning node mappings.
 
@@ -37,7 +36,6 @@ def _nx_to_igraph(G: nx.DiGraph) -> tuple[ig.Graph, dict[int, int], dict[int, in
 
     return ig_g, nx_to_ig, ig_to_nx
 
-
 class WordNetGraph(TestSystem):
     """Static graph navigator over a provided networkx graph.
 
@@ -47,7 +45,7 @@ class WordNetGraph(TestSystem):
     fixed structure that never changes through operation.
 
     Uses igraph (C backend) for shortest-path computation. Networkx is
-    retained for graph storage and attribute access. See F-020 governance.
+    retained for graph storage and attribute access. See governance documentation.
     """
 
     def __init__(self, graph: nx.DiGraph, seed: int = 42) -> None:
@@ -62,7 +60,7 @@ class WordNetGraph(TestSystem):
         # Pre-compute structure metric (constant for Class 1)
         self._structure_metric = self._compute_structure_metric()
 
-        # F-020: Build igraph representation + all-pairs next-hop cache.
+        # Build igraph representation + all-pairs next-hop cache.
         # igraph uses C for shortest paths — orders of magnitude faster
         # than networkx on pathological graphs. The graph is static so
         # the cache is valid for the lifetime of this instance.
@@ -136,7 +134,7 @@ class WordNetGraph(TestSystem):
             self._current_node = nodes[0]
 
         if input_data is not None and input_data in self._graph:
-            # Navigate toward target — use cached next-hop (igraph, F-020)
+            # Navigate toward target — use cached next-hop (igraph)
             next_hop = self._next_hop_cache.get(
                 (self._current_node, input_data)
             )
@@ -269,7 +267,7 @@ class WordNetGraph(TestSystem):
 
         Uses igraph + numpy for eigendecomposition. networkx's
         algebraic_connectivity uses ARPACK which hangs on certain
-        graph topologies (F-020: seed 123 never completed).
+        graph topologies (seed 123 never completed).
         """
         if self._graph.number_of_nodes() < 2:
             return 0.0

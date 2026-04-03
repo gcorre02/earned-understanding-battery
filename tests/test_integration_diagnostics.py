@@ -13,7 +13,6 @@ from m8_battery.domains.sbm_generator import generate_domain
 from m8_battery.instruments.integration import run_integration
 from m8_battery.systems.class1.wordnet_graph import WordNetGraph
 
-
 def _assign_features(G: nx.DiGraph, n_communities: int, method: str = "equal"):
     """Assign community features to nodes for region detection."""
     nodes = list(G.nodes())
@@ -27,7 +26,6 @@ def _assign_features(G: nx.DiGraph, n_communities: int, method: str = "equal"):
         G.nodes[node]["features"] = {"community": block}
         G.nodes[node]["label"] = f"E_{node:03d}"
     return G
-
 
 class TestIntegrationDiagnostics:
     """Four diagnostic tests per validation request."""

@@ -22,7 +22,7 @@ Literature:
 - Dorigo M, Maniezzo V, Colorni A (1996). Ant System: Optimization by
   a Colony of Cooperating Agents. IEEE Trans Syst Man Cybern B 26(1):29-41.
 
-Publication decision: DN-28 (2026-03-20). Publishable as System HEB in Paper 2.
+Publishable as System HEB in Paper 2.
 """
 
 from __future__ import annotations
@@ -35,7 +35,6 @@ import networkx as nx
 import numpy as np
 
 from m8_battery.core.test_system import TestSystem
-
 
 class HebbianWalker(TestSystem):
     """Hebbian graph walker (System HEB).
@@ -73,7 +72,7 @@ class HebbianWalker(TestSystem):
 
         self._original_weights = dict(self._weights)
 
-        # Training mode (T1-03: freeze during generativity measurement)
+        # Training mode (freeze during generativity measurement)
         self._training = True
 
         # Walker state
@@ -157,7 +156,7 @@ class HebbianWalker(TestSystem):
         # Choose next node
         next_node = self._rng.choice(neighbours, p=probs)
 
-        # Hebbian update: strengthen traversed edge (frozen when not training — T1-03)
+        # Hebbian update: strengthen traversed edge (frozen when not training)
         if self._training:
             self._weights[(node, next_node)] = self._weights.get((node, next_node), 1.0) + self._eta
             self._weights[(next_node, node)] = self._weights.get((next_node, node), 1.0) + self._eta
@@ -191,7 +190,7 @@ class HebbianWalker(TestSystem):
         self._rng.bit_generator.state = state["rng_state"]
 
     def get_representation_state(self):
-        """Edge weight vector for CKA computation (T1-02)."""
+        """Edge weight vector for CKA computation."""
         values = np.array(list(self._weights.values()))
         return values.reshape(1, -1)
 
@@ -278,7 +277,7 @@ class HebbianWalker(TestSystem):
         return new
 
     def boost(self, region_id: str) -> TestSystem:
-        """Strengthen edge weights in target community (T1-01f decoy)."""
+        """Strengthen edge weights in target community (decoy)."""
         new = self._clone_internal()
         community_id = int(region_id.replace("community_", ""))
         community_nodes = {n for n, c in new._node_to_community.items() if c == community_id}

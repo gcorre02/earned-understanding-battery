@@ -2,7 +2,7 @@
 
 Paper 2 role: System 4A-anchor. Validates the self-engagement instrument.
 
-Architecture (DN-23 — live Brian2):
+Architecture (live Brian2):
 - Brian2 simulator runs LIVE during ALL battery operations
 - STDP is ALWAYS active — weights update based on spike timing
 - step() advances the Brian2 simulation
@@ -25,10 +25,8 @@ import numpy as np
 
 from m8_battery.core.test_system import TestSystem
 
-
 def _log(msg: str) -> None:
     print(f"[stdp] {msg}", file=sys.stderr, flush=True)
-
 
 def _build_network(
     n_neurons: int = 100,
@@ -105,9 +103,8 @@ def _build_network(
         "dt_ms": dt_ms,
     }
 
-
 class STDPNetwork(TestSystem):
-    """Brian2 STDP spiking neural network — live simulator (DN-23).
+    """Brian2 STDP spiking neural network — live simulator.
 
     Brian2 runs continuously. STDP is always active. The system is
     always earning. step() advances the simulation. perturb() modifies
@@ -144,7 +141,7 @@ class STDPNetwork(TestSystem):
         )
 
         self._step_count = 0
-        self._training = True  # T1-03: can freeze STDP
+        self._training = True  # can freeze STDP
 
         # Track visit counts per group for engagement
         self._group_spike_counts = np.zeros(n_groups, dtype=np.float64)
@@ -181,7 +178,7 @@ class STDPNetwork(TestSystem):
         S = self._components["S"]
 
         # Set input currents
-        # Background: low enough that recurrent drive matters at scale (DN-23 scale note).
+        # Background: low enough that recurrent drive matters at scale (scale note).
         # At 1000 neurons, ~25 within-group connections per neuron — recurrent input
         # becomes a meaningful fraction of total drive. Weight structure shapes firing.
         for i in range(self._n_neurons):
@@ -199,7 +196,7 @@ class STDPNetwork(TestSystem):
         # When input_data is None (wander/recovery): only background + recurrent
         # Spike rates will depend on synaptic weight structure, not external drive
 
-        # Snapshot weights and STDP traces if frozen (T1-03)
+        # Snapshot weights and STDP traces if frozen
         if not self._training:
             w_before = np.array(S.w[:]).copy()
             apre_before = np.array(S.apre[:]).copy()
@@ -245,7 +242,7 @@ class STDPNetwork(TestSystem):
         self._group_spike_counts = state["group_spike_counts"]
 
     def get_representation_state(self):
-        """Synaptic weight vector for CKA (T1-02). Reshaped to (n_groups, -1)."""
+        """Synaptic weight vector for CKA. Reshaped to (n_groups, -1)."""
         w = np.array(self._components["S"].w[:])
         # Reshape to avoid (1, N) which creates N×N matrix in CKA
         n = max(self._n_groups, int(np.sqrt(len(w))))
@@ -324,7 +321,7 @@ class STDPNetwork(TestSystem):
         return new
 
     def boost(self, region_id: str) -> TestSystem:
-        """Boost synaptic weights within target group to w_max (T1-01f decoy)."""
+        """Boost synaptic weights within target group to w_max (decoy)."""
         new = self._build_clone()
         group_id = int(region_id.replace("group_", ""))
         S = new._components["S"]

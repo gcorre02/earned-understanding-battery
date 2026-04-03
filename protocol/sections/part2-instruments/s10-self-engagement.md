@@ -14,7 +14,7 @@ The system gravitates toward its most significant material during unstructured t
 
 ### 3. Metric
 
-The instrument produces a two-metric output (DN-20).
+The instrument produces a two-metric output.
 
 **Disruption** (resistance measurement):
 
@@ -92,14 +92,14 @@ passed = trajectory_passed AND resistance_ratio > 1.0 AND recovery_ratio > 1.0
 | `no-resistance` | `resistance_ratio <= 1.0` | Trained system is no more resistant to perturbation than a fresh system. Earned structure does not provide perturbation resistance. |
 | `no-recovery` | `recovery_ratio <= 1.0` | Trained system does not recover its engagement pattern any more than a fresh system. Earned structure does not create preferential return dynamics. |
 | `topology-driven` | Both ratios fail AND `fresh_recovery > 0.8` | Both trained and fresh systems recover, suggesting recovery is driven by graph topology rather than earned structure. The SBM community structure itself creates attractor basins. |
-| `perturbation-precondition-failed` | DN-31 Option C: perturbation did not reduce target region structure, or target region not elevated | Indeterminate. Returns `passed=None`. The perturbation protocol could not meaningfully test the system because either (a) the target region's structure was not elevated above the non-target mean (nothing to perturb), or (b) the perturbation did not reduce target structure (perturbation ineffective). |
-| `decoy-drift` | T1-01f: `decoy_drift_ratio > original_recovery_ratio` | The system drifted toward the boosted decoy region instead of recovering its original engagement pattern. The apparent recovery (if any) is toward an artificial attractor, not the system's earned structure. |
+| `perturbation-precondition-failed` | Option C: perturbation did not reduce target region structure, or target region not elevated | Indeterminate. Returns `passed=None`. The perturbation protocol could not meaningfully test the system because either (a) the target region's structure was not elevated above the non-target mean (nothing to perturb), or (b) the perturbation did not reduce target structure (perturbation ineffective). |
+| `decoy-drift` | `decoy_drift_ratio > original_recovery_ratio` | The system drifted toward the boosted decoy region instead of recovering its original engagement pattern. The apparent recovery (if any) is toward an artificial attractor, not the system's earned structure. |
 
 ### 8. Positive Control Evidence
 
 **PC-SE (AttractorRecoveryWalker, Option A node consolidation).** The architectural ground truth for self-engagement: node-level consolidation memory is not perturbable by the edge perturbation protocol. The walker accumulates visit counts at nodes, and these counts survive edge-weight manipulation because they are stored in a separate data structure. When edges are flattened, the walker's node-level memory still directs it back to previously consolidated regions.
 
-Direct instrument testing results (DN-35, 3 seeds):
+Direct instrument testing results (, 3 seeds):
 
 | Seed | Passed | Resistance Ratio | Recovery Ratio |
 |------|--------|------------------|----------------|
@@ -111,7 +111,7 @@ Direct instrument testing results (DN-35, 3 seeds):
 
 **Non-circularity.** The architecture guarantees recovery because node memory is structurally immune to edge perturbation. This is the positive control's purpose: to provide an architectural guarantee that the instrument can detect, not to simulate a realistic learning system. The positive control tests whether the measurement protocol works, not whether any particular learning mechanism is sufficient.
 
-**PC-SE tested via direct instrument invocation (Option 3, DN-35).** The trajectory precondition correctly identifies topology-driven walkers as not having path-dependent earned structure (`earned_ratio ~ 1.0`), so PC-SE cannot pass through the normal battery pipeline. Direct invocation with `trajectory_passed_override=True` is standard practice for instrument-level validation.
+**PC-SE tested via direct instrument invocation (Option 3).** The trajectory precondition correctly identifies topology-driven walkers as not having path-dependent earned structure (`earned_ratio ~ 1.0`), so PC-SE cannot pass through the normal battery pipeline. Direct invocation with `trajectory_passed_override=True` is standard practice for instrument-level validation.
 
 ### 9. Calibration Results
 
@@ -142,18 +142,18 @@ Key observations:
 
 ### 10. Known Limitations
 
-1. **Trajectory precondition blocks most systems.** The precondition (`trajectory_passed = True`) prevents self-engagement from being assessed on any system that does not show earned developmental trajectory. In the Phase A calibration, this blocks 11/13 battery-pipeline systems. This is correct behaviour (DN-36) -- topology-driven walkers should not be tested for self-engagement -- but it means the instrument's discrimination power is primarily exercised in the conjunction, not in isolation.
+1. **Trajectory precondition blocks most systems.** The precondition (`trajectory_passed = True`) prevents self-engagement from being assessed on any system that does not show earned developmental trajectory. In the Phase A calibration, this blocks 11/13 battery-pipeline systems. This is correct behaviour -- topology-driven walkers should not be tested for self-engagement -- but it means the instrument's discrimination power is primarily exercised in the conjunction, not in isolation.
 
-2. **PC-SE tested via direct invocation, not battery runner.** The positive control cannot pass through the normal battery pipeline because the trajectory precondition correctly identifies its topology-driven dynamics as non-path-dependent. Direct invocation (DN-35) validates instrument sensitivity but does not test the full battery workflow for self-engagement. This gap is acceptable because the precondition is a feature, not a bug.
+2. **PC-SE tested via direct invocation, not battery runner.** The positive control cannot pass through the normal battery pipeline because the trajectory precondition correctly identifies its topology-driven dynamics as non-path-dependent. Direct invocation validates instrument sensitivity but does not test the full battery workflow for self-engagement. This gap is acceptable because the precondition is a feature, not a bug.
 
 3. **Perturbation semantics.** The default perturbation method (`flatten_to_mean`) replaces edge weights in the target region with their mean value. This may be too aggressive for some architectures -- it destroys fine-grained weight structure entirely rather than degrading it. Alternative perturbation methods (noise injection, partial flattening) are not currently implemented.
 
-4. **SBM community homogeneity limits perturbation targeting.** SBM generates communities with identical internal structure, so DN-32's "target highest-structure region" heuristic depends on the system having developed differential structure across homogeneous communities. In the Phase A calibration, 9/21 system-seed combinations pass the perturbation precondition (T1-01e) after the DN-32 fix. The remaining 12/21 fail because no region has sufficiently elevated structure relative to the non-target mean.
+4. **SBM community homogeneity limits perturbation targeting.** SBM generates communities with identical internal structure, so 's "target highest-structure region" heuristic depends on the system having developed differential structure across homogeneous communities. In the Phase A calibration, 9/21 system-seed combinations pass the perturbation precondition after the fix. The remaining 12/21 fail because no region has sufficiently elevated structure relative to the non-target mean.
 
 5. **Recovery horizon family is diagnostic, not gated.** The recovery curve is measured at [W/2, W, 2W, 4W] to provide diagnostic information about recovery dynamics (instant recovery suggests topology-driven, gradual recovery suggests genuine self-engagement, no recovery suggests destroyed structure). However, only the primary recovery at W enters the pass condition. The curve shape informs interpretation but does not determine pass/fail.
 
-6. **Perturbation protocol detail.** The full protocol sequence is: (1) free wander to establish engagement pattern, (2) target highest-structure region (DN-32), (3) validate perturbation precondition (T1-01e: target must be elevated, perturbation must reduce it), (4) perturb, (5) immediate measurement, (6) false-attractor control (T1-01f: boost a decoy region and check whether the system drifts toward it instead of recovering), (7) recovery horizon family [W/2, W, 2W, 4W]. Steps 3 and 6 are validation gates; step 7 is diagnostic.
+6. **Perturbation protocol detail.** The full protocol sequence is: (1) free wander to establish engagement pattern, (2) target highest-structure region, (3) validate perturbation precondition (target must be elevated, perturbation must reduce it), (4) perturb, (5) immediate measurement, (6) false-attractor control (boost a decoy region and check whether the system drifts toward it instead of recovering), (7) recovery horizon family [W/2, W, 2W, 4W]. Steps 3 and 6 are validation gates; step 7 is diagnostic.
 
-7. **DN-31 Option C: indeterminate returns.** When perturbation preconditions fail (T1-01e), the instrument returns `passed=None` (indeterminate) rather than `passed=False`. The conjunction treats `None` as not-pass, so the practical effect is the same as failure, but the semantic distinction is preserved: the system was not tested, not shown to lack self-engagement.
+7. ** Option C: indeterminate returns.** When perturbation preconditions fail, the instrument returns `passed=None` (indeterminate) rather than `passed=False`. The conjunction treats `None` as not-pass, so the practical effect is the same as failure, but the semantic distinction is preserved: the system was not tested, not shown to lack self-engagement.
 
 8. **Single reliable positive control.** PC-SE is the only architecturally guaranteed positive control. STDP passes reliably but its mechanism (spike-timing plasticity) is less precisely characterised than PC-SE's node consolidation. Expanding the positive control set would strengthen confidence in the instrument's sensitivity.

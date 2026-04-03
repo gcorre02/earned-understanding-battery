@@ -11,14 +11,12 @@ from m8_battery.domains.sbm_generator import generate_domain_family
 from m8_battery.domains.presets import SMALL
 from m8_battery.systems.internal.hebbian_walker import HebbianWalker
 
-
 @pytest.fixture
 def walker_and_graph():
     family = generate_domain_family(SMALL)
     G = family["A"]
     walker = HebbianWalker(G, seed=42, eta=0.1, decay=0.01, temperature=0.5)
     return walker, G, family
-
 
 class TestHebbianBasics:
     def test_initial_structure_metric_low(self, walker_and_graph):
@@ -89,7 +87,6 @@ class TestHebbianBasics:
         walker.set_state(state)
         metric_after = walker.get_structure_metric()
         assert abs(metric_before - metric_after) < 1e-10
-
 
 class TestHebbianSelfEngagement:
     """The critical test: does HebbianWalker pass self-engagement?"""

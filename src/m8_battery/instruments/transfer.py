@@ -25,7 +25,6 @@ from m8_battery.domains.spectral_verifier import (
     spectral_similarity,
 )
 
-
 def run_transfer(
     system: TestSystem,
     naive_system: TestSystem,
@@ -99,7 +98,7 @@ def run_transfer(
     else:
         effect_size = None
 
-    # DN-22 earned ratio: trained_auc / naive_auc
+    # earned ratio: trained_auc / naive_auc
     # If naive also shows transfer (e.g., learns during step), the earned ratio
     # distinguishes magnitude. Ratio > 1.0 means trained has MORE transfer.
     if abs(naive_auc) > 1e-10:
@@ -111,13 +110,13 @@ def run_transfer(
     # Capped at 1e6 (ratio-based, not geometric mean — higher cap acceptable)
     earned_ratio = min(earned_ratio, 1e6)
 
-    # Decision logic (DN-22: earned ratio required)
+    # Decision logic (earned ratio required)
     # Transfer = trained system has measurably better structure on A'
     has_advantage = transfer_advantage > 0.1
     metrics_differ = abs(trained_final - naive_final) > 1e-6
     passes_earned = earned_ratio > 1.0
 
-    # T1-05: Failure mode classification
+    # Failure mode classification
     if has_advantage and metrics_differ and passes_earned:
         passed = True
         failure_mode = "earned"
@@ -127,7 +126,7 @@ def run_transfer(
     elif has_advantage and metrics_differ and not passes_earned:
         passed = False
         failure_mode = "statistical"  # Naive shows similar → distributional overlap
-        notes = (f"Transfer present but not earned (DN-22): earned_ratio={earned_ratio:.2f}. "
+        notes = (f"Transfer present but not earned: earned_ratio={earned_ratio:.2f}. "
                  f"Naive system shows similar transfer.")
     elif not metrics_differ:
         passed = False
@@ -165,7 +164,6 @@ def run_transfer(
         notes=notes,
         failure_mode=failure_mode,
     )
-
 
 def _collect_trajectory(
     system: TestSystem,

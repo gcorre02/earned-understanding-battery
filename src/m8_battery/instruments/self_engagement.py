@@ -1,4 +1,4 @@
-"""Self-engagement instrument (DN-20 redesign).
+"""Self-engagement instrument (redesign).
 
 Tests whether earned structure creates preferential self-engagement that
 persists under perturbation. Measures both RESISTANCE to perturbation
@@ -9,7 +9,7 @@ Literature basis:
 - Basin stability: Menck et al. (2013) — return to attractor after perturbation
 - STAR Protocols (2025) — resistance measurement protocol
 
-DN-20: Full redesign. Three additions over original:
+Full redesign. Three additions over original:
   A. Precondition check (trajectory must show signal)
   B. Substrate-appropriate perturbation (per adapter)
   C. Two-metric output (resistance + recovery, both vs fresh baseline)
@@ -26,10 +26,8 @@ from m8_battery.core.test_system import TestSystem
 from m8_battery.core.types import InstrumentResult
 from m8_battery.core.provenance import ProvenanceLog
 
-
 def _log(msg: str) -> None:
     print(f"[self_engagement] {msg}", file=sys.stderr, flush=True)
-
 
 def _cosine_sim(a: dict[str, float], b: dict[str, float], regions: list[str]) -> float:
     """Cosine similarity between two engagement distributions."""
@@ -40,7 +38,6 @@ def _cosine_sim(a: dict[str, float], b: dict[str, float], regions: list[str]) ->
     if norm_a > 1e-10 and norm_b > 1e-10:
         return float(np.dot(vec_a, vec_b) / (norm_a * norm_b))
     return 0.0
-
 
 def _run_perturbation_protocol(
     system: TestSystem,
@@ -74,7 +71,7 @@ def _run_perturbation_protocol(
     if not pre_engagement or all(v < 1e-10 for v in pre_engagement.values()):
         return {"error": "degenerate engagement distribution after wander"}
 
-    # DN-32: Target highest-STRUCTURE region, not highest-engagement.
+    # Target highest-STRUCTURE region, not highest-engagement.
     # SBM generates homogeneous communities, so the highest-engagement
     # region rarely has elevated structure. Targeting by structure directly
     # asks: "does the system's EARNED structure resist perturbation?"
@@ -87,7 +84,7 @@ def _run_perturbation_protocol(
     _log(f"  target region: {target_region} (structure={pre_structure[target_region]:.4f}, "
          f"engagement={pre_engagement.get(target_region, 0.0):.4f})")
 
-    # T1-01e: Perturbation validation gate
+    # Perturbation validation gate
     target_structure_pre = pre_structure.get(target_region, 0.0)
     non_target_structures = [v for k, v in pre_structure.items() if k != target_region]
     mean_non_target = sum(non_target_structures) / max(len(non_target_structures), 1)
@@ -99,26 +96,26 @@ def _run_perturbation_protocol(
     perturbed = system.perturb(target_region, method=perturbation_method)
     _log(f"  perturb: {_time.monotonic()-t0:.2f}s")
 
-    # T1-01e: Verify perturbation reduced target structure
+    # Verify perturbation reduced target structure
     post_structure = perturbed.get_structure_distribution()
     target_structure_post = post_structure.get(target_region, 0.0)
 
     if target_structure_pre <= mean_non_target:
-        perturbation_caveat = (f"T1-01e: target region {target_region} structure "
+        perturbation_caveat = (f"Perturbation validation: target region {target_region} structure "
                                f"({target_structure_pre:.4f}) not elevated vs "
                                f"non-target mean ({mean_non_target:.4f})")
         perturbation_validated = False
         _log(f"  PRECONDITION FAILED: {perturbation_caveat}")
     elif target_structure_post >= target_structure_pre:
-        perturbation_caveat = (f"T1-01e: perturbation did not reduce target structure "
+        perturbation_caveat = (f"Perturbation validation: perturbation did not reduce target structure "
                                f"(pre={target_structure_pre:.4f}, post={target_structure_post:.4f})")
         perturbation_validated = False
         _log(f"  PRECONDITION FAILED: {perturbation_caveat}")
     else:
-        _log(f"  T1-01e validated: target structure {target_structure_pre:.4f} → "
+        _log(f"  validated: target structure {target_structure_pre:.4f} → "
              f"{target_structure_post:.4f} (non-target mean={mean_non_target:.4f})")
 
-    # DN-31 Option C: return indeterminate when preconditions fail
+    # Option C: return indeterminate when preconditions fail
     if not perturbation_validated:
         return {
             "indeterminate": True,
@@ -134,7 +131,7 @@ def _run_perturbation_protocol(
     perturbed.step(None)
     post_immediate = perturbed.get_engagement_distribution()
 
-    # T1-01f: False-attractor control
+    # False-attractor control
     # Boost a non-target region to create a decoy attractor. If the system
     # reconstructs the ORIGINAL pattern instead of drifting to the decoy,
     # that's stronger evidence of earned self-engagement.
@@ -163,10 +160,10 @@ def _run_perturbation_protocol(
         decoy_drift_ratio = rec_decoy / max(pre_decoy, 1e-10)
 
         prefers_original = original_recovery_ratio > decoy_drift_ratio
-        _log(f"  T1-01f: decoy={decoy_region} original_recovery={original_recovery_ratio:.4f} "
+        _log(f"  decoy={decoy_region} original_recovery={original_recovery_ratio:.4f} "
              f"decoy_drift={decoy_drift_ratio:.4f} prefers_original={prefers_original}")
 
-    # Phase 3: Recovery horizon family (T1-01g)
+    # Phase 3: Recovery horizon family
     # Measure recovery at multiple windows: W/2, W, 2W, 4W
     # The curve shape is diagnostic — instant=topology, gradual=genuine, none=destroyed
     t0 = _time.monotonic()
@@ -215,7 +212,6 @@ def _run_perturbation_protocol(
         "decoy_drift_ratio": decoy_drift_ratio,
     }
 
-
 def run_self_engagement(
     system: TestSystem,
     wander_steps: int,
@@ -225,7 +221,7 @@ def run_self_engagement(
     control_factory: Callable[[], TestSystem] | None = None,
     trajectory_passed: bool | None = None,
 ) -> InstrumentResult:
-    """Run the self-engagement instrument (DN-20 redesign).
+    """Run the self-engagement instrument (redesign).
 
     Protocol:
     1. Precondition: check trajectory_passed. If absent/static → FAIL.
@@ -241,7 +237,7 @@ def run_self_engagement(
         perturbation_method: How to perturb
         recovery_window: Steps after perturbation
         provenance: Optional provenance log
-        control_factory: Returns fresh matched control. Required for DN-20.
+        control_factory: Returns fresh matched control. Required for self-engagement measurement.
         trajectory_passed: Result of trajectory instrument. None/False → precondition fail.
     """
     if provenance is None:
@@ -281,9 +277,9 @@ def run_self_engagement(
             passed=None,
             notes=f"Trained protocol error: {trained_result['error']}",
         )
-    # DN-31 Option C: perturbation precondition failed → indeterminate
+    # Option C: perturbation precondition failed → indeterminate
     if trained_result.get("indeterminate"):
-        _log(f"  DN-31: perturbation precondition failed — returning indeterminate")
+        _log(f"  perturbation precondition failed — returning indeterminate")
         return InstrumentResult(
             name="self_engagement",
             passed=None,
@@ -298,7 +294,7 @@ def run_self_engagement(
         return InstrumentResult(
             name="self_engagement",
             passed=None,
-            notes="No control_factory — fresh baseline required for DN-20",
+            notes="No control_factory — fresh baseline required for ",
         )
 
     _log("Running perturbation protocol on FRESH baseline")
@@ -353,17 +349,17 @@ def run_self_engagement(
     passes_resistance = resistance_ratio > 1.0
     passes_recovery = recovery_ratio > 1.0
 
-    # T1-01e: Check perturbation validation from both trained and fresh protocols
+    # Check perturbation validation from both trained and fresh protocols
     trained_validated = trained_result.get("perturbation_validated", True)
     trained_caveat = trained_result.get("perturbation_caveat")
     fresh_validated = fresh_result.get("perturbation_validated", True)
 
-    # T1-05: Failure mode classification
+    # Failure mode classification
     if passes_resistance and passes_recovery:
         passed = True
         failure_mode = "earned"
         notes = (
-            f"Self-engagement detected (DN-20): "
+            f"Self-engagement detected: "
             f"resistance_ratio={resistance_ratio:.4f}, recovery_ratio={recovery_ratio:.4f}. "
             f"Trained system resists perturbation MORE and recovers MORE than fresh baseline."
         )
@@ -387,7 +383,7 @@ def run_self_engagement(
             f"Trained system does not exceed fresh baseline."
         )
 
-    # Check decoy drift (T1-01f)
+    # Check decoy drift
     trained_decoy_drift = trained_result.get("decoy_drift_ratio")
     trained_original_recovery = trained_result.get("original_recovery_ratio")
     if (passed and trained_decoy_drift is not None and trained_original_recovery is not None

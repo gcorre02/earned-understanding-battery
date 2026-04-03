@@ -51,7 +51,6 @@ EDGE_COLOURS = {
 
 CLASS_LABELS = {0: "CLASS 1\nFIXED", 1: "CLASS 2\nFROZEN", 2: "CLASS 3\nLEARNING"}
 
-
 def community_layout(graph_data, width=10, height=10):
     """3x2 grid communities, grid nodes within."""
     comms = {}
@@ -81,7 +80,6 @@ def community_layout(graph_data, width=10, height=10):
             )
     return positions
 
-
 def compute_traversal_stats(traversal):
     """Count node visits and edge traversals."""
     node_visits = Counter()
@@ -98,7 +96,6 @@ def compute_traversal_stats(traversal):
                 edge_traversals[ek] += 1
 
     return node_visits, edge_traversals
-
 
 def draw_panel(ax, sys_id, graph_data, traversal, layout):
     """Draw one system's panel."""
@@ -147,7 +144,6 @@ def draw_panel(ax, sys_id, graph_data, traversal, layout):
     ax.set_title(SYSTEM_NAMES[sys_id], color="white", fontsize=10, pad=4,
                  fontfamily="sans-serif")
 
-
 def create_9panel(graph_data, systems_data, layout):
     """Create the 3x3 figure."""
     fig = plt.figure(figsize=(16, 16), facecolor=BG)
@@ -172,7 +168,6 @@ def create_9panel(graph_data, systems_data, layout):
     plt.close(fig)
     return out
 
-
 def create_3c_detail(graph_data, systems_data, layout):
     """Close-up of 3C panel."""
     fig, ax = plt.subplots(1, 1, figsize=(8, 8), facecolor=BG)
@@ -186,7 +181,6 @@ def create_3c_detail(graph_data, systems_data, layout):
     print(f"Saved: {out}")
     plt.close(fig)
 
-
 def main():
     data = json.loads(DATA_PATH.read_text())
     graph_data = data["graph"]
@@ -199,7 +193,6 @@ def main():
     create_9panel(graph_data, systems_data, layout)
     create_3c_detail(graph_data, systems_data, layout)
     print("Done.")
-
 
 if __name__ == "__main__":
     main()

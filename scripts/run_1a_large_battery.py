@@ -26,7 +26,6 @@ from m8_battery.analysis.behavioural_generativity import (
 
 SEEDS = [42, 123, 456]
 
-
 def run_structural_battery(seed):
     """Run full 5-instrument structural battery on 1A LARGE."""
     t0 = time.time()
@@ -90,7 +89,6 @@ def run_structural_battery(seed):
         "trajectory_battery": baseline.get("trajectory_battery", "unknown"),
     }
 
-
 def run_behavioural(seed):
     """Run behavioural generativity on 1A LARGE."""
     t0 = time.time()
@@ -113,7 +111,6 @@ def run_behavioural(seed):
         "behavioural_classification": cls,
         "time_s": round(time.time() - t0, 1),
     }
-
 
 def main():
     all_results = []
@@ -162,7 +159,6 @@ def main():
     with open(outpath, "w") as f:
         json.dump(all_results, f, indent=2)
     print(f"\nResults saved to {outpath}")
-
 
 if __name__ == "__main__":
     main()

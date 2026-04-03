@@ -23,7 +23,6 @@ from m8_battery.core.types import DomainConfig, SystemClass
 from m8_battery.domains.sbm_generator import generate_domain_family
 from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
 
-
 MEDIUM = DomainConfig(
     n_nodes=150, n_communities=6,
     p_within=0.3, p_between=0.02,
@@ -37,8 +36,7 @@ SYSTEM_CLASSES = {
     "1A": SystemClass.CLASS_1, "1B": SystemClass.CLASS_1, "1C": SystemClass.CLASS_1,
     "2A": SystemClass.CLASS_2, "2B": SystemClass.CLASS_2, "2C": SystemClass.CLASS_2,
     "3A": SystemClass.CLASS_3, "3B": SystemClass.CLASS_3, "3C": SystemClass.CLASS_3,
-    "HEB": SystemClass.CLASS_3,   # Publishable per DN-28
-    "STDP": SystemClass.CLASS_3,  # Paper 2 system 4A-anchor
+    "HEB": SystemClass.CLASS_3,   # Publishable per "STDP": SystemClass.CLASS_3,  # Paper 2 system 4A-anchor
     "3D": SystemClass.CLASS_3,    # Empowerment (Klyubin 2005)
     "3E": SystemClass.CLASS_3,    # Active inference (Friston 2010)
 }
@@ -62,22 +60,18 @@ SYSTEM_NAMES = {
 # LLM systems get MPS on M5, everything else CPU
 LLM_SYSTEMS = {"2A", "3C"}
 
-
 def get_device(system_id: str) -> str:
     if system_id in LLM_SYSTEMS and torch.backends.mps.is_available():
         return "mps"
     return "cpu"
 
-
 def _count_communities(graph) -> int:
     return len({graph.nodes[n].get("features", {}).get("community", 0)
                 for n in graph.nodes()})
 
-
 def _clone_with_graph(system, graph):
     system.set_graph(graph)
     return system
-
 
 def make_system(system_id, graph, seed, n_features):
     device = get_device(system_id)
@@ -136,7 +130,7 @@ def make_system(system_id, graph, seed, n_features):
         def _make_3c_control(g=graph, d=device, sd=seed):
             """Control factory: graph-attached, model-loaded fresh FoxworthyF.
             train_on_domain(g, n_warmup=0) loads model without training.
-            See F-022 lazy loading investigation."""
+            See lazy loading investigation."""
             f = FoxworthyF(seed=sd + 1000, device=d, theta=0.0)
             f.train_on_domain(g, n_warmup=0)
             return f
@@ -172,7 +166,6 @@ def make_system(system_id, graph, seed, n_features):
         return s, lambda g=graph, sd=seed: ActiveInferenceAgent(g, seed=sd + 1000)
 
     raise ValueError(f"Unknown system: {system_id}")
-
 
 def run_single(system_id, seed):
     config = DomainConfig(
@@ -253,13 +246,12 @@ def run_single(system_id, seed):
 
     return out
 
-
 def main():
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     all_systems = ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C", "HEB", "STDP", "3D", "3E"]
     total = len(all_systems) * len(SEEDS)
 
-    print(f"M5 Max Full Recalibration (T1-09) — {total} runs")
+    print(f"M5 Max Full Recalibration — {total} runs")
     print(f"Scale: MEDIUM (150 nodes, 6 communities)")
     print(f"LLM systems ({LLM_SYSTEMS}) on MPS, rest on CPU")
     print(f"Anchor systems: HEB (internal), STDP (1000 neurons, ~18min/run)")
@@ -301,7 +293,6 @@ def main():
     print("\n" + "=" * 70)
     print("RECALIBRATION COMPLETE")
     print(f"Results in: {RESULTS_DIR}")
-
 
 if __name__ == "__main__":
     main()

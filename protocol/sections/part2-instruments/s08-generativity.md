@@ -67,7 +67,7 @@ B2 is the primary test domain. The shifted node IDs guarantee zero edge overlap 
 | Node IDs | same range as A |
 | Edge Jaccard with A | **0.097** |
 
-B1 results carry the `potentially_confounded` signal classification because edge overlap (9.7%) cannot be ruled out as a contributor to divergence (F-040).
+B1 results carry the `potentially_confounded` signal classification because edge overlap (9.7%) cannot be ruled out as a contributor to divergence.
 
 ### Domain B0 (Diagnostic -- Isomorphic)
 
@@ -133,7 +133,7 @@ The primary metric is the Jensen-Shannon divergence (JSD) between the community-
 
 ### Why Transition JSD
 
-Transition JSD captures how a system moves between communities, not merely which communities it visits. This makes it sensitive to structural dynamics (navigation patterns) rather than just marginal preferences (where the system spends time). Finding F-045 established that transition JSD has a noise floor approximately 10x lower than marginal JSD, providing substantially greater sensitivity to genuine structural transfer signals.
+Transition JSD captures how a system moves between communities, not merely which communities it visits. This makes it sensitive to structural dynamics (navigation patterns) rather than just marginal preferences (where the system spends time). Finding established that transition JSD has a noise floor approximately 10x lower than marginal JSD, providing substantially greater sensitivity to genuine structural transfer signals.
 
 ---
 
@@ -179,7 +179,7 @@ generativity = transition_jsd > per_type_noise_floor AND not degenerate
 
 **Seed replication (Rigour Principle 5):** At least 2 of 3 seeds must independently meet the above criteria. A single seed passing is insufficient -- it could reflect initialisation luck rather than systematic structural transfer.
 
-**Coherence NOT gated on SBM:** Structural consistency (DN-30a) is computed but does not enter the pass condition on SBM domains. Findings F-048 and F-049 established that SBM community homogeneity makes role-level transfer detection unreliable. Coherence gating is deferred to Phase B heterogeneous domains.
+**Coherence NOT gated on SBM:** Structural consistency is computed but does not enter the pass condition on SBM domains. Findings and established that SBM community homogeneity makes role-level transfer detection unreliable. Coherence gating is deferred to Phase B heterogeneous domains.
 
 ---
 
@@ -189,11 +189,11 @@ The following metrics are computed and reported alongside the primary metric but
 
 ### Marginal JSD
 
-JSD of community visit distributions (fraction of steps in each community) between trained and fresh systems. Retained for comparability with earlier analyses. Finding F-045 established that marginal JSD has a noise floor approximately 10x higher than transition JSD, making it less sensitive to structural dynamics.
+JSD of community visit distributions (fraction of steps in each community) between trained and fresh systems. Retained for comparability with earlier analyses. Finding established that marginal JSD has a noise floor approximately 10x higher than transition JSD, making it less sensitive to structural dynamics.
 
-### Structural Consistency (DN-30a)
+### Structural Consistency
 
-Cosine similarity of role-aggregated transition matrices between the training-domain frozen run and the novel-domain frozen run. Measures whether the pattern of community-to-community transitions is preserved across domains. Diagnostic only on SBM domains per F-048 and F-049: SBM communities are too homogeneous for meaningful role-level transfer detection.
+Cosine similarity of role-aggregated transition matrices between the training-domain frozen run and the novel-domain frozen run. Measures whether the pattern of community-to-community transitions is preserved across domains. Diagnostic only on SBM domains per and SBM communities are too homogeneous for meaningful role-level transfer detection.
 
 ### Self-Transition Rate
 
@@ -216,7 +216,7 @@ Each system-seed-domain combination receives one of the following signal classif
 | `degenerate_fresh` | Fresh system visits <3 communities with >1% engagement | Baseline is degenerate. Comparison is unreliable. |
 | `maximum_divergence` | Transition JSD near ln(2) | Trained and fresh are maximally different. May indicate pathological behaviour rather than meaningful transfer. |
 | `potentially_confounded` | Edge Jaccard > 0 between A and B (applies to all B1 results) | Above-floor signal may be partially or wholly attributable to shared edges rather than structural transfer. |
-| `divergent_incoherent` | Transition JSD > noise floor but structural consistency is negative or near zero, AND coherence would have been expected | Signal is present but transferred dynamics are incoherent. On SBM this classification is diagnostic only (F-048/F-049). |
+| `divergent_incoherent` | Transition JSD > noise floor but structural consistency is negative or near zero, AND coherence would have been expected | Signal is present but transferred dynamics are incoherent. On SBM this classification is diagnostic only (). |
 | `candidate` | Transition JSD > noise floor, not degenerate, not confounded (B2 only) | Genuine candidate for structural transfer. Subject to seed replication check. |
 
 ---
@@ -230,7 +230,7 @@ Each system-seed-domain combination receives one of the following signal classif
 - **B0** (isomorphic, Edge Jaccard = 0.0313): Tests transfer to identical structure under different labels. Useful for understanding whether the system has learned graph-level invariances. Results are informative but not gated.
 - **B1** (shared node space, Edge Jaccard = 0.097): Tests transfer in the presence of partial edge overlap. All B1 results carry the `potentially_confounded` classification. B1 is retained for diagnostic comparison with B2: if a system shows signal on B1 but not B2, edge leakage is the most likely explanation.
 
-This hierarchy was established by DN-32 after F-040 demonstrated that edge overlap on B1 produces confounded signals.
+This hierarchy was established by after demonstrated that edge overlap on B1 produces confounded signals.
 
 ---
 
@@ -239,9 +239,9 @@ This hierarchy was established by DN-32 after F-040 demonstrated that edge overl
 SBM communities are structurally homogeneous -- all communities have the same internal density (p_within = 0.3) and the same inter-community connectivity pattern (p_between = 0.02). This means:
 
 1. **No role differentiation:** There are no hub communities, peripheral communities, or bridge communities. Every community is structurally equivalent to every other community.
-2. **Structural consistency unreliable (F-048):** Cosine similarity of role-aggregated transition matrices cannot detect role-level transfer because no roles exist to transfer.
-3. **Perturbation targeting limited (F-046):** Perturbation tests cannot probe role-specific responses for the same reason.
-4. **Fingerprint SC also fails (F-049):** Alternative formulations of structural consistency also fail on SBM for the same underlying reason.
+2. **Structural consistency unreliable:** Cosine similarity of role-aggregated transition matrices cannot detect role-level transfer because no roles exist to transfer.
+3. **Perturbation targeting limited:** Perturbation tests cannot probe role-specific responses for the same reason.
+4. **Fingerprint SC also fails:** Alternative formulations of structural consistency also fail on SBM for the same underlying reason.
 
 This limitation is intrinsic to the SBM domain family, not to the instrument. Coherence gating and perturbation-based validation are deferred to Phase B, which will introduce heterogeneous domains (real-world graphs or synthetic graphs with differentiated community structures).
 
@@ -296,9 +296,7 @@ Note: 3D and 3E share null distributions with PC1 because all three use the same
 
 The following design choices were made during instrument development. Each is documented here for transparency:
 
-1. **Transition JSD over marginal JSD as primary metric.** Marginal JSD measures where a system spends time; transition JSD measures how it moves. Transition JSD has a 10x lower noise floor (F-045) and better separates structural dynamics from visitation preferences. Decision documented in DN-18.
-
-2. **Row-wise weighted JSD over unweighted.** Weighting by visitation frequency ensures that communities the system actually navigates contribute more than communities it rarely visits. Unweighted averaging would give equal weight to rarely-visited communities where transition estimates are noisy.
+1. **Transition JSD over marginal JSD as primary metric.** Marginal JSD measures where a system spends time; transition JSD measures how it moves. Transition JSD has a 10x lower noise floor and better separates structural dynamics from visitation preferences. Decision documented in 2. **Row-wise weighted JSD over unweighted.** Weighting by visitation frequency ensures that communities the system actually navigates contribute more than communities it rarely visits. Unweighted averaging would give equal weight to rarely-visited communities where transition estimates are noisy.
 
 3. **Natural logarithm (base e) over base 2.** Base e gives JSD range [0, ln(2)] rather than [0, 1]. This is a scaling convention with no effect on ranking or pass/fail decisions. Natural log is standard in the information theory literature used by Paper 1.
 
@@ -310,15 +308,11 @@ The following design choices were made during instrument development. Each is do
 
 7. **2/3 seed replication over 3/3.** Requiring all three seeds to pass would be overly stringent given that one seed can be degenerate for system-specific reasons (e.g., PC3 seed 456 collapses to 2 communities). 2/3 ensures replication while tolerating seed-specific degeneracy.
 
-8. **B2-primary policy over B1-primary.** B2 has zero edge overlap, eliminating the confound discovered in F-040. B1 is retained as diagnostic only. Decision documented in DN-32.
-
-9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (F-048, F-049). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to Phase B heterogeneous domains. Decision documented in DN-30a.
-
-10. **500 steps fixed.** Sufficient for stable transition matrix estimation on 6-community graphs. Shorter windows (100-200 steps) produce noisier matrices; longer windows (1000+) provide diminishing returns. The window was not optimised -- it was set a priori and held constant.
+8. **B2-primary policy over B1-primary.** B2 has zero edge overlap, eliminating the confound discovered in F-040. B1 is retained as diagnostic only. Decision documented in 9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (F-048, F-049). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to Phase B heterogeneous domains. Decision documented in 10. **500 steps fixed.** Sufficient for stable transition matrix estimation on 6-community graphs. Shorter windows (100-200 steps) produce noisier matrices; longer windows (1000+) provide diminishing returns. The window was not optimised -- it was set a priori and held constant.
 
 11. **Degeneracy threshold at 3 communities.** A system visiting <3 communities has insufficient transition diversity for meaningful JSD comparison. The threshold of 3 (out of 6) was chosen as the minimum for non-trivial dynamics.
 
-12. **step(None) for autonomous navigation.** Using `step(None)` rather than `step(random_input)` ensures the system navigates without external guidance. Finding F-042 established that `step(inp)` with arbitrary inputs can teleport graph walkers, confounding the measurement. `step(None)` avoids this.
+12. **step(None) for autonomous navigation.** Using `step(None)` rather than `step(random_input)` ensures the system navigates without external guidance. Finding established that `step(inp)` with arbitrary inputs can teleport graph walkers, confounding the measurement. `step(None)` avoids this.
 
 ---
 
@@ -344,7 +338,7 @@ The protocol specification document (`outputs/protocol-specification-generativit
 
 ---
 
-### 8.16. Pre-Registered Null Result Interpretation Scenarios (DN-33)
+### 8.16. Pre-Registered Null Result Interpretation Scenarios
 
 These interpretations are locked BEFORE Phase C data exists. They define how each plausible outcome on the Class 4 candidate will be reported, preventing post-hoc narrative fitting.
 

@@ -18,7 +18,6 @@ from m8_battery.core.test_system import TestSystem
 from m8_battery.core.types import InstrumentResult
 from m8_battery.core.provenance import ProvenanceLog
 
-
 def run_integration(
     system: TestSystem,
     probe_inputs: list[Any],
@@ -111,7 +110,7 @@ def run_integration(
     else:
         gini = 0.0
 
-    # T1-04: Post-ablation stability check
+    # Post-ablation stability check
     # Does the system form a stable new regime after ablation, or collapse?
     # Ablate the highest-degradation region, run M steps, measure stability.
     reorganisation_stability = None
@@ -145,7 +144,7 @@ def run_integration(
             except Exception:
                 reorganisation_stability = None
 
-    # T1-04: Low-engagement control ablation
+    # Low-engagement control ablation
     # If ANY ablation causes global change → fragile, not integrated
     control_ablation_gini = None
     engagement = system.get_engagement_distribution()
@@ -173,7 +172,7 @@ def run_integration(
     # High CV (> 0.5) = non-uniform degradation = integration
     has_integration = gini > 0.3 or cv > 0.5
 
-    # T1-05: Failure mode classification
+    # Failure mode classification
     if has_integration:
         passed = True
         # Check if it's fragile (control ablation also causes global change)
@@ -226,7 +225,6 @@ def run_integration(
         failure_mode=failure_mode,
     )
 
-
 def compute_integration_earned_ratio(
     system: TestSystem,
     control_factory,
@@ -273,7 +271,6 @@ def compute_integration_earned_ratio(
         "fresh_gini": float(fresh_gini),
         "earned_ratio": float(min(earned_ratio, 1e6)),
     }
-
 
 def _probe_metric(system: TestSystem, probe_inputs: list[Any]) -> float:
     """Run probe inputs and return final structure metric."""

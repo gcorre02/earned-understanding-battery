@@ -38,14 +38,11 @@ from m8_battery.instruments.generativity import (
 )
 from m8_battery.instruments.role_utils import classify_all_nodes, compute_role_transition_matrix
 
-
 def _log(msg: str) -> None:
     print(f"[harmonised] {msg}", file=sys.stderr, flush=True)
 
-
 N_STEPS = 500  # Fixed step count for all generativity measurements
 SEEDS = [42, 123, 456]
-
 
 @dataclass
 class GenerativityResult:
@@ -67,14 +64,12 @@ class GenerativityResult:
     signal_type: str
     commit: str
 
-
 def edge_jaccard(g1, g2) -> float:
     e1 = set(g1.edges())
     e2 = set(g2.edges())
     if not e1 and not e2:
         return 0.0
     return len(e1 & e2) / len(e1 | e2)
-
 
 def get_community_map(graph) -> dict:
     mapping = {}
@@ -83,7 +78,6 @@ def get_community_map(graph) -> dict:
         features = data.get("features", {})
         mapping[node] = features.get("community", data.get("block", 0))
     return mapping
-
 
 def run_generativity_measurement(
     system,
@@ -155,7 +149,7 @@ def run_generativity_measurement(
         trained_st = _self_transition_rate(T_trained)
         fresh_st = _self_transition_rate(T_fresh)
 
-    # DN-30a: Role-aggregated structural consistency
+    # Role-aggregated structural consistency
     sc = 0.0
     if len(trained_seq) > 1 and len(fresh_seq) > 1:
         node_to_role = classify_all_nodes(domain_graph)
@@ -194,7 +188,6 @@ def run_generativity_measurement(
         signal_type=signal,
         commit=commit,
     )
-
 
 def compute_null_pair(
     system_factory: Callable,
@@ -267,7 +260,6 @@ def compute_null_pair(
         "structural_consistency": round(sc, 6),
         "domain_variant": domain_variant,
     }
-
 
 def main():
     import subprocess
@@ -486,7 +478,7 @@ def main():
                 if cfg["train_steps"] > 0:
                     trained.train_on_domain(domain_a, n_steps=cfg["train_steps"])
 
-                # DN-30a: Capture training transition matrix (role-aggregated)
+                # Capture training transition matrix (role-aggregated)
                 # Post-training recording phase on domain A (frozen)
                 trained.set_training(False)
                 trained.reset_engagement_tracking()
@@ -498,7 +490,7 @@ def main():
                 node_to_role_a = classify_all_nodes(domain_a)
                 training_role_T = compute_role_transition_matrix(training_seq, node_to_role_a)
 
-                # DN-37: sync fresh baseline starting position with trained
+                # sync fresh baseline starting position with trained
                 init_pos = trained.get_initial_position()
                 fresh = cfg["fresh"](domain_a, seed, init_pos)
 
@@ -534,7 +526,7 @@ def main():
             node_to_role_a = classify_all_nodes(domain_a)
             training_role_T = compute_role_transition_matrix(training_seq, node_to_role_a)
 
-            # DN-37: sync fresh baseline starting position (if factory supports it)
+            # sync fresh baseline starting position (if factory supports it)
             init_pos = trained.get_initial_position()
             try:
                 fresh = cfg["fresh"](domain_a, seed, init_pos)
@@ -681,7 +673,6 @@ def main():
     }
     print(json.dumps(output, indent=2))
     _log("Done.")
-
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,4 @@
-## S15. Pre-Registered Null Result Interpretation Scenarios (DN-33)
+## S15. Pre-Registered Null Result Interpretation Scenarios
 
 These interpretations are locked BEFORE Phase C data exists. They define how each plausible outcome on the Class 4 candidate will be reported, preventing post-hoc narrative fitting.
 

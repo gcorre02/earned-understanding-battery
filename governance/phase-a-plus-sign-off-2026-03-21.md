@@ -17,18 +17,18 @@ Phase A+ was created to resolve the generativity instrument after Phase A found 
 
 | # | Criterion | Status | Evidence |
 |---|-----------|--------|----------|
-| 1 | Root cause of 0/13 identified | PASS | F-035: three independent causes (metric insensitivity, confounded domains, placeholder thresholds) |
+| 1 | Root cause of 0/13 identified | PASS | three independent causes (metric insensitivity, confounded domains, placeholder thresholds) |
 | 2 | Positive controls constructed | PASS | PC1 and PC3 produce above-floor signal on B2 (3/3 and 2/3 seeds respectively) |
 | 3 | Negative controls confirmed | PASS | HEB, 3D, 3E all below floor on B2 (0/3 seeds each) |
 | 4 | Noise floors calibrated | PASS | Per-type p95 from 50 null pairs, bootstrap CIs from 10,000 resamples (F-041, F-050) |
-| 5 | Confound eliminated | PASS | B2 domain has Edge Jaccard = 0.0 with A; all B1 results classified as potentially_confounded (F-040, DN-32) |
-| 6 | Primary metric validated | PASS | Transition JSD achieves ROC AUC = 1.0 [1.0, 1.0] separating positive from negative controls (F-050) |
-| 7 | Sensitivity validated | PASS | Cohen's d ~ 3.27; transition JSD floor ~10x lower than marginal JSD floor (F-045) |
-| 8 | Instrument bug fixed | PASS | step(inp) teleportation fixed; step(None) used throughout (F-042) |
+| 5 | Confound eliminated | PASS | B2 domain has Edge Jaccard = 0.0 with A; all B1 results classified as potentially_confounded (F-040) |
+| 6 | Primary metric validated | PASS | Transition JSD achieves ROC AUC = 1.0 [1.0, 1.0] separating positive from negative controls |
+| 7 | Sensitivity validated | PASS | Cohen's d ~ 3.27; transition JSD floor ~10x lower than marginal JSD floor |
+| 8 | Instrument bug fixed | PASS | step(inp) teleportation fixed; step(None) used throughout |
 | 9 | Protocol frozen | PASS | generativity-instrument-protocol-v1.0.md, commit 388a90f |
 | 10 | Reproducibility bundle | PASS | harmonised_results.json + null_distribution_raw_samples.csv + requirements-v3.txt |
-| 11 | Coherence limitation documented | PASS | SC unreliable on SBM (F-048, F-049); coherence gating deferred to Phase B (DN-30a) |
-| 12 | 0/13 reconfirmed | PASS | F-051: 0/13 confirmed under harmonised transition protocol on B2 |
+| 11 | Coherence limitation documented | PASS | SC unreliable on SBM (F-048, F-049); coherence gating deferred to Phase B |
+| 12 | 0/13 reconfirmed | PASS | 0/13 confirmed under harmonised transition protocol on B2 |
 
 ---
 
@@ -38,7 +38,7 @@ Phase A+ was created to resolve the generativity instrument after Phase A found 
 
 2. **The 0/13 result is real.** None of the 13 systems in the current battery exhibit structural transfer on SBM domains under the calibrated transition JSD protocol. This is not an instrument artefact -- it is a genuine empirical finding.
 
-3. **Transition JSD is the correct primary metric.** It provides approximately 10x better sensitivity than marginal JSD (F-045) and achieves perfect discrimination between positive and negative controls.
+3. **Transition JSD is the correct primary metric.** It provides approximately 10x better sensitivity than marginal JSD and achieves perfect discrimination between positive and negative controls.
 
 4. **The B2 domain eliminates the edge-leakage confound.** Zero edge overlap between training and test domains means any above-floor signal is unambiguously from structural transfer.
 
@@ -50,11 +50,11 @@ Phase A+ was created to resolve the generativity instrument after Phase A found 
 
 ## 4. What Phase A+ Does NOT Establish
 
-1. **Structural consistency as a gating metric.** Coherence (structural consistency / DN-30a) is computed but not gated on SBM domains. SBM community homogeneity makes role-level transfer detection unreliable (F-048, F-049). Coherence gating requires heterogeneous domains and is deferred to Phase B.
+1. **Structural consistency as a gating metric.** Coherence (structural consistency / ) is computed but not gated on SBM domains. SBM community homogeneity makes role-level transfer detection unreliable (F-048, F-049). Coherence gating requires heterogeneous domains and is deferred to Phase B.
 
 2. **Generativity on non-SBM domains.** All results are on synthetic SBM graphs. Whether the instrument and its calibration transfer to real-world networks, scale-free graphs, or heterogeneous synthetic graphs is unknown. Phase B will address this.
 
-3. **Perturbation-based causal validation.** SBM homogeneity limits perturbation targeting (F-046). The perturbation audit found 19/21 fail before the step(inp) fix, and 9/21 after. Perturbation-based validation of structural transfer requires differentiated community roles, deferred to Phase B.
+3. **Perturbation-based causal validation.** SBM homogeneity limits perturbation targeting. The perturbation audit found 19/21 fail before the step(inp) fix, and 9/21 after. Perturbation-based validation of structural transfer requires differentiated community roles, deferred to Phase B.
 
 4. **Why 0/13 systems lack generativity.** The phase establishes the empirical fact but does not explain the architectural reasons. Understanding why specific system families fail to produce structural transfer is a Phase B research question.
 
@@ -76,42 +76,42 @@ Phase A+ was created to resolve the generativity instrument after Phase A found 
 
 ---
 
-## 6. Findings Register (F-035 through F-051)
+## 6. Findings Register (through F-051)
 
 | Finding | Summary |
 |---------|---------|
-| F-035 | Three independent causes of 0/13 generativity: metric insensitivity, confounded domains, placeholder thresholds |
-| F-036 | Empowerment 0/5 is genuine (topological) -- empowerment systems lack internal dynamics that survive domain switch |
-| F-037 | Instrument measured structural metric, not behavioural JSD -- original generativity used wrong comparison basis |
-| F-038 | HEB self-engagement seed-dependent (1/3) -- only one seed shows any signal, insufficient for replication |
-| F-039 | Placeholder threshold produced false positive (HEB conjunction) -- uncalibrated threshold flagged noise as signal |
-| F-040 | HEB generativity signal is seed noise -- B1 edge overlap confounds apparent signal |
-| F-041 | Null JSD distributions established per-type p95 floors -- 50 pairs per cell, bootstrap CIs confirm stability |
-| F-042 | step(inp) teleported graph walkers -- external input bypassed graph topology, producing artefactual transitions |
-| F-043 | Positive control signal below marginal JSD noise floor -- marginal JSD too insensitive to detect known transfer |
-| F-044 | Complete positive control results compiled -- PC1 and PC3 fully characterised across B0/B1/B2 |
-| F-045 | Transition JSD resolves sensitivity (10x lower floor) -- transition matrices capture dynamics marginal distributions miss |
-| F-046 | Perturbation audit: 19/21 fail before fix, 9/21 after fix -- SBM homogeneity limits perturbation targeting |
-| F-047 | Structural consistency appears to validate PC1 -- high SC values on PC1 suggest role-level transfer |
-| F-048 | SC temperature-dependent and fragile on SBM -- small parameter changes flip SC sign, unreliable for gating |
-| F-049 | Fingerprint SC also fails -- SBM too homogeneous for any structural consistency formulation to be reliable |
-| F-050 | ROC AUC = 1.0, bootstrap CIs stable -- perfect discrimination between positive and negative controls |
-| F-051 | 0/13 confirmed under harmonised transition protocol -- original null result holds with calibrated instrument |
+| | Three independent causes of 0/13 generativity: metric insensitivity, confounded domains, placeholder thresholds |
+| | Empowerment 0/5 is genuine (topological) -- empowerment systems lack internal dynamics that survive domain switch |
+| | Instrument measured structural metric, not behavioural JSD -- original generativity used wrong comparison basis |
+| | HEB self-engagement seed-dependent (1/3) -- only one seed shows any signal, insufficient for replication |
+| | Placeholder threshold produced false positive (HEB conjunction) -- uncalibrated threshold flagged noise as signal |
+| | HEB generativity signal is seed noise -- B1 edge overlap confounds apparent signal |
+| | Null JSD distributions established per-type p95 floors -- 50 pairs per cell, bootstrap CIs confirm stability |
+| | step(inp) teleported graph walkers -- external input bypassed graph topology, producing artefactual transitions |
+| | Positive control signal below marginal JSD noise floor -- marginal JSD too insensitive to detect known transfer |
+| | Complete positive control results compiled -- PC1 and PC3 fully characterised across B0/B1/B2 |
+| | Transition JSD resolves sensitivity (10x lower floor) -- transition matrices capture dynamics marginal distributions miss |
+| | Perturbation audit: 19/21 fail before fix, 9/21 after fix -- SBM homogeneity limits perturbation targeting |
+| | Structural consistency appears to validate PC1 -- high SC values on PC1 suggest role-level transfer |
+| | SC temperature-dependent and fragile on SBM -- small parameter changes flip SC sign, unreliable for gating |
+| | Fingerprint SC also fails -- SBM too homogeneous for any structural consistency formulation to be reliable |
+| | ROC AUC = 1.0, bootstrap CIs stable -- perfect discrimination between positive and negative controls |
+| | 0/13 confirmed under harmonised transition protocol -- original null result holds with calibrated instrument |
 
 ---
 
-## 7. Decision Register (DN-25 through DN-32)
+## 7. Decision Register (through )
 
 | Decision | Summary |
 |----------|---------|
-| DN-25 | Phase A+ scope: investigate 0/13, build positive controls, recalibrate instrument |
-| DN-26 | Positive control strategy: use PC1 (predictive coding with transfer mechanism) and PC3 (enhanced PC with stronger transfer) |
-| DN-27 | step(None) policy: all generativity navigation uses autonomous stepping to avoid teleportation artefact (F-042) |
-| DN-28 | Remove Hebbian MOAT flag: HEB is publishable for self-engagement but does not exhibit generativity |
-| DN-29 | Generativity test design: transition JSD primary, per-type noise floors, 2/3 seed replication, degeneracy check |
-| DN-30a | Structural consistency definition and SBM addendum: SC is diagnostic only on SBM, coherence gating deferred to Phase B |
-| DN-31 | Domain difficulty ladder: B0 (isomorphic), B1 (shared node space), B2 (zero overlap) -- establishes confound gradient |
-| DN-32 | Phase B gating decisions: B2-primary policy, coherence deferral, heterogeneous domains required for SC validation |
+| | Phase A+ scope: investigate 0/13, build positive controls, recalibrate instrument |
+| | Positive control strategy: use PC1 (predictive coding with transfer mechanism) and PC3 (enhanced PC with stronger transfer) |
+| | step(None) policy: all generativity navigation uses autonomous stepping to avoid teleportation artefact |
+| | Hebbian walker publishable: HEB is publishable for self-engagement but does not exhibit generativity |
+| | Generativity test design: transition JSD primary, per-type noise floors, 2/3 seed replication, degeneracy check |
+| | Structural consistency definition and SBM addendum: SC is diagnostic only on SBM, coherence gating deferred to Phase B |
+| | Domain difficulty ladder: B0 (isomorphic), B1 (shared node space), B2 (zero overlap) -- establishes confound gradient |
+| | Phase B gating decisions: B2-primary policy, coherence deferral, heterogeneous domains required for SC validation |
 
 ---
 

@@ -19,10 +19,8 @@ from m8_battery.domains.presets import MEDIUM
 from m8_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
 from m8_battery.systems.positive_controls.gnn_navigator import GNNNavigator
 
-
 def _log(msg):
     print(f"[b0_test] {msg}", file=sys.stderr, flush=True)
-
 
 def js_divergence(p, q):
     """JSD base e, epsilon-smoothed."""
@@ -36,21 +34,17 @@ def js_divergence(p, q):
     jsd = 0.5 * kl_pm + 0.5 * kl_qm
     return max(0.0, min(jsd, np.log(2)))
 
-
 def coherence_normalised(trained_h, fresh_h):
     denom = fresh_h + trained_h + 1e-10
     return (fresh_h - trained_h) / denom
-
 
 def engagement_entropy(dist):
     vals = np.array(list(dist.values()), dtype=np.float64) + 1e-10
     vals = vals / vals.sum()
     return float(-np.sum(vals * np.log(vals)))
 
-
 def count_visited(dist, min_frac=0.01):
     return sum(1 for v in dist.values() if v > min_frac)
-
 
 def classify_signal(jsd, coherence, trained_vis, fresh_vis, edge_overlap=None):
     MAX_JSD = np.log(2)
@@ -68,7 +62,6 @@ def classify_signal(jsd, coherence, trained_vis, fresh_vis, edge_overlap=None):
         return "divergent_incoherent"
     return "candidate_generativity"
 
-
 def trajectory_autocorrelation(visit_sequence, node_to_community, lag=1):
     """Autocorrelation of community-membership sequence."""
     communities = [node_to_community.get(n, 0) for n in visit_sequence]
@@ -82,7 +75,6 @@ def trajectory_autocorrelation(visit_sequence, node_to_community, lag=1):
         return 1.0
     autocorr = np.sum((arr[:n-lag] - mean) * (arr[lag:] - mean)) / ((n - lag) * var)
     return float(autocorr)
-
 
 def run_generativity_with_trajectory(system, domain_graph, n_steps, node_to_community):
     """Run generativity protocol and return engagement + trajectory."""
@@ -102,7 +94,6 @@ def run_generativity_with_trajectory(system, domain_graph, n_steps, node_to_comm
 
     return engagement, entropy, visited, trajectory, autocorr
 
-
 def edge_jaccard(g1, g2):
     """Edge set Jaccard similarity."""
     e1 = set(g1.edges())
@@ -110,7 +101,6 @@ def edge_jaccard(g1, g2):
     if not e1 and not e2:
         return 0.0
     return len(e1 & e2) / len(e1 | e2)
-
 
 def get_community_map(graph):
     """Node to community mapping."""
@@ -120,7 +110,6 @@ def get_community_map(graph):
         features = data.get("features", {})
         mapping[node] = features.get("community", data.get("block", 0))
     return mapping
-
 
 def run_test(system_name, system_factory, control_factory, domain_a, domain_target,
              target_name, n_steps, seeds, edge_overlap):
@@ -169,7 +158,6 @@ def run_test(system_name, system_factory, control_factory, domain_a, domain_targ
              f"t_ac={trained_ac:.4f} f_ac={fresh_ac:.4f}")
 
     return results
-
 
 def main():
     seeds = [42, 123, 456]
@@ -256,7 +244,6 @@ def main():
 
     print(json.dumps(all_results, indent=2))
     _log("Done.")
-
 
 if __name__ == "__main__":
     main()

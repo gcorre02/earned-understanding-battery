@@ -35,10 +35,8 @@ from m8_battery.domains.sbm_generator import generate_domain_family
 from m8_battery.domains.presets import SMALL, MEDIUM, LARGE
 from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
 
-
 PRESETS = {"small": SMALL, "medium": MEDIUM, "large": LARGE}
 RESULTS_DIR = Path(__file__).parent.parent / "results" / "calibration"
-
 
 def _get_device() -> str:
     """Auto-detect CUDA. Use GPU for calibration, CPU for tests.
@@ -51,12 +49,10 @@ def _get_device() -> str:
     # return "cuda" if torch.cuda.is_available() else "cpu"
     return "cpu"
 
-
 def _count_communities(graph) -> int:
     """Count communities in graph."""
     return len({graph.nodes[n].get("features", {}).get("community", 0)
                 for n in graph.nodes()})
-
 
 def make_system(system_id: str, graph, seed: int, n_features: int):
     """Instantiate a system by ID. Returns (system, control_factory)."""
@@ -118,26 +114,21 @@ def make_system(system_id: str, graph, seed: int, n_features: int):
     else:
         raise ValueError(f"Unknown system: {system_id}")
 
-
 def _clone_with_graph(system, graph):
     system.set_graph(graph)
     return system
-
 
 def _train_gat(system, graph):
     system.train_on_domain(graph)
     return system
 
-
 def _train_dqn(system, graph):
     system.train_on_domain(graph)
     return system
 
-
 def _train_curiosity(system, graph):
     system.train_on_domain(graph)
     return system
-
 
 SYSTEM_CLASSES = {
     "1A": SystemClass.CLASS_1, "1B": SystemClass.CLASS_1, "1C": SystemClass.CLASS_1,
@@ -158,7 +149,6 @@ SYSTEM_NAMES = {
 }
 
 ALL_SYSTEMS = ["1A", "1B", "1C", "2A", "2B", "2C", "3A", "3B", "3C"]
-
 
 def run_single(
     system_id: str, scale: str, seed: int, preset: DomainConfig,
@@ -253,7 +243,6 @@ def run_single(
 
     return result_dict
 
-
 def main():
     parser = argparse.ArgumentParser(description="M8 Battery Calibration Runner")
     parser.add_argument("--scale", default="medium", choices=["small", "medium", "large"])
@@ -322,7 +311,6 @@ def main():
             passed = "PASS" if r["overall_passed"] else "FAIL"
             t = f"{r['battery_time_s']:.1f}s"
             print(f"{r['system_id']:<6} {r['seed']:<6} {passed:<10} {t:<8}")
-
 
 if __name__ == "__main__":
     main()

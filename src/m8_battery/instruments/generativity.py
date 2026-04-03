@@ -1,4 +1,4 @@
-"""Generativity instrument (DN-18 behavioural JSD + DN-30 coherence).
+"""Generativity instrument (behavioural JSD + coherence).
 
 Tests whether frozen earned structure produces coherent, differentiated
 responses on novel domains compared to a fresh system.
@@ -8,16 +8,16 @@ Metrics (peer reviewer #2 upgrade):
 - DIAGNOSTIC: Marginal engagement JSD (community visit proportions, retained)
 - Self-transition rate (community persistence, replaces autocorrelation)
 
-Pass condition (DN-29 strict + DN-30a addendum + Rigour Principles):
+Pass condition (strict + addendum + Rigour Principles):
 1. Transition JSD > calibrated noise floor (trained behaviour differs from fresh)
 2. Not degenerate (system visits >= 3 communities)
 3. Coherence metrics (entropy, structural consistency) reported as DIAGNOSTIC
-   — not gated on SBM domains (F-048/F-049: too homogeneous)
+   — not gated on SBM domains (too homogeneous)
 
 Threshold status: PRELIMINARY until derived from positive/negative distributions.
 Results with preliminary thresholds are RAW DATA, not classifications.
 
-Rigour Principles (from F-039 response):
+Rigour Principles (from response):
 - P1: No conclusions without calibrated thresholds
 - P2: Every metric bounded and interpretable
 - P4: Signal types distinguished
@@ -37,10 +37,8 @@ from m8_battery.core.types import InstrumentResult
 from m8_battery.core.provenance import ProvenanceLog
 from m8_battery.instruments.role_utils import classify_all_nodes, compute_role_transition_matrix, N_ROLES
 
-
 def _log(msg: str) -> None:
     print(f"[generativity] {msg}", file=sys.stderr, flush=True)
-
 
 # Maximum JSD for natural log = ln(2) ≈ 0.6931
 MAX_JSD = float(np.log(2))
@@ -50,7 +48,6 @@ MIN_VISITED_COMMUNITIES = 3
 
 # Threshold status
 THRESHOLD_STATUS = "PRELIMINARY"  # Change to CALIBRATED after proper derivation
-
 
 def _js_divergence(p: np.ndarray, q: np.ndarray) -> float:
     """Jensen-Shannon divergence (base e) between two distributions.
@@ -70,7 +67,6 @@ def _js_divergence(p: np.ndarray, q: np.ndarray) -> float:
     # Clamp to valid range (numerical safety)
     return max(0.0, min(jsd, MAX_JSD))
 
-
 def _engagement_entropy(dist: dict[str, float]) -> float:
     """Shannon entropy of engagement distribution. Range: [0, ln(n_regions)]."""
     if not dist or all(v <= 0 for v in dist.values()):
@@ -80,11 +76,9 @@ def _engagement_entropy(dist: dict[str, float]) -> float:
     vals = vals / vals.sum()
     return float(-np.sum(vals * np.log(vals)))
 
-
 def _count_visited(dist: dict[str, float], min_fraction: float = 0.01) -> int:
     """Count communities with non-trivial engagement (> min_fraction)."""
     return sum(1 for v in dist.values() if v > min_fraction)
-
 
 def _coherence_normalised(trained_entropy: float, fresh_entropy: float) -> float:
     """Normalised coherence difference. Bounded [-1, 1].
@@ -95,7 +89,6 @@ def _coherence_normalised(trained_entropy: float, fresh_entropy: float) -> float
     """
     denom = fresh_entropy + trained_entropy + 1e-10
     return float((fresh_entropy - trained_entropy) / denom)
-
 
 def _compute_transition_matrix(
     visit_sequence: list,
@@ -116,7 +109,6 @@ def _compute_transition_matrix(
     row_sums = np.maximum(row_sums, 1e-10)
     T = T / row_sums
     return T
-
 
 def _transition_jsd(T_trained: np.ndarray, T_fresh: np.ndarray) -> float:
     """Row-wise JSD between two transition matrices, weighted average.
@@ -142,7 +134,6 @@ def _transition_jsd(T_trained: np.ndarray, T_fresh: np.ndarray) -> float:
         return 0.0
     return float(np.clip(np.average(row_jsds, weights=np.array(weights)), 0.0, MAX_JSD))
 
-
 def _transition_entropy(T: np.ndarray) -> float:
     """Average row entropy of transition matrix. Lower = more structured."""
     row_entropies = []
@@ -153,7 +144,6 @@ def _transition_entropy(T: np.ndarray) -> float:
             row_entropies.append(float(-np.sum(row * np.log(row))))
     return float(np.mean(row_entropies)) if row_entropies else 0.0
 
-
 def _self_transition_rate(T: np.ndarray) -> float:
     """Average diagonal of transition matrix. Higher = more community persistence."""
     active_rows = [i for i in range(T.shape[0]) if T[i].sum() > 1e-10]
@@ -161,13 +151,12 @@ def _self_transition_rate(T: np.ndarray) -> float:
         return 0.0
     return float(np.mean([T[i, i] for i in active_rows]))
 
-
 def _structural_consistency(
     T_trained_A: np.ndarray,
     T_trained_B: np.ndarray,
     T_fresh_B: np.ndarray,
 ) -> float:
-    """DN-30a coherence: cosine similarity of role-aggregated transition matrices.
+    """ coherence: cosine similarity of role-aggregated transition matrices.
 
     Measures whether the trained system's behaviour on B reflects its
     earned structure from A, compared to a fresh system on B.
@@ -193,7 +182,6 @@ def _structural_consistency(
 
     return sim_trained - sim_fresh
 
-
 def _classify_signal(
     jsd: float,
     coherence: float,
@@ -217,7 +205,6 @@ def _classify_signal(
         return "divergent_incoherent"  # Maladaptive bias
     return "candidate_generativity"
 
-
 def run_generativity(
     system: TestSystem,
     domain_b_inputs: list[Any],
@@ -229,7 +216,7 @@ def run_generativity(
     domain_b_graph: Any = None,
     training_transition_matrix: np.ndarray | None = None,
 ) -> InstrumentResult:
-    """Run the generativity instrument (DN-18 behavioural + DN-30a coherence).
+    """Run the generativity instrument (behavioural + coherence).
 
     THRESHOLD STATUS: PRELIMINARY. Results are raw data, not classifications,
     until the threshold is derived from positive/negative distributions.
@@ -290,7 +277,7 @@ def run_generativity(
     trajectory_stability = 1.0 - (np.array(trajectory).std() / (np.array(trajectory).mean() + 1e-10))
     retention = metric_after / reference_metric if abs(reference_metric) > 1e-10 else 0.0
 
-    # --- Fresh system on domain B (DN-18 behavioural comparison) ---
+    # --- Fresh system on domain B (behavioural comparison) ---
     jsd = 0.0
     fresh_entropy = 0.0
     coherence = 0.0
@@ -302,7 +289,7 @@ def run_generativity(
     t_coherence = 0.0
     trained_self_trans = 0.0
     fresh_self_trans = 0.0
-    # DN-30a structural consistency (replaces entropy coherence as pass criterion)
+    # structural consistency (replaces entropy coherence as pass criterion)
     structural_consistency_value = 0.0
 
     # Build community mapping from domain B graph for transition matrix
@@ -336,7 +323,7 @@ def run_generativity(
             fresh_vec = np.array([fresh_engagement.get(r, 0.0) for r in regions])
             jsd = _js_divergence(trained_vec, fresh_vec)
 
-            # DN-30 coherence for marginal: normalised difference (bounded [-1, 1])
+            # coherence for marginal: normalised difference (bounded [-1, 1])
             coherence = _coherence_normalised(trained_entropy, fresh_entropy)
 
             # --- Transition-matrix metrics (PRIMARY) ---
@@ -350,7 +337,7 @@ def run_generativity(
                 trained_self_trans = _self_transition_rate(T_trained)
                 fresh_self_trans = _self_transition_rate(T_fresh)
 
-            # --- DN-30a: Role-aggregated structural consistency ---
+            # --- Role-aggregated structural consistency ---
             if domain_b_graph is not None and len(trained_visit_seq) > 1 and len(fresh_visit_seq) > 1:
                 node_to_role_b = classify_all_nodes(domain_b_graph)
                 T_role_trained_B = compute_role_transition_matrix(trained_visit_seq, node_to_role_b)
@@ -377,7 +364,7 @@ def run_generativity(
     # --- Pass/fail: PRELIMINARY threshold (Rigour Principle 1) ---
     # These classifications are PROVISIONAL until threshold is calibrated
     passes_jsd = jsd > jsd_threshold
-    # DN-30a addendum (F-048/F-049): coherence is DIAGNOSTIC on SBM domains.
+    # addendum (): coherence is DIAGNOSTIC on SBM domains.
     # SBM's homogeneous role distributions make coherence metrics fragile at
     # moderate preference strengths. Coherence gate deferred to Phase B
     # (heterogeneous domains). Pass criterion: transition_jsd > floor + not degenerate.
@@ -429,8 +416,8 @@ def run_generativity(
         "marginal_jsd": jsd,
         "transition_jsd": t_jsd,
         "structural_consistency": structural_consistency_value,
-        "concentration": coherence,  # DN-30 entropy (diagnostic only)
-        "transition_concentration": t_coherence,  # DN-30 transition entropy (diagnostic only)
+        "concentration": coherence,  # entropy (diagnostic only)
+        "transition_concentration": t_coherence,  # transition entropy (diagnostic only)
         "signal_type": signal_type,
         "trained_entropy": trained_entropy,
         "fresh_entropy": fresh_entropy,
@@ -461,10 +448,10 @@ def run_generativity(
             "fresh_engagement": fresh_engagement,
             # Transition-matrix JSD (primary metric — peer reviewer #2)
             "transition_jsd": float(t_jsd),
-            "transition_coherence": float(t_coherence),  # DN-30 entropy (now DIAGNOSTIC only)
+            "transition_coherence": float(t_coherence),  # entropy (now DIAGNOSTIC only)
             "trained_self_transition_rate": float(trained_self_trans),
             "fresh_self_transition_rate": float(fresh_self_trans),
-            # DN-30a structural consistency (PRIMARY coherence criterion)
+            # structural consistency (PRIMARY coherence criterion)
             "structural_consistency": float(structural_consistency_value),
             # Diagnostics
             "edge_overlap": edge_overlap,

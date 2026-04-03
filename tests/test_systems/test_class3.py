@@ -11,7 +11,6 @@ from m8_battery.domains.sbm_generator import generate_domain
 from m8_battery.domains.presets import SMALL
 from m8_battery.environments.graph_navigation import GraphNavigationEnv
 
-
 class TestGraphNavigationEnv:
     def test_env_creation(self):
         G = generate_domain(SMALL)
@@ -63,7 +62,6 @@ class TestGraphNavigationEnv:
             _, reward, _, _, _ = env.step(valid[0])
             assert reward == 0.0
 
-
 class TestDQNAgent:
     def test_train_and_step(self):
         from m8_battery.systems.class3.dqn_agent import DQNAgent
@@ -95,7 +93,6 @@ class TestDQNAgent:
         agent.train_on_domain(G)
         clone = agent.clone()
         assert clone._is_trained is False  # Clone starts fresh
-
 
 class TestCuriosityAgent:
     def test_train_and_step(self):

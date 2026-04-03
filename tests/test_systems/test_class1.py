@@ -8,7 +8,6 @@ from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
 from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator, NavigationStrategy
 from m8_battery.systems.class1.foxworthy_a import FoxworthyA
 
-
 class TestRuleBasedNavigator:
     def test_greedy_strategy(self):
         G = generate_domain(SMALL)
@@ -62,7 +61,6 @@ class TestRuleBasedNavigator:
         G = generate_domain(SMALL)
         system = RuleBasedNavigator(G)
         assert len(system.get_regions()) == 4
-
 
 class TestFoxworthyA:
     def test_basic_step(self):

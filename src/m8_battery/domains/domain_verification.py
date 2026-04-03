@@ -1,4 +1,4 @@
-"""Domain construction quality verification (T1-06).
+"""Domain construction quality verification.
 
 Verifies that domain pairs (A/A', A/B) preserve structural invariants
 while destroying surface statistics. Quantitative checks for each
@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import numpy as np
 import networkx as nx
-
 
 def verify_structural_preservation(
     G1: nx.DiGraph, G2: nx.DiGraph, k: int = 10,
@@ -74,7 +73,6 @@ def verify_structural_preservation(
         "spectral_similarity": spectral_similarity,
     }
 
-
 def verify_surface_destruction(
     G1: nx.DiGraph, G2: nx.DiGraph,
 ) -> dict[str, float]:
@@ -124,7 +122,6 @@ def verify_surface_destruction(
         "feature_shift": feature_shift,
     }
 
-
 def verify_domain_family(
     family: dict[str, nx.DiGraph],
 ) -> dict[str, dict]:
@@ -158,7 +155,6 @@ def verify_domain_family(
         }
 
     return results
-
 
 def check_leakage_channels(G: nx.DiGraph) -> list[str]:
     """Document known leakage channels in the domain construction.

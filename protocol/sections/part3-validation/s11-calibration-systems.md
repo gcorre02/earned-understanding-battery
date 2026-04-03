@@ -52,7 +52,7 @@ AMB = ambiguous (null result on that instrument, not a clear pass or fail).
 
 **Within-class consistency:**
 
-- **Class 1 (1A, 1B, 1C):** All three fail every instrument. No learning mechanism means no developmental trajectory, no earned structure, no generativity. Integration effects in 1A/1B are received (DN-22: earned_ratio = 1.00) and correctly excluded.
+- **Class 1 (1A, 1B, 1C):** All three fail every instrument. No learning mechanism means no developmental trajectory, no earned structure, no generativity. Integration effects in 1A/1B are received (earned_ratio = 1.00) and correctly excluded.
 - **Class 2 (2A, 2B, 2C):** All three fail the conjunction. Frozen weights preclude trajectory development. 2C shows transfer (earned_ratio = 1.26) but fails trajectory and generativity -- the conjunction catches it.
 - **Class 3 (3A-3E, HEB, STDP):** Variable per-instrument profiles but all fail the conjunction. HEB achieves the richest profile (trajectory + integration + transfer) but fails generativity and self-engagement. STDP passes trajectory, transfer, and self-engagement but fails integration and generativity. The conjunction requirement for all five instruments is the discriminative gate.
 

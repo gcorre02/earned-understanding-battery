@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """T1-09: Reprocess thresholds from final recalibration data.
 
-Applies DN-19 methodology (three-zone classification) to all instruments
-including earned ratio thresholds (DN-22). Validates conjunction for all
+Applies methodology (three-zone classification) to all instruments
+including earned ratio thresholds. Validates conjunction for all
 systems including Hebbian (internal) and STDP (4A-anchor).
 
 Produces:
@@ -37,7 +37,6 @@ INSTRUMENTS = [
     "self_engagement",
 ]
 
-
 def load_results():
     """Load all recalibration JSON files."""
     results = []
@@ -45,7 +44,6 @@ def load_results():
         with open(f) as fh:
             results.append(json.load(fh))
     return results
-
 
 def analyse_instrument(runs, inst_name):
     """Analyse one instrument across all runs."""
@@ -96,7 +94,6 @@ def analyse_instrument(runs, inst_name):
             es_vals = [v["es"] for v in vals]
             pass_vals = [v["passed"] for v in vals]
             print(f"    {sid}: ES={[round(v,4) for v in es_vals]} passed={pass_vals}")
-
 
 def conjunction_validation(runs):
     """Validate conjunction: no Class 1-3 system passes all 5."""
@@ -171,9 +168,8 @@ def conjunction_validation(runs):
         elif any(conj_passes):
             print(f"    WARNING: STDP passes full conjunction on some seeds")
 
-
 def failure_taxonomy(runs):
-    """Report failure modes from T1-05 taxonomy."""
+    """Report failure modes from taxonomy."""
     print(f"\n{'='*60}")
     print(f"  FAILURE MODE TAXONOMY")
     print(f"{'='*60}")
@@ -190,7 +186,7 @@ def failure_taxonomy(runs):
                 mode = "earned"
             elif "Precondition" in notes:
                 mode = "precondition-fail"
-            elif "not earned" in notes or "DN-22" in notes:
+            elif "not earned" in notes or "" in notes:
                 mode = "architectural"
             elif "No response" in notes or "constant" in notes or "unchanged" in notes:
                 mode = "absent"
@@ -207,7 +203,6 @@ def failure_taxonomy(runs):
         for mode, systems in sorted(modes.items()):
             unique = sorted(set(systems))
             print(f"    {mode}: {unique}")
-
 
 def main():
     print("T1-09: Threshold Reprocessing + Conjunction Validation")
@@ -234,7 +229,6 @@ def main():
     print(f"\n{'='*60}")
     print(f"  RECALIBRATION COMPLETE")
     print(f"{'='*60}")
-
 
 if __name__ == "__main__":
     main()

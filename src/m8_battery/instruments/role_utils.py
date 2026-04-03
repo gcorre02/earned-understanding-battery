@@ -18,7 +18,6 @@ import numpy as np
 ROLE_NAMES = ["hub", "bridge", "periphery", "leaf"]
 N_ROLES = len(ROLE_NAMES)
 
-
 def classify_node_role(graph: nx.DiGraph, node, mean_degree: float) -> int:
     """Classify a single node into a topological role.
 
@@ -52,7 +51,6 @@ def classify_node_role(graph: nx.DiGraph, node, mean_degree: float) -> int:
 
     return 2  # periphery
 
-
 def classify_all_nodes(graph: nx.DiGraph) -> dict:
     """Classify all nodes in a graph by topological role.
 
@@ -66,7 +64,6 @@ def classify_all_nodes(graph: nx.DiGraph) -> dict:
     else:
         mean_deg = sum(graph.degree(node) for node in graph.nodes()) / n
     return {node: classify_node_role(graph, node, mean_deg) for node in graph.nodes()}
-
 
 def compute_role_transition_matrix(
     visit_sequence: list,

@@ -498,7 +498,12 @@ def main():
                 node_to_role_a = classify_all_nodes(domain_a)
                 training_role_T = compute_role_transition_matrix(training_seq, node_to_role_a)
 
+                # DN-37: sync fresh baseline starting position with trained
+                init_pos = trained.get_initial_position()
                 fresh = cfg["fresh"](domain_a, seed)
+                if init_pos is not None and hasattr(fresh, '_current_node'):
+                    fresh._current_node = init_pos
+                    fresh._initial_position = init_pos
 
                 result = run_generativity_measurement(
                     trained, fresh, domain_graph,
@@ -532,7 +537,12 @@ def main():
             node_to_role_a = classify_all_nodes(domain_a)
             training_role_T = compute_role_transition_matrix(training_seq, node_to_role_a)
 
+            # DN-37: sync fresh baseline starting position
+            init_pos = trained.get_initial_position()
             fresh = cfg["fresh"](domain_a, seed)
+            if init_pos is not None and hasattr(fresh, '_current_node'):
+                fresh._current_node = init_pos
+                fresh._initial_position = init_pos
 
             result = run_generativity_measurement(
                 trained, fresh, domain_b1,

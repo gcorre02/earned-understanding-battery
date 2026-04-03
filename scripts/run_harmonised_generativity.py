@@ -326,27 +326,27 @@ def main():
     graph_walker_configs = {
         "HEB": {
             "factory": lambda g, s: HebbianWalker(g, seed=s, eta=0.1, decay=0.01, temperature=0.5),
-            "fresh": lambda g, s: HebbianWalker(g, seed=s + 1000),
+            "fresh": lambda g, s, ip=None: HebbianWalker(g, seed=s + 1000, initial_position=ip),
             "train_steps": 2000,
         },
         "3D": {
             "factory": lambda g, s: EmpowermentAgent(g, seed=s),
-            "fresh": lambda g, s: EmpowermentAgent(g, seed=s + 1000),
+            "fresh": lambda g, s, ip=None: EmpowermentAgent(g, seed=s + 1000, initial_position=ip),
             "train_steps": 2000,
         },
         "3E": {
             "factory": lambda g, s: ActiveInferenceAgent(g, seed=s),
-            "fresh": lambda g, s: ActiveInferenceAgent(g, seed=s + 1000),
+            "fresh": lambda g, s, ip=None: ActiveInferenceAgent(g, seed=s + 1000, initial_position=ip),
             "train_steps": 2000,
         },
         "PC1": {
             "factory": lambda g, s: RoleBasedWalker(g, seed=s, eta=0.8, temperature=0.01),
-            "fresh": lambda g, s: RoleBasedWalker(g, seed=s + 1000),
+            "fresh": lambda g, s, ip=None: RoleBasedWalker(g, seed=s + 1000, initial_position=ip),
             "train_steps": 10000,
         },
         "PC3": {
             "factory": lambda g, s: GNNNavigator(g, seed=s, train_epochs=500, temperature=0.05),
-            "fresh": lambda g, s: GNNNavigator(g, seed=s + 1000),
+            "fresh": lambda g, s, ip=None: GNNNavigator(g, seed=s + 1000, initial_position=ip),
             "train_steps": 2000,
         },
     }
@@ -500,10 +500,7 @@ def main():
 
                 # DN-37: sync fresh baseline starting position with trained
                 init_pos = trained.get_initial_position()
-                fresh = cfg["fresh"](domain_a, seed)
-                if init_pos is not None and hasattr(fresh, '_current_node'):
-                    fresh._current_node = init_pos
-                    fresh._initial_position = init_pos
+                fresh = cfg["fresh"](domain_a, seed, init_pos)
 
                 result = run_generativity_measurement(
                     trained, fresh, domain_graph,
@@ -537,12 +534,12 @@ def main():
             node_to_role_a = classify_all_nodes(domain_a)
             training_role_T = compute_role_transition_matrix(training_seq, node_to_role_a)
 
-            # DN-37: sync fresh baseline starting position
+            # DN-37: sync fresh baseline starting position (if factory supports it)
             init_pos = trained.get_initial_position()
-            fresh = cfg["fresh"](domain_a, seed)
-            if init_pos is not None and hasattr(fresh, '_current_node'):
-                fresh._current_node = init_pos
-                fresh._initial_position = init_pos
+            try:
+                fresh = cfg["fresh"](domain_a, seed, init_pos)
+            except TypeError:
+                fresh = cfg["fresh"](domain_a, seed)
 
             result = run_generativity_measurement(
                 trained, fresh, domain_b1,

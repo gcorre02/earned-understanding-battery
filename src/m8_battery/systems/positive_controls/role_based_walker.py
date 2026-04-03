@@ -99,6 +99,7 @@ class RoleBasedWalker(TestSystem):
         seed: int = 42,
         eta: float = 0.05,
         temperature: float = 1.0,
+        initial_position: int | None = None,
     ) -> None:
         self._graph = graph
         self._seed = seed
@@ -120,7 +121,11 @@ class RoleBasedWalker(TestSystem):
         self._role_rewards = np.zeros(N_ROLES)  # Accumulated engagement per role
 
         # Navigation state
-        self._current_node = self._nodes[0] if self._nodes else 0
+        if initial_position is not None and initial_position in self._graph:
+            self._current_node = initial_position
+        else:
+            self._current_node = self._nodes[0] if self._nodes else 0
+        self._initial_position = self._current_node
         self._visit_counts = np.zeros(self._n_nodes, dtype=np.float64)
         self._step_count = 0
         self._training = True
@@ -355,6 +360,9 @@ class RoleBasedWalker(TestSystem):
         communities = sorted(set(self._node_to_community.values()))
         return [f"community_{c}" for c in communities]
 
+    def get_initial_position(self) -> int:
+        return self._initial_position
+
     def clone(self) -> TestSystem:
         return self._clone_internal()
 
@@ -373,6 +381,7 @@ class RoleBasedWalker(TestSystem):
         new._role_visits = self._role_visits.copy()
         new._role_rewards = self._role_rewards.copy()
         new._current_node = self._current_node
+        new._initial_position = self._initial_position
         new._visit_counts = self._visit_counts.copy()
         new._step_count = self._step_count
         new._training = self._training
@@ -383,7 +392,8 @@ class RoleBasedWalker(TestSystem):
     def train_on_domain(self, graph: nx.DiGraph, n_steps: int = 1000) -> None:
         """Train role preferences by exploring the graph."""
         if graph is not self._graph:
-            self.__init__(graph, seed=self._seed, eta=self._eta, temperature=self._temperature)
+            self.__init__(graph, seed=self._seed, eta=self._eta, temperature=self._temperature,
+                         initial_position=getattr(self, '_initial_position', None))
         _log(f"Training role-based walker: {n_steps} steps, {self._n_nodes} nodes")
         for _ in range(n_steps):
             self.step(None)

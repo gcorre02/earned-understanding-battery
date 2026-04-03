@@ -54,6 +54,7 @@ class ActiveInferenceAgent(TestSystem):
         graph: nx.DiGraph,
         seed: int = 42,
         alpha: float = 1.0,  # Dirichlet prior concentration
+        initial_position: int | None = None,
     ) -> None:
         self._graph = graph
         self._seed = seed
@@ -84,7 +85,11 @@ class ActiveInferenceAgent(TestSystem):
         self._initial_pB = self._pB.copy()
 
         # Navigation state
-        self._current_node = self._nodes[0] if self._nodes else 0
+        if initial_position is not None and initial_position in self._graph:
+            self._current_node = initial_position
+        else:
+            self._current_node = self._nodes[0] if self._nodes else 0
+        self._initial_position = self._current_node
         self._visit_counts = np.zeros(self._n_nodes, dtype=np.float64)
         self._step_count = 0
         self._training = True
@@ -301,6 +306,9 @@ class ActiveInferenceAgent(TestSystem):
         communities = sorted(set(self._node_to_community.values()))
         return [f"community_{c}" for c in communities]
 
+    def get_initial_position(self) -> int:
+        return self._initial_position
+
     def clone(self) -> TestSystem:
         return self._clone_internal()
 
@@ -318,6 +326,7 @@ class ActiveInferenceAgent(TestSystem):
         new._pB = self._pB.copy()
         new._initial_pB = self._initial_pB.copy()
         new._current_node = self._current_node
+        new._initial_position = self._initial_position
         new._visit_counts = self._visit_counts.copy()
         new._step_count = self._step_count
         new._training = self._training
@@ -327,7 +336,8 @@ class ActiveInferenceAgent(TestSystem):
     def train_on_domain(self, graph: nx.DiGraph, n_steps: int = 500) -> None:
         """Train by exploring the graph under active inference."""
         if graph is not self._graph:
-            self.__init__(graph, seed=self._seed, alpha=self._alpha)
+            self.__init__(graph, seed=self._seed, alpha=self._alpha,
+                         initial_position=getattr(self, '_initial_position', None))
         _log(f"Training active inference agent: {n_steps} steps, {self._n_nodes} nodes")
         for _ in range(n_steps):
             self.step(None)

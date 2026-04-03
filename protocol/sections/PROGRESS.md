@@ -63,4 +63,23 @@
 
 ---
 
-## Completion: 18/18 sections written, aggregated, reviewed. Internal reference scrub in progress.
+## Completion: 18/18 sections written, aggregated, reviewed. Internal reference scrub DONE (commit 0d97dab).
+
+---
+
+## Outstanding Work (Pre-OSF, per DN-37)
+
+| # | Task | Status | Blocking? |
+|---|------|--------|-----------|
+| A | Starting position sync (all adapters) | **NEXT** | Yes — medium risk for SE |
+| B | Master protocol update (investigation findings in §4,§7,§9,§10) | Pending (after A) | Yes |
+| C | Add OSF 2 sentence to §17 | Pending (with B) | Minor |
+| D | Rerun SE ROC with synced positions | Pending (after A) | Verification |
+| E | Verify integration documentation | Pending | Documentation |
+| F | Create public repo (earned-understanding-battery) | Pending (after A-E) | Yes — repo hygiene |
+| G | Protocol fixes: ICL exclusion, commit hash, author name | Pending (with F) | Minor |
+
+See:
+- dn-37-heb-observation-starting-position-osf2-m5-tasks-2026-04-03.md
+- m5-investigation-cross-instrument-test-setup-risks-2026-04-03.md
+- m5-instruction-create-public-repo-earned-understanding-battery-2026-04-03.md

@@ -127,6 +127,18 @@ class TestSystem(ABC):
         has already earned. Default: no-op (systems that don't learn during
         step() need not override).
 
-        Used by generativity instrument (T1-03): domain B measurement must
+        Used by generativity instrument: domain B measurement must
         be frozen to distinguish structural influence from online adaptation.
         """
+
+    def get_initial_position(self) -> Any:
+        """Return the node the system started at (before any training).
+
+        Used to sync fresh baseline starting position with trained system.
+        The fresh baseline should start at the same position as the trained
+        system did at the beginning of training, ensuring the ONLY difference
+        is the training history, not the starting conditions.
+
+        Default: None (systems without a graph position concept).
+        """
+        return None

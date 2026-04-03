@@ -97,6 +97,7 @@ class GNNNavigator(TestSystem):
         lr: float = 0.01,
         train_epochs: int = 200,
         temperature: float = 0.5,
+        initial_position: int | None = None,
     ) -> None:
         self._graph = graph
         self._seed = seed
@@ -127,7 +128,11 @@ class GNNNavigator(TestSystem):
             self._node_to_community[node] = features.get("community", data.get("block", 0))
 
         # Navigation state
-        self._current_node = self._nodes[0] if self._nodes else 0
+        if initial_position is not None and initial_position in self._graph:
+            self._current_node = initial_position
+        else:
+            self._current_node = self._nodes[0] if self._nodes else 0
+        self._initial_position = self._current_node
         self._visit_counts = np.zeros(self._n_nodes, dtype=np.float64)
         self._step_count = 0
         self._training = True
@@ -303,6 +308,9 @@ class GNNNavigator(TestSystem):
         communities = sorted(set(self._node_to_community.values()))
         return [f"community_{c}" for c in communities]
 
+    def get_initial_position(self) -> int:
+        return self._initial_position
+
     def clone(self) -> TestSystem:
         return self._clone_internal()
 
@@ -326,6 +334,7 @@ class GNNNavigator(TestSystem):
         new._initial_state = {k: v.clone() for k, v in self._initial_state.items()}
         new._node_to_community = dict(self._node_to_community)
         new._current_node = self._current_node
+        new._initial_position = self._initial_position
         new._visit_counts = self._visit_counts.copy()
         new._step_count = self._step_count
         new._training = self._training
@@ -338,7 +347,8 @@ class GNNNavigator(TestSystem):
         if graph is not self._graph:
             self.__init__(graph, seed=self._seed, hidden_dim=self._hidden_dim,
                          embed_dim=self._embed_dim, lr=self._lr,
-                         train_epochs=self._train_epochs, temperature=self._temperature)
+                         train_epochs=self._train_epochs, temperature=self._temperature,
+                         initial_position=getattr(self, '_initial_position', None))
 
         # Phase 1: Train GCN to predict communities
         labels = _build_labels(self._graph)

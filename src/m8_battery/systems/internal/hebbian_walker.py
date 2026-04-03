@@ -55,6 +55,7 @@ class HebbianWalker(TestSystem):
         eta: float = 0.1,
         decay: float = 0.01,
         temperature: float = 0.5,
+        initial_position: int | None = None,
     ) -> None:
         self._original_graph = graph.copy()
         self._graph = graph.copy()
@@ -77,7 +78,11 @@ class HebbianWalker(TestSystem):
 
         # Walker state
         nodes = list(self._graph.nodes())
-        self._current_node: int = self._rng.choice(nodes) if nodes else 0
+        if initial_position is not None and initial_position in self._graph:
+            self._current_node = initial_position
+        else:
+            self._current_node: int = self._rng.choice(nodes) if nodes else 0
+        self._initial_position = self._current_node
         self._visit_counts: dict[int, int] = {}
         self._step_count = 0
 
@@ -289,6 +294,9 @@ class HebbianWalker(TestSystem):
         communities = sorted(set(self._node_to_community.values()))
         return [f"community_{c}" for c in communities]
 
+    def get_initial_position(self) -> int:
+        return self._initial_position
+
     def clone(self) -> TestSystem:
         return self._clone_internal()
 
@@ -304,6 +312,7 @@ class HebbianWalker(TestSystem):
         new._weights = dict(self._weights)
         new._original_weights = dict(self._original_weights)
         new._current_node = self._current_node
+        new._initial_position = self._initial_position
         new._visit_counts = dict(self._visit_counts)
         new._step_count = self._step_count
         new._node_to_community = dict(self._node_to_community)
@@ -315,6 +324,7 @@ class HebbianWalker(TestSystem):
         # Re-initialise on new graph if different
         if graph is not self._graph:
             self.__init__(graph, seed=self._seed, eta=self._eta,
-                         decay=self._decay, temperature=self._temperature)
+                         decay=self._decay, temperature=self._temperature,
+                         initial_position=getattr(self, '_initial_position', None))
         for _ in range(n_steps):
             self.step(None)

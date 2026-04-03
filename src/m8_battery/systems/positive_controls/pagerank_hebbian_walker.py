@@ -60,6 +60,7 @@ class PageRankHebbianWalker(TestSystem):
         beta: float = 1.0,
         recompute_interval: int = 50,
         damping: float = 0.85,
+        initial_position: int | None = None,
     ) -> None:
         self._original_graph = graph.copy()
         self._graph = graph.copy()
@@ -90,7 +91,11 @@ class PageRankHebbianWalker(TestSystem):
 
         # Walker state
         nodes = list(self._graph.nodes())
-        self._current_node: int = self._rng.choice(nodes) if nodes else 0
+        if initial_position is not None and initial_position in self._graph:
+            self._current_node = initial_position
+        else:
+            self._current_node: int = self._rng.choice(nodes) if nodes else 0
+        self._initial_position = self._current_node
         self._visit_counts: dict[int, int] = {}
         self._step_count = 0
 
@@ -357,6 +362,9 @@ class PageRankHebbianWalker(TestSystem):
 
     # --- Cloning ---
 
+    def get_initial_position(self) -> int:
+        return self._initial_position
+
     def clone(self) -> TestSystem:
         return self._clone_internal()
 
@@ -377,6 +385,7 @@ class PageRankHebbianWalker(TestSystem):
         new._pagerank = dict(self._pagerank)
         new._steps_since_recompute = self._steps_since_recompute
         new._current_node = self._current_node
+        new._initial_position = self._initial_position
         new._visit_counts = dict(self._visit_counts)
         new._step_count = self._step_count
         new._node_to_community = dict(self._node_to_community)
@@ -389,6 +398,7 @@ class PageRankHebbianWalker(TestSystem):
             self.__init__(graph, seed=self._seed, eta=self._eta,
                          decay=self._decay, temperature=self._temperature,
                          beta=self._beta, recompute_interval=self._recompute_interval,
-                         damping=self._damping)
+                         damping=self._damping,
+                         initial_position=getattr(self, '_initial_position', None))
         for _ in range(n_steps):
             self.step(None)

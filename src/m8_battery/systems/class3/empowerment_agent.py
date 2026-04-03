@@ -131,6 +131,7 @@ class EmpowermentAgent(TestSystem):
         seed: int = 42,
         recompute_interval: int = 50,
         temperature: float = 1.0,
+        initial_position: int | None = None,
     ) -> None:
         self._graph = graph
         self._seed = seed
@@ -152,7 +153,11 @@ class EmpowermentAgent(TestSystem):
         self._empowerment = np.ones(self._n_nodes) / self._n_nodes
 
         # Navigation state
-        self._current_node = self._nodes[0] if self._nodes else 0
+        if initial_position is not None and initial_position in self._graph:
+            self._current_node = initial_position
+        else:
+            self._current_node = self._nodes[0] if self._nodes else 0
+        self._initial_position = self._current_node
         self._visit_counts = np.zeros(self._n_nodes, dtype=np.float64)
         self._step_count = 0
         self._training = True
@@ -361,6 +366,9 @@ class EmpowermentAgent(TestSystem):
         communities = sorted(set(self._node_to_community.values()))
         return [f"community_{c}" for c in communities]
 
+    def get_initial_position(self) -> int:
+        return self._initial_position
+
     def clone(self) -> TestSystem:
         return self._clone_internal()
 
@@ -379,6 +387,7 @@ class EmpowermentAgent(TestSystem):
         new._observed_T = self._observed_T.copy()
         new._empowerment = self._empowerment.copy()
         new._current_node = self._current_node
+        new._initial_position = self._initial_position
         new._visit_counts = self._visit_counts.copy()
         new._step_count = self._step_count
         new._training = self._training
@@ -389,7 +398,8 @@ class EmpowermentAgent(TestSystem):
         """Train by exploring the graph and learning empowerment landscape."""
         if graph is not self._graph:
             self.__init__(graph, seed=self._seed, recompute_interval=self._recompute_interval,
-                         temperature=self._temperature)
+                         temperature=self._temperature,
+                         initial_position=getattr(self, '_initial_position', None))
         _log(f"Training empowerment agent: {n_steps} steps, {self._n_nodes} nodes")
         for _ in range(n_steps):
             self.step(None)

@@ -22,7 +22,7 @@ from m8_battery.core.test_system import TestSystem
 
 
 class FrozenLLM(TestSystem):
-    """Frozen TinyLlama adapter for the M8 battery.
+    """Frozen TinyLlama adapter for the Earned Understanding Battery.
 
     Loads TinyLlama-1.1B-Chat, freezes all weights, and uses it
     for text-based graph navigation. Structure metric = mean attention

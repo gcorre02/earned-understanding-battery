@@ -1,4 +1,4 @@
-"""Stochastic Block Model domain generation for the M8 battery."""
+"""Stochastic Block Model domain generation for the Earned Understanding Battery."""
 
 from __future__ import annotations
 

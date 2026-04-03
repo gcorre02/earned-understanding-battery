@@ -13,3 +13,7 @@ results/
 *.safetensors
 .pytest_cache/
 outputs/
+.DS_Store
+protocol/sections/
+results/m5-*
+results/m8-*

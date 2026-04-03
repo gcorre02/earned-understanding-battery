@@ -1,4 +1,4 @@
-"""Core data types for the M8 battery."""
+"""Core data types for the Earned Understanding Battery."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Tests for domain construction quality verification (T1-06)."""
+"""Tests for domain construction quality verification."""
 
 import pytest
 

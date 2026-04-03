@@ -103,7 +103,7 @@ class TestTransfer:
 
 class TestSelfEngagement:
     def test_class1_self_engagement_precondition_fail(self):
-        """Class 1: trajectory absent → self-engagement precondition FAIL (DN-20)."""
+        """Class 1: trajectory absent → self-engagement precondition FAIL."""
         system, family, nodes_a, _, _ = _make_system_and_inputs()
 
         # Operate first
@@ -422,11 +422,11 @@ class TestBaselineProtocol:
         reason="Foxworthy F (3C) requires GPU — run on M5 Max or CUDA machine"
     )
     def test_known_received(self):
-        """3C generativity should classify as 'received' (F-022/DN-18).
+        """3C generativity should classify as 'received' per earned ratio requirement.
 
         Fresh FoxworthyF passes generativity (pre-trained LLM responds to
         novel text). Classification: received — capability exists before
-        training. See F-022 resolution + DN-18.
+        training per earned ratio requirement.
 
         Skip on Razer — DistilGPT-2 too slow. Run on M5 Max.
         """
@@ -443,7 +443,7 @@ class TestBaselineProtocol:
 
             train_on_domain(G, n_warmup=0) loads the model without training,
             so get_structure_metric() returns the real Kaiming init norm (~8.0)
-            instead of 0.0. See F-022 lazy loading investigation.
+            instead of 0.0. See lazy loading investigation.
             """
             f = FoxworthyF(seed=99, device="cpu", theta=0.0)
             f.train_on_domain(G, n_warmup=0)
@@ -465,13 +465,13 @@ class TestBaselineProtocol:
         )
 
         cls = result.metadata["baseline"]["instrument_classifications"]
-        # T1-03: With learning frozen during generativity measurement, 3C no longer
-        # adapts to novel input. Classification changes from "received" (F-022) to
+        # With learning frozen during generativity measurement, 3C no longer
+        # adapts to novel input. Classification changes from "received" to
         # "absent" or "anomalous" depending on metric behaviour. Both trained and
         # fresh show minimal generativity when frozen. This is the correct outcome
-        # of T1-03 — generativity measures structural influence, not online adaptation.
+        # of learning freeze — generativity measures structural influence, not online adaptation.
         assert cls["generativity"] in ("absent", "anomalous", "received"), (
-            f"3C generativity should be absent/anomalous/received after T1-03 freeze, got {cls['generativity']}"
+            f"3C generativity should be absent/anomalous/received after learning freeze, got {cls['generativity']}"
         )
 
 

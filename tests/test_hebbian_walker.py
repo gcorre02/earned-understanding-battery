@@ -1,6 +1,6 @@
 """Tests for HebbianWalker (System HEB).
 
-Publishable per DN-28. Validates self-engagement instrument and
+Publishable: Hebb 1949, Dorigo 1992. Validates self-engagement instrument and
 demonstrates 4/5 battery profile (fails generativity).
 """
 

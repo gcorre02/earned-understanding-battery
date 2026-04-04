@@ -175,13 +175,15 @@ def run_integration(
     # Failure mode classification
     if has_integration:
         passed = True
-        # Check if it's fragile (control ablation also causes global change)
+        # Three-way failure mode subclassification (all compatible with PASS):
         if control_ablation_gini is not None and control_ablation_gini > 0.3:
-            failure_mode = "fragile"  # Any ablation causes global change
-        elif reorganisation_stability is not None and reorganisation_stability < 0.5:
-            failure_mode = "earned"  # Reorganises to new stable regime
+            failure_mode = "fragile"  # Any ablation causes global change — brittle, not selectively integrated
+        elif reorganisation_stability is not None and reorganisation_stability > 0.5:
+            failure_mode = "earned"  # System reorganises to a new stable regime after ablation
+        elif reorganisation_stability is not None and reorganisation_stability <= 0.5:
+            failure_mode = "earned_unsettled"  # Non-uniform ablation response but system has not stabilised within observation window
         else:
-            failure_mode = "earned"
+            failure_mode = "earned"  # No reorganisation_stability data available — classify as earned by default
         notes = f"Non-linear degradation detected: Gini={gini:.4f}, CV={cv:.4f}"
         if reorganisation_stability is not None:
             notes += f", reorganisation_stability={reorganisation_stability:.4f}"

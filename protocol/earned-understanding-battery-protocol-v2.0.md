@@ -514,7 +514,7 @@ The integration instrument computes the following metrics from per-region ablati
 |--------|-----------|-----------|
 | Gini | > 0.3 | Degradation magnitudes are sufficiently unequal -- some regions are disproportionately important |
 | CV | > 0.5 | Alternative gate: non-uniform degradation pattern |
-| Reorganisation stability | < 0.5 | Distinguishes fragile collapse (unstable) from earned reorganisation (stable new regime) |
+| Reorganisation stability | > 0.5 | System has settled into a new stable engagement regime after ablation (high cosine similarity between midpoint and endpoint distributions). Values below 0.5 indicate ongoing destabilisation. Diagnostic only — does not gate pass/fail, but informs failure-mode subclassification. |
 
 The integration gate requires `Gini > 0.3 OR CV > 0.5`. Either condition suffices because both capture the same underlying phenomenon (non-uniform ablation response) through different statistical lenses. The reorganisation stability check is used for failure-mode classification, not for the primary pass gate.
 
@@ -546,7 +546,7 @@ where:
 
 **Fragility check:** If `control_ablation_gini > 0.3` (removing a low-engagement region also causes global reorganisation), the failure mode is classified as `fragile` rather than `earned`. A fragile system passes the integration gate but the failure-mode classification flags that any perturbation -- not just targeted ablation -- causes reorganisation.
 
-The pass condition does not gate on reorganisation stability directly. Stability is diagnostic: it distinguishes earned integration (system reorganises to stable new regime) from fragile integration (system collapses and does not stabilise).
+The pass condition does not gate on reorganisation stability. Stability informs the failure-mode subclassification: `earned` (system reorganises and settles, stability > 0.5), `earned_unsettled` (system reorganises but has not settled within the observation window, stability <= 0.5), or `fragile` (any ablation causes global change, control_ablation_gini > 0.3). All three subclassifications are compatible with a PASS on the integration instrument — the Gini/CV gate and earned ratio are the pass criteria.
 
 ---
 
@@ -554,7 +554,8 @@ The pass condition does not gate on reorganisation stability directly. Stability
 
 | Mode | Condition | Interpretation |
 |------|-----------|----------------|
-| `earned` | has_integration AND earned_ratio > 1.0 AND (control_ablation_gini <= 0.3 OR reorganisation_stability < 0.5) | Genuine non-decomposable structure. Ablation causes selective, non-linear reorganisation. |
+| `earned` | has_integration AND earned_ratio > 1.0 AND control_ablation_gini <= 0.3 AND reorganisation_stability > 0.5 | Genuine non-decomposable structure. Ablation causes selective reorganisation and the system settles into a new stable regime. |
+| `earned_unsettled` | has_integration AND earned_ratio > 1.0 AND control_ablation_gini <= 0.3 AND reorganisation_stability <= 0.5 | Non-decomposable structure detected, but the ablated system has not stabilised within the observation window. Still a PASS — the observation window (M steps) may be too short for this architecture's reorganisation dynamics. |
 | `fragile` | has_integration AND control_ablation_gini > 0.3 | Any ablation causes global change. System is brittle, not selectively integrated. |
 | `absent` | max(abs(degradation)) < 1e-6 | No reorganisation at all. Ablation has no effect on the structure metric. |
 | `modular` | CV < 0.2 AND NOT has_integration | Only local effect per region. No cross-region reorganisation. System is decomposable. |
@@ -618,6 +619,8 @@ Recalibration data, medium scale (150 nodes), three seeds per system. PC-INT res
 4. **Fragile vs earned boundary.** The fragile/earned distinction depends on the control ablation (removing a low-engagement region). If all regions have similar engagement, the control ablation is not well-separated from the primary ablations, and the fragile classification may be unreliable. PC-INT seed 42 demonstrates this edge case: it passes integration but is classified as fragile because the control ablation also caused reorganisation.
 
 5. **Reorganisation stability is architecture-dependent.** HEB shows very high reorganisation stability (0.9997) because Hebbian walkers quickly find new equilibria. Other architectures may show lower stability not because they lack integration but because their reorganisation dynamics are slower. The stability metric is diagnostic only, not gated, for this reason.
+
+   Systems with slower reorganisation dynamics may show `earned_unsettled` classification (reorganisation_stability <= 0.5) despite having genuine integration. The observation window (M steps, default 50) was calibrated on the Phase A panel and may be insufficient for architectures with longer convergence times. The `earned_unsettled` classification does not affect the pass/fail verdict — it flags that the post-ablation stability question remains open for that system and merits longer observation in supplementary analysis.
 ## 8. Generativity
 
 **Status:** FROZEN

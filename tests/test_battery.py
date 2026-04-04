@@ -8,17 +8,17 @@ Full battery on Class 1 → overall FAIL (expected and correct).
 import pytest
 import torch
 
-from m8_battery.core.types import SystemClass
-from m8_battery.domains.sbm_generator import generate_domain, generate_domain_family
-from m8_battery.domains.presets import SMALL
-from m8_battery.instruments.integration import run_integration
-from m8_battery.instruments.generativity import run_generativity
-from m8_battery.instruments.transfer import run_transfer
-from m8_battery.instruments.self_engagement import run_self_engagement
-from m8_battery.instruments.provenance_constraint import check_provenance
-from m8_battery.instruments.battery_runner import run_battery, run_reset_discrimination, BatteryConfig
-from m8_battery.systems.class1.wordnet_graph import WordNetGraph
-from m8_battery.core.provenance import ProvenanceLog
+from earned_understanding_battery.core.types import SystemClass
+from earned_understanding_battery.domains.sbm_generator import generate_domain, generate_domain_family
+from earned_understanding_battery.domains.presets import SMALL
+from earned_understanding_battery.instruments.integration import run_integration
+from earned_understanding_battery.instruments.generativity import run_generativity
+from earned_understanding_battery.instruments.transfer import run_transfer
+from earned_understanding_battery.instruments.self_engagement import run_self_engagement
+from earned_understanding_battery.instruments.provenance_constraint import check_provenance
+from earned_understanding_battery.instruments.battery_runner import run_battery, run_reset_discrimination, BatteryConfig
+from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
+from earned_understanding_battery.core.provenance import ProvenanceLog
 
 def _make_system_and_inputs():
     """Helper: create a Class 1 system + domain family inputs."""
@@ -422,7 +422,7 @@ class TestBaselineProtocol:
 
         Skip on Razer — DistilGPT-2 too slow. Run on M5 Max.
         """
-        from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+        from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
 
         family = generate_domain_family(SMALL)
         G = family["A"]
@@ -521,7 +521,7 @@ class TestResetDiscrimination:
 
     def test_foxworthy_c_transient(self):
         """Foxworthy C (Class 2C): hidden state resets — transient dynamics."""
-        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+        from earned_understanding_battery.systems.class2.foxworthy_c import FoxworthyC
 
         G = generate_domain(SMALL)
         n_features = SMALL.n_node_features

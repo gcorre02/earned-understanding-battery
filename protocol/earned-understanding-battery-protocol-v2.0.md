@@ -11,94 +11,103 @@
 
 ## 1. Purpose and Scope
 
-The battery is a framework-agnostic empirical test for Class 4 candidacy as
-defined in Paper 1 Section 5. It operationalises five conjunctive necessary
-properties that a system must satisfy before it can be considered a candidate
-for understanding-as-earned-structure:
+The battery is a framework-agnostic empirical test for Class 4 candidacy as defined in Paper 1 (DOI: 10.5281/zenodo.19178410). It operationalises the five necessary properties proposed in Paper 1 Section 3 — emergence, stability, integration, operational impact, and transfer — as a conjunction of five instruments applied under a provenance constraint.
 
-1. **Emergence (Trajectory)** -- the system develops structured representations
-   over time that were not present at initialisation.
-2. **Stability (Self-Engagement)** -- the system actively maintains its acquired
-   structure under perturbation, rather than passively retaining it.
-3. **Integration** -- components of the acquired structure are mutually
-   informative, forming a coherent whole rather than isolated fragments.
-4. **Operational Impact (Generativity)** -- the acquired structure causally
-   shapes the system's future behaviour in observable ways.
-5. **Transfer** -- the structure generalises to structurally novel domains that
-   the system was not trained on.
+The battery does not validate the definition by measuring its components one by one. It attempts to falsify the regime predicted by the definition. Each instrument is an intervention designed to determine whether the system's organisational dynamics behave as the framework predicts. Failure of any instrument constitutes a negative result, regardless of task performance.
 
-Plus **provenance** as an epistemic condition (see Section 5).
+The battery is a Class 4 detector, not a spectrum classifier. It answers exactly one question: does the candidate satisfy all five necessary properties under the provenance constraint? It does not grade how much understanding a system possesses, nor does it rank candidates against one another.
 
-The battery is a **Class 4 detector**, not a spectrum classifier. It
-answers exactly one question: does the candidate satisfy all five necessary
-properties under the provenance constraint? It does not grade how much
-understanding a system possesses, nor does it rank candidates against one
-another.
+Capability and earning are orthogonal. A system can be highly capable — producing correct answers, solving complex tasks — without having earned its internal structure. The battery measures earning, not capability.
 
-Capability and earning are orthogonal. A system can be highly capable
--- producing correct answers, solving complex tasks -- without having earned its
-internal structure. The battery measures earning, not capability.
+### How the instruments probe the properties
 
-The framework's value lies in making the question answerable, not in
-guaranteeing the answer. A null result -- a system that fails the battery -- is
-a publishable finding that constrains the space of viable architectures
-(Paper 1 Section 10.1).
+The five instruments are not independent tests that happen to be conjoined. They probe a single regime from different angles, and their conjunction reflects the exclusion logic of Paper 1 Section 3.6: each instrument rules out a way in which the preceding properties could be satisfied without amounting to earned understanding.
 
-**Reference:** Paper 1, DOI 10.5281/zenodo.19178410.
+**Developmental trajectory** tracks whether structural organisation develops through operation — compression from diffuse to stable over time. A pre-registered measure of structural organisation is compared against a matched fresh system on the same inputs, and a positive result requires that the trained system's development exceeds what the architecture alone provides. Systems whose structure is fixed at initialisation show flat trajectories. Systems whose development is indistinguishable from a fresh instance have architectural trajectory, not earned trajectory. But even a system with a clear developmental trend may be producing structure that dissolves the moment input stops. That is why stability requires a separate instrument.
+
+**Self-engagement** tests whether developed structure is actively maintained. The perturbation protocol flattens local structural advantages and measures whether engagement bias toward consolidated regions persists or reconstructs. If it disappears, the structure was a side effect of current input, not something the system maintains. If it recovers, the system is doing work to preserve its own organisation. This instrument requires developmental trajectory as a precondition — there is no point testing maintenance of structure that never emerged. The two instruments are coupled by design, not by accident.
+
+**Integration** ablates consolidated regions and measures whether the system's global dynamics reorganise or merely continue with a piece missing. The key metric is non-uniformity of degradation across regions: if some regions matter disproportionately more than others under ablation, the structure is non-decomposable. The earned ratio separates integration developed through the system's own dynamics from integration received from graph topology — Class 1 systems show high integration from SBM community structure alone, and the earned ratio correctly rejects them. Integration tells us the structure is coherent. It does not tell us the structure does anything.
+
+**Generativity** freezes the system's learned state and places it on a domain it has never encountered. The evaluation domain (B2) shares no edges with the training domain — zero topological overlap, shifted node IDs, no shared features. Any above-noise signal on B2 is therefore from structural transfer, not residual familiarity or in-context learning. The freeze-then-switch design isolates what the structure does from what the system might learn on the spot. A system whose frozen structure produces coherent, differentiated navigation on a novel domain has structure that is operationally active, not inert. But a signal on B2 could in principle arise from distributional regularities in the SBM family rather than from relational structure the system has internalised. Transfer addresses that.
+
+**Transfer** exposes the system to a domain that preserves the relational invariants of its training domain while destroying surface statistics. Node labels are permuted, features are re-sampled, superficial cues are removed. If the experienced system converges faster than a matched naive system under these conditions, the advantage is traceable to structural correspondence rather than statistical familiarity. Transfer is the property that separates memorisation from earned structure. On its own, however, transfer can arise from standard statistical generalisation — a system that has seen enough distributional regularity can generalise without emergence, stability, integration, or operational impact. Only the conjunction discriminates.
+
+**Provenance** is the epistemic condition that makes the other five scientifically verifiable. Understanding may exist without traceability, a theatre ensemble's developmental trajectory can be described but not replayed from identical initial conditions, and it is no less Class 4 for that opacity. But scientific confirmation requires an unbroken evidential chain from inputs through dynamics to consolidated structure. Without provenance, instrument results are descriptions, not evidence. The battery is designed for computational systems not because understanding is restricted to computation, but because computation is the substrate in which provenance can be guaranteed.
+
+### Registration scope
+
+All threshold choices, domain parameters, and instrument designs in this document were informed by Phase A and Phase A+ calibration data. Those data existed before the protocol was frozen. The calibration panel (13 systems spanning Classes 1–3) was used to develop and validate the instruments, not to test the central hypothesis.
+
+Phase C — the evaluation of a Class 4 candidate — is the confirmatory stage. Results from Phase C will be interpreted under this frozen protocol. Supplementary analyses (Section 17) may inform discussion but do not alter the registered pass/fail rules unless formally amended per Section 18.
+
+The framework's value lies in making the question answerable, not in guaranteeing the answer. A null result — a system that fails the battery — is a publishable finding that constrains the space of viable architectures (Paper 1 Section 10.1).
+
 ## 2. Conjunction Logic
 
 ### The conjunction is the test
 
-All five instruments must return a positive result under the provenance
-constraint for the battery to pass. No single instrument is sufficient on its
-own (Paper 1 Section 3.6). The five properties are jointly necessary because
-each captures a distinct aspect of earned structure that the others do not
-entail.
+All five instruments must return a positive result under the provenance constraint for the battery to pass. No single instrument is sufficient on its own (Paper 1 Section 3.6). The five properties are jointly necessary because each captures a distinct aspect of earned structure that the others do not entail.
+
+The conjunction is not a checklist. It reflects the exclusion logic of Paper 1 Section 3.6: each property rules out a way in which the preceding ones could be satisfied without amounting to earned understanding.
+
+Emergence without stability is transient noise: organisation that appears and dissolves. Stability without integration is frozen modularity: persistent structure that remains side by side without mutual constraint. Integration without operational impact is dead structure: tightly coupled organisation that never changes what the system can do. Operational impact without transfer is context-bound expertise: behavioural transformation confined to one domain. Transfer without emergence is statistical generalisation: competence that extends to new contexts through distributional regularity rather than through structure earned during operation.
 
 ### No multiple-comparison correction
 
-Each instrument tests a **distinct property**. They are not repeated tests of
-the same hypothesis, nor are they correlated probes of a single latent
-variable. Standard multiple-comparison corrections (Bonferroni, FDR) are
-therefore inapplicable and would be methodologically incorrect. Each instrument
-has its own null hypothesis, its own test statistic, and its own threshold.
+Each instrument tests a distinct property. They are not repeated tests of the same hypothesis, nor are they correlated probes of a single latent variable. Standard multiple-comparison corrections (Bonferroni, FDR) are therefore inapplicable and would be methodologically incorrect. Each instrument has its own null hypothesis, its own test statistic, and its own threshold.
+
+### Seed-level aggregation and battery verdict
+
+Each instrument is evaluated across three seeds (42, 123, 456). An instrument passes if at least 2 of 3 seeds independently meet its pass condition. If seeds disagree, the conservative interpretation is adopted: a single seed passing is insufficient, as it could reflect initialisation luck rather than a systematic property.
+
+The battery verdict is the conjunction of the five instrument-level verdicts. Each instrument must pass (>=2/3 seeds) independently. If any instrument fails, the battery returns a negative result regardless of the other four.
 
 ### Partial pass semantics
 
-A partial pass (4 out of 5 instruments positive) constitutes a battery
-**FAIL**. There is no weighted score, no aggregate metric, and no "close
-enough" threshold. The specific failing instrument identifies which necessary
-property the system lacks, providing diagnostic value:
+A partial pass (4 out of 5 instruments positive) constitutes a battery **FAIL**. There is no weighted score, no aggregate metric, and no "close enough" threshold. The specific failing instrument identifies which necessary property the system lacks, providing diagnostic value:
 
-| Failing Instrument | Missing Property          |
-|--------------------|---------------------------|
-| Trajectory         | No emergent structure      |
-| Self-Engagement    | No active maintenance      |
-| Integration        | No structural coherence    |
-| Generativity       | No operational impact      |
-| Transfer           | No cross-domain generality |
+| Failing Instrument       | Missing Property           |
+|--------------------------|----------------------------|
+| Developmental Trajectory | No emergent structure      |
+| Self-Engagement          | No active maintenance      |
+| Integration              | No structural coherence    |
+| Generativity             | No operational impact      |
+| Transfer                 | No cross-domain generality |
+
+### Numerical tolerance
+
+For all instruments that use a ratio-based earned comparison (earned ratio, resistance ratio, recovery ratio), the following tolerance policy applies:
+
+- Ratios within epsilon = 0.01 of 1.0 (i.e., between 0.99 and 1.01 inclusive) are classified as **indeterminate** — neither clearly earned nor clearly absent.
+- Indeterminate results on a given seed are treated as **not-pass** for the 2/3 seed aggregation rule.
+- Raw ratios are always reported alongside the pass/fail classification, so that the magnitude of the effect is visible regardless of the gating decision.
+
+This policy prevents floating-point artefacts or negligible numerical advantages from being counted as genuine earning.
 
 ### Execution order
 
-The battery runner (`battery_runner.py`) evaluates all five instruments
-sequentially in the following order:
+The battery runner evaluates all five instruments sequentially:
 
-1. **Trajectory** -- must pass before Self-Engagement is meaningful
-2. **Integration** -- structural coherence of learned representations
-3. **Generativity (frozen)** -- operational impact with frozen weights
-4. **Transfer** -- generalisation to novel domain A'
-5. **Self-Engagement** -- gated by Trajectory precondition
+1. Developmental Trajectory
+2. Integration
+3. Generativity (frozen)
+4. Transfer
+5. Self-Engagement (gated by Trajectory precondition)
 
-Self-Engagement is executed last because it requires evidence that structure
-exists (Trajectory pass) before testing whether the system actively maintains
-that structure.
+Self-Engagement is executed last because it requires evidence that structure exists (Trajectory pass) before testing whether the system actively maintains that structure.
 
-### Baseline classification (Phase 8)
+### Run exclusion and failure handling
 
-After all instruments complete on the trained system, the battery runner
-executes baseline instruments on a fresh (untrained) system to classify each
-property as earned, received, absent, or anomalous. See Section 4 for baseline
-methodology.
+- A **provenance failure** (incomplete evidential chain) results in a battery FAIL regardless of instrument results.
+- A **precondition failure** (e.g., Self-Engagement when Trajectory did not pass) counts as a FAIL on that instrument, not as "not assessed." It enters the conjunction as a negative result.
+- A **perturbation-precondition failure** (the perturbation protocol could not meaningfully test the system) returns an indeterminate result on that seed. Indeterminate seeds count as not-pass for the 2/3 rule.
+- A **hardware or software failure** that prevents a seed from completing is documented and the seed is excluded. No replacement seeds are permitted. If fewer than 2 seeds complete for any instrument, that instrument cannot pass and the battery returns FAIL.
+- A **degeneracy** (system collapses to fewer than 3 communities) on a given seed is documented and that seed counts as FAIL for the affected instrument.
+
+### Baseline classification
+
+After all instruments complete on the trained system, the battery runner executes baseline instruments on a fresh (untrained) system to classify each property as earned, received, absent, or anomalous. See Section 4 for baseline methodology.
 ## 3. Domain Construction
 
 ### Domain family

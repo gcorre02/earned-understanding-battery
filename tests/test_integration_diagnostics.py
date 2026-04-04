@@ -8,10 +8,10 @@ import networkx as nx
 import numpy as np
 import pytest
 
-from m8_battery.core.types import DomainConfig
-from m8_battery.domains.sbm_generator import generate_domain
-from m8_battery.instruments.integration import run_integration
-from m8_battery.systems.class1.wordnet_graph import WordNetGraph
+from earned_understanding_battery.core.types import DomainConfig
+from earned_understanding_battery.domains.sbm_generator import generate_domain
+from earned_understanding_battery.instruments.integration import run_integration
+from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
 
 def _assign_features(G: nx.DiGraph, n_communities: int, method: str = "equal"):
     """Assign community features to nodes for region detection."""

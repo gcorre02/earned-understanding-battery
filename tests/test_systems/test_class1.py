@@ -1,12 +1,12 @@
 """Tests for Class 1 system adapters."""
 
-from m8_battery.core.types import SystemClass
-from m8_battery.domains.sbm_generator import generate_domain, generate_domain_family
-from m8_battery.domains.presets import SMALL
-from m8_battery.instruments.developmental_trajectory import run_developmental_trajectory
-from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
-from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator, NavigationStrategy
-from m8_battery.systems.class1.foxworthy_a import FoxworthyA
+from earned_understanding_battery.core.types import SystemClass
+from earned_understanding_battery.domains.sbm_generator import generate_domain, generate_domain_family
+from earned_understanding_battery.domains.presets import SMALL
+from earned_understanding_battery.instruments.developmental_trajectory import run_developmental_trajectory
+from earned_understanding_battery.instruments.battery_runner import run_battery, BatteryConfig
+from earned_understanding_battery.systems.class1.rule_navigator import RuleBasedNavigator, NavigationStrategy
+from earned_understanding_battery.systems.class1.foxworthy_a import FoxworthyA
 
 class TestRuleBasedNavigator:
     def test_greedy_strategy(self):

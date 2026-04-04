@@ -1,4 +1,4 @@
-"""Extract traversal data from all 9 M8 battery systems for Blender animation.
+"""Extract traversal data from all 9 Earned Understanding Battery systems for Blender animation.
 
 Generates a MEDIUM SBM graph, runs each system through 200 steps,
 captures per-step node visits, computes 3D layout, exports to JSON.
@@ -23,9 +23,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import networkx as nx
 import torch
-from m8_battery.core.types import DomainConfig
-from m8_battery.domains.sbm_generator import generate_domain
-from m8_battery.domains.presets import MEDIUM
+from earned_understanding_battery.core.types import DomainConfig
+from earned_understanding_battery.domains.sbm_generator import generate_domain
+from earned_understanding_battery.domains.presets import MEDIUM
 
 RESULTS_DIR = Path(__file__).parent.parent / "results" / "animation"
 
@@ -57,52 +57,52 @@ def make_system(system_id: str, graph: nx.DiGraph):
     device = _get_device()
 
     if system_id == "1A":
-        from m8_battery.systems.class1.wordnet_graph import WordNetGraph
+        from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
         return WordNetGraph(graph=graph, seed=SEED)
 
     elif system_id == "1B":
-        from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator
+        from earned_understanding_battery.systems.class1.rule_navigator import RuleBasedNavigator
         return RuleBasedNavigator(graph=graph, seed=SEED)
 
     elif system_id == "1C":
-        from m8_battery.systems.class1.foxworthy_a import FoxworthyA
+        from earned_understanding_battery.systems.class1.foxworthy_a import FoxworthyA
         s = FoxworthyA(n_features=N_FEATURES, seed=SEED)
         s.set_graph(graph)
         return s
 
     elif system_id == "2A":
-        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        from earned_understanding_battery.systems.class2.frozen_llm import FrozenLLM
         s = FrozenLLM(seed=SEED, device=device)
         s.set_graph(graph)
         s.load_model()
         return s
 
     elif system_id == "2B":
-        from m8_battery.systems.class2.frozen_gnn import FrozenGAT
+        from earned_understanding_battery.systems.class2.frozen_gnn import FrozenGAT
         s = FrozenGAT(n_features=N_FEATURES, n_classes=N_COMMUNITIES, seed=SEED)
         s.train_on_domain(graph, epochs=50)
         return s
 
     elif system_id == "2C":
-        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+        from earned_understanding_battery.systems.class2.foxworthy_c import FoxworthyC
         s = FoxworthyC(n_features=N_FEATURES, seed=SEED)
         s.set_graph(graph)
         return s
 
     elif system_id == "3A":
-        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
         s = DQNAgent(seed=SEED)
         s.train_on_domain(graph)
         return s
 
     elif system_id == "3B":
-        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
         s = CuriosityAgent(seed=SEED)
         s.train_on_domain(graph)
         return s
 
     elif system_id == "3C":
-        from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+        from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
         s = FoxworthyF(seed=SEED, device=device, theta=0.0)
         s.set_graph(graph)
         s.load_model()
@@ -133,7 +133,7 @@ def main():
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("=== M8 Traversal Data Extraction ===")
+    print("=== Traversal Data Extraction ===")
     print(f"Steps: {args.steps}, Lightweight: {args.lightweight_only}")
     print()
 

@@ -19,9 +19,9 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from m8_battery.core.types import DomainConfig, SystemClass
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
+from earned_understanding_battery.core.types import DomainConfig, SystemClass
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.instruments.battery_runner import run_battery, BatteryConfig
 
 MEDIUM = DomainConfig(
     n_nodes=150, n_communities=6,
@@ -78,53 +78,53 @@ def make_system(system_id, graph, seed, n_features):
     n_classes = _count_communities(graph)
 
     if system_id == "1A":
-        from m8_battery.systems.class1.wordnet_graph import WordNetGraph
+        from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
         s = WordNetGraph(graph, seed=seed)
         return s, lambda: WordNetGraph(graph, seed=seed + 1000)
 
     elif system_id == "1B":
-        from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator
+        from earned_understanding_battery.systems.class1.rule_navigator import RuleBasedNavigator
         s = RuleBasedNavigator(graph, seed=seed)
         return s, lambda: RuleBasedNavigator(graph, seed=seed + 1000)
 
     elif system_id == "1C":
-        from m8_battery.systems.class1.foxworthy_a import FoxworthyA
+        from earned_understanding_battery.systems.class1.foxworthy_a import FoxworthyA
         s = FoxworthyA(n_features=n_features, seed=seed)
         s.set_graph(graph)
         return s, lambda: _clone_with_graph(FoxworthyA(n_features=n_features, seed=seed + 1000), graph)
 
     elif system_id == "2A":
-        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        from earned_understanding_battery.systems.class2.frozen_llm import FrozenLLM
         s = FrozenLLM(seed=seed, device=device)
         s.set_graph(graph)
         return s, lambda: _clone_with_graph(FrozenLLM(seed=seed + 1000, device=device), graph)
 
     elif system_id == "2B":
-        from m8_battery.systems.class2.frozen_gnn import FrozenGAT
+        from earned_understanding_battery.systems.class2.frozen_gnn import FrozenGAT
         s = FrozenGAT(n_features=n_features, n_classes=n_classes, seed=seed)
         s.train_on_domain(graph)
         return s, lambda: (lambda g: (g.train_on_domain(graph), g)[-1])(FrozenGAT(n_features=n_features, n_classes=n_classes, seed=seed + 1000))
 
     elif system_id == "2C":
-        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+        from earned_understanding_battery.systems.class2.foxworthy_c import FoxworthyC
         s = FoxworthyC(n_features=n_features, hidden_dim=32, seed=seed)
         s.set_graph(graph)
         return s, lambda: _clone_with_graph(FoxworthyC(n_features=n_features, hidden_dim=32, seed=seed + 1000), graph)
 
     elif system_id == "3A":
-        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
         s = DQNAgent(n_features=n_features, seed=seed, total_timesteps=2000)
         s.train_on_domain(graph)
         return s, lambda: (lambda g: (g.train_on_domain(graph), g)[-1])(DQNAgent(n_features=n_features, seed=seed + 1000, total_timesteps=2000))
 
     elif system_id == "3B":
-        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
         s = CuriosityAgent(n_features=n_features, seed=seed, total_timesteps=2000)
         s.train_on_domain(graph)
         return s, lambda: (lambda g: (g.train_on_domain(graph), g)[-1])(CuriosityAgent(n_features=n_features, seed=seed + 1000, total_timesteps=2000))
 
     elif system_id == "3C":
-        from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+        from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
         s = FoxworthyF(seed=seed, device=device, theta=0.0)
         s.train_on_domain(graph, n_warmup=50)
         def _make_3c_control(g=graph, d=device, sd=seed):
@@ -137,13 +137,13 @@ def make_system(system_id, graph, seed, n_features):
         return s, _make_3c_control
 
     elif system_id == "HEB":
-        from m8_battery.systems.internal.hebbian_walker import HebbianWalker
+        from earned_understanding_battery.systems.internal.hebbian_walker import HebbianWalker
         s = HebbianWalker(graph, seed=seed, eta=0.1, decay=0.01, temperature=0.5)
         s.train_on_domain(graph, n_steps=300)
         return s, lambda sd=seed: HebbianWalker(graph, seed=sd + 1000, eta=0.1, decay=0.01, temperature=0.5)
 
     elif system_id == "STDP":
-        from m8_battery.systems.anchor.stdp_network import STDPNetwork
+        from earned_understanding_battery.systems.anchor.stdp_network import STDPNetwork
         s = STDPNetwork(n_neurons=1000, connection_prob=0.1, seed=seed, n_groups=4)
         s.train_on_domain(None, duration_s=10.0)
         def _make_stdp_fresh(sd=seed):
@@ -154,13 +154,13 @@ def make_system(system_id, graph, seed, n_features):
         return s, _make_stdp_fresh
 
     elif system_id == "3D":
-        from m8_battery.systems.class3.empowerment_agent import EmpowermentAgent
+        from earned_understanding_battery.systems.class3.empowerment_agent import EmpowermentAgent
         s = EmpowermentAgent(graph, seed=seed, recompute_interval=100)
         s.train_on_domain(graph, n_steps=2000)
         return s, lambda g=graph, sd=seed: EmpowermentAgent(g, seed=sd + 1000, recompute_interval=100)
 
     elif system_id == "3E":
-        from m8_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
+        from earned_understanding_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
         s = ActiveInferenceAgent(graph, seed=seed)
         s.train_on_domain(graph, n_steps=1000)
         return s, lambda g=graph, sd=seed: ActiveInferenceAgent(g, seed=sd + 1000)

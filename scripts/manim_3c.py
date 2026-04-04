@@ -4,7 +4,7 @@ Single panel: nodes appear on discovery, edges grow on traversal.
 Gold light on dark background. The exploration → consolidation transition.
 
 Usage:
-    cd m8-battery
+    cd earned-understanding-battery
     manim -pql scripts/manim_3c.py GrowingGraph3C   # low quality preview
     manim -pqh scripts/manim_3c.py GrowingGraph3C   # high quality
 """

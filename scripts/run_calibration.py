@@ -30,10 +30,10 @@ import numpy as np
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from m8_battery.core.types import DomainConfig, SystemClass
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.domains.presets import SMALL, MEDIUM, LARGE
-from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
+from earned_understanding_battery.core.types import DomainConfig, SystemClass
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.domains.presets import SMALL, MEDIUM, LARGE
+from earned_understanding_battery.instruments.battery_runner import run_battery, BatteryConfig
 
 PRESETS = {"small": SMALL, "medium": MEDIUM, "large": LARGE}
 RESULTS_DIR = Path(__file__).parent.parent / "results" / "calibration"
@@ -60,53 +60,53 @@ def make_system(system_id: str, graph, seed: int, n_features: int):
     n_classes = _count_communities(graph)
 
     if system_id == "1A":
-        from m8_battery.systems.class1.wordnet_graph import WordNetGraph
+        from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
         system = WordNetGraph(graph, seed=seed)
         return system, lambda: WordNetGraph(graph, seed=seed + 1000)
 
     elif system_id == "1B":
-        from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator
+        from earned_understanding_battery.systems.class1.rule_navigator import RuleBasedNavigator
         system = RuleBasedNavigator(graph, seed=seed)
         return system, lambda: RuleBasedNavigator(graph, seed=seed + 1000)
 
     elif system_id == "1C":
-        from m8_battery.systems.class1.foxworthy_a import FoxworthyA
+        from earned_understanding_battery.systems.class1.foxworthy_a import FoxworthyA
         system = FoxworthyA(n_features=n_features, seed=seed)
         system.set_graph(graph)
         return system, lambda: _clone_with_graph(FoxworthyA(n_features=n_features, seed=seed + 1000), graph)
 
     elif system_id == "2A":
-        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        from earned_understanding_battery.systems.class2.frozen_llm import FrozenLLM
         system = FrozenLLM(seed=seed, device=device)
         system.set_graph(graph)
         return system, lambda: _clone_with_graph(FrozenLLM(seed=seed + 1000, device=device), graph)
 
     elif system_id == "2B":
-        from m8_battery.systems.class2.frozen_gnn import FrozenGAT
+        from earned_understanding_battery.systems.class2.frozen_gnn import FrozenGAT
         system = FrozenGAT(n_features=n_features, n_classes=n_classes, seed=seed)
         system.train_on_domain(graph)
         return system, lambda: _train_gat(FrozenGAT(n_features=n_features, n_classes=n_classes, seed=seed + 1000), graph)
 
     elif system_id == "2C":
-        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+        from earned_understanding_battery.systems.class2.foxworthy_c import FoxworthyC
         system = FoxworthyC(n_features=n_features, hidden_dim=32, seed=seed)
         system.set_graph(graph)
         return system, lambda: _clone_with_graph(FoxworthyC(n_features=n_features, hidden_dim=32, seed=seed + 1000), graph)
 
     elif system_id == "3A":
-        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
         system = DQNAgent(n_features=n_features, seed=seed, total_timesteps=2000)
         system.train_on_domain(graph)
         return system, lambda: _train_dqn(DQNAgent(n_features=n_features, seed=seed + 1000, total_timesteps=2000), graph)
 
     elif system_id == "3B":
-        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
         system = CuriosityAgent(n_features=n_features, seed=seed, total_timesteps=2000)
         system.train_on_domain(graph)
         return system, lambda: _train_curiosity(CuriosityAgent(n_features=n_features, seed=seed + 1000, total_timesteps=2000), graph)
 
     elif system_id == "3C":
-        from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+        from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
         system = FoxworthyF(seed=seed, device=device, theta=0.0)
         system.train_on_domain(graph, n_warmup=50)
         return system, lambda: _clone_with_graph(FoxworthyF(seed=seed + 1000, device=device, theta=0.0), graph)
@@ -244,7 +244,7 @@ def run_single(
     return result_dict
 
 def main():
-    parser = argparse.ArgumentParser(description="M8 Battery Calibration Runner")
+    parser = argparse.ArgumentParser(description="Earned Understanding Battery Calibration Runner")
     parser.add_argument("--scale", default="medium", choices=["small", "medium", "large"])
     parser.add_argument("--seeds", default="42,123,456")
     parser.add_argument("--systems", default=",".join(ALL_SYSTEMS))
@@ -257,7 +257,7 @@ def main():
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    print(f"=== M8 Calibration: {scale.upper()} ({preset.n_nodes} nodes) ===")
+    print(f"=== Calibration: {scale.upper()} ({preset.n_nodes} nodes) ===")
     print(f"Systems: {systems}")
     print(f"Seeds: {seeds}")
     print()

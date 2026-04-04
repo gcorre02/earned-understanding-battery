@@ -4,10 +4,10 @@ import json
 import tempfile
 from pathlib import Path
 
-from m8_battery.core.types import (
+from earned_understanding_battery.core.types import (
     BatteryResult, DomainConfig, InstrumentResult, SystemClass,
 )
-from m8_battery.core.provenance import ProvenanceLog
+from earned_understanding_battery.core.provenance import ProvenanceLog
 
 class TestInstrumentResult:
     def test_basic_creation(self):

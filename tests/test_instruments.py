@@ -1,10 +1,10 @@
 """Tests for battery instruments."""
 
-from m8_battery.core.types import DomainConfig
-from m8_battery.domains.sbm_generator import generate_domain
-from m8_battery.domains.presets import SMALL
-from m8_battery.instruments.developmental_trajectory import run_developmental_trajectory
-from m8_battery.systems.class1.wordnet_graph import WordNetGraph
+from earned_understanding_battery.core.types import DomainConfig
+from earned_understanding_battery.domains.sbm_generator import generate_domain
+from earned_understanding_battery.domains.presets import SMALL
+from earned_understanding_battery.instruments.developmental_trajectory import run_developmental_trajectory
+from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
 
 class TestDevelopmentalTrajectory:
     """Tests for the developmental trajectory instrument."""
@@ -52,7 +52,7 @@ class TestDevelopmentalTrajectory:
 
     def test_provenance_logged(self):
         """Instrument should produce provenance events."""
-        from m8_battery.core.provenance import ProvenanceLog
+        from earned_understanding_battery.core.provenance import ProvenanceLog
 
         G = generate_domain(SMALL)
         system = WordNetGraph(G, seed=42)

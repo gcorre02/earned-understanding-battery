@@ -17,20 +17,20 @@ from math import log2
 
 import numpy as np
 
-from m8_battery.analysis.behavioural_generativity import (
+from earned_understanding_battery.analysis.behavioural_generativity import (
     generate_paired_domains,
     record_behaviour,
     compute_behavioural_divergence,
     classify_divergence,
     BehaviourTrace,
 )
-from m8_battery.systems.class1.wordnet_graph import WordNetGraph
-from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator
-from m8_battery.systems.class1.foxworthy_a import FoxworthyA
-from m8_battery.systems.class2.frozen_llm import FrozenLLM
-from m8_battery.systems.class2.frozen_gnn import FrozenGAT
-from m8_battery.systems.class3.dqn_agent import DQNAgent
-from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
+from earned_understanding_battery.systems.class1.rule_navigator import RuleBasedNavigator
+from earned_understanding_battery.systems.class1.foxworthy_a import FoxworthyA
+from earned_understanding_battery.systems.class2.frozen_llm import FrozenLLM
+from earned_understanding_battery.systems.class2.frozen_gnn import FrozenGAT
+from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
+from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
 
 SCALES_BASE = [
     ("SMALL", 50, 4),
@@ -142,7 +142,7 @@ def run_single(system_id, scale_name, n_nodes, n_communities, seed):
             trained.train_on_domain(domain_a)
             trained.set_graph(domain_b)
             # Recreate env for domain_b so observations match
-            from m8_battery.environments.graph_navigation import GraphNavigationEnv
+            from earned_understanding_battery.environments.graph_navigation import GraphNavigationEnv
             trained._env = GraphNavigationEnv(
                 graph=domain_b, n_features=trained._n_features,
                 max_degree=trained._max_degree, reward_mode="target",
@@ -155,7 +155,7 @@ def run_single(system_id, scale_name, n_nodes, n_communities, seed):
             trained.train_on_domain(domain_a)
             trained.set_graph(domain_b)
             # Recreate env for domain_b
-            from m8_battery.environments.graph_navigation import GraphNavigationEnv
+            from earned_understanding_battery.environments.graph_navigation import GraphNavigationEnv
             trained._env = GraphNavigationEnv(
                 graph=domain_b, n_features=8,
                 max_degree=20, reward_mode="curiosity",

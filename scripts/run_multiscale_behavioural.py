@@ -17,15 +17,15 @@ from math import log2
 
 import numpy as np
 
-from m8_battery.analysis.behavioural_generativity import (
+from earned_understanding_battery.analysis.behavioural_generativity import (
     generate_paired_domains,
     record_behaviour,
     compute_behavioural_divergence,
     classify_divergence,
     BehaviourTrace,
 )
-from m8_battery.systems.class3.foxworthy_f import FoxworthyF
-from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
+from earned_understanding_battery.systems.class2.foxworthy_c import FoxworthyC
 
 # Scale ladder
 SCALES = [

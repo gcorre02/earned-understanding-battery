@@ -6,10 +6,10 @@ Total timesteps kept low (2000) for test speed.
 
 import pytest
 
-from m8_battery.core.types import SystemClass
-from m8_battery.domains.sbm_generator import generate_domain
-from m8_battery.domains.presets import SMALL
-from m8_battery.environments.graph_navigation import GraphNavigationEnv
+from earned_understanding_battery.core.types import SystemClass
+from earned_understanding_battery.domains.sbm_generator import generate_domain
+from earned_understanding_battery.domains.presets import SMALL
+from earned_understanding_battery.environments.graph_navigation import GraphNavigationEnv
 
 class TestGraphNavigationEnv:
     def test_env_creation(self):
@@ -64,7 +64,7 @@ class TestGraphNavigationEnv:
 
 class TestDQNAgent:
     def test_train_and_step(self):
-        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
 
         G = generate_domain(SMALL)
         agent = DQNAgent(seed=42, total_timesteps=500)
@@ -77,7 +77,7 @@ class TestDQNAgent:
         assert result["trained"] is True
 
     def test_regions(self):
-        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
 
         G = generate_domain(SMALL)
         agent = DQNAgent(seed=42)
@@ -86,7 +86,7 @@ class TestDQNAgent:
         assert len(regions) == 4
 
     def test_clone(self):
-        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
 
         G = generate_domain(SMALL)
         agent = DQNAgent(seed=42, total_timesteps=500)
@@ -96,7 +96,7 @@ class TestDQNAgent:
 
 class TestCuriosityAgent:
     def test_train_and_step(self):
-        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
 
         G = generate_domain(SMALL)
         agent = CuriosityAgent(seed=42, total_timesteps=500)
@@ -107,7 +107,7 @@ class TestCuriosityAgent:
         assert result["current_node"] is not None
 
     def test_structure_metric_exists(self):
-        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
 
         G = generate_domain(SMALL)
         agent = CuriosityAgent(seed=42, total_timesteps=500)
@@ -116,7 +116,7 @@ class TestCuriosityAgent:
         assert isinstance(metric, float)
 
     def test_clone(self):
-        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
 
         G = generate_domain(SMALL)
         agent = CuriosityAgent(seed=42, total_timesteps=500)

@@ -7,9 +7,9 @@ demonstrates 4/5 battery profile (fails generativity).
 import pytest
 import numpy as np
 
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.domains.presets import SMALL
-from m8_battery.systems.internal.hebbian_walker import HebbianWalker
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.domains.presets import SMALL
+from earned_understanding_battery.systems.internal.hebbian_walker import HebbianWalker
 
 @pytest.fixture
 def walker_and_graph():

@@ -6,9 +6,9 @@ of Variant F must pass all four to confirm faithful replication.
 All four must PASS before proceeding to A6 calibration.
 """
 
-from m8_battery.domains.sbm_generator import generate_domain
-from m8_battery.domains.presets import SMALL
-from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+from earned_understanding_battery.domains.sbm_generator import generate_domain
+from earned_understanding_battery.domains.presets import SMALL
+from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
 
 def _make_trained_system(n_steps: int = 15) -> tuple:
     """Helper: create and train a Foxworthy F system."""

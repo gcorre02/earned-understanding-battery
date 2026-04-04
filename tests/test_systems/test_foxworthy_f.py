@@ -10,10 +10,10 @@ domain text is always high-surprisal for DistilGPT-2).
 
 import pytest
 
-from m8_battery.core.types import DomainConfig
-from m8_battery.domains.sbm_generator import generate_domain
-from m8_battery.domains.presets import SMALL
-from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+from earned_understanding_battery.core.types import DomainConfig
+from earned_understanding_battery.domains.sbm_generator import generate_domain
+from earned_understanding_battery.domains.presets import SMALL
+from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
 
 def _make_system(theta: float = 0.0, **kwargs) -> tuple:
     """Helper: create Foxworthy F + domain graph.

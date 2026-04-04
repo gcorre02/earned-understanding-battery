@@ -14,10 +14,10 @@ import sys
 import numpy as np
 import torch
 
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.domains.presets import MEDIUM
-from m8_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
-from m8_battery.systems.positive_controls.gnn_navigator import GNNNavigator
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.domains.presets import MEDIUM
+from earned_understanding_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
+from earned_understanding_battery.systems.positive_controls.gnn_navigator import GNNNavigator
 
 def _log(msg):
     print(f"[b0_test] {msg}", file=sys.stderr, flush=True)
@@ -227,7 +227,7 @@ def main():
 
     # --- Also run autocorrelation on the 13 calibration systems ---
     # (HEB, 3D, 3E are the graph walkers with set_domain)
-    from m8_battery.systems.internal.hebbian_walker import HebbianWalker
+    from earned_understanding_battery.systems.internal.hebbian_walker import HebbianWalker
 
     def heb_factory(graph, seed):
         return HebbianWalker(graph, seed=seed, eta=0.1, decay=0.01, temperature=0.5)

@@ -12,12 +12,12 @@ import json
 import sys
 import time
 
-from m8_battery.core.types import SystemClass
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.domains.presets import LARGE
-from m8_battery.instruments.battery_runner import run_battery, BatteryConfig
-from m8_battery.systems.class1.wordnet_graph import WordNetGraph
-from m8_battery.analysis.behavioural_generativity import (
+from earned_understanding_battery.core.types import SystemClass
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.domains.presets import LARGE
+from earned_understanding_battery.instruments.battery_runner import run_battery, BatteryConfig
+from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
+from earned_understanding_battery.analysis.behavioural_generativity import (
     generate_paired_domains,
     record_behaviour,
     compute_behavioural_divergence,
@@ -32,13 +32,13 @@ def run_structural_battery(seed):
     family = generate_domain_family(LARGE._replace(seed=seed) if hasattr(LARGE, '_replace') else LARGE)
 
     # Generate with the specific seed
-    from m8_battery.core.types import DomainConfig
+    from earned_understanding_battery.core.types import DomainConfig
     config = DomainConfig(
         n_nodes=500, n_communities=12,
         p_within=0.25, p_between=0.015,
         seed=seed,
     )
-    from m8_battery.domains.sbm_generator import generate_domain_family as gen_family
+    from earned_understanding_battery.domains.sbm_generator import generate_domain_family as gen_family
     family = gen_family(config)
 
     G = family["A"]

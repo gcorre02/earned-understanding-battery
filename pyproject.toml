@@ -3,9 +3,9 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "m8-battery"
+name = "earned-understanding-battery"
 version = "0.1.0"
-description = "Emergent Understanding Battery — framework-agnostic test suite for Class 4 candidacy"
+description = "Earned Understanding Battery — framework-agnostic test suite for Class 4 candidacy"
 requires-python = ">=3.11"
 license = {text = "UNLICENSED"}
 
@@ -39,7 +39,7 @@ analysis = [
     "pandas>=2.0",
 ]
 all = [
-    "m8-battery[class1,class2,class3,analysis]",
+    "earned-understanding-battery[class1,class2,class3,analysis]",
 ]
 dev = [
     "pytest>=7.0",

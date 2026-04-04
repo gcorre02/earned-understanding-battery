@@ -3,16 +3,16 @@
 import networkx as nx
 import numpy as np
 
-from m8_battery.core.types import DomainConfig
-from m8_battery.domains.sbm_generator import generate_domain, generate_domain_family
-from m8_battery.domains.spectral_verifier import (
+from earned_understanding_battery.core.types import DomainConfig
+from earned_understanding_battery.domains.sbm_generator import generate_domain, generate_domain_family
+from earned_understanding_battery.domains.spectral_verifier import (
     compute_graph_signature,
     spectral_similarity,
     verify_cross_format_invariance,
 )
-from m8_battery.domains.encoders.graph_encoder import encode_graph
-from m8_battery.domains.encoders.gym_encoder import encode_gym
-from m8_battery.domains.presets import SMALL, MEDIUM, LARGE
+from earned_understanding_battery.domains.encoders.graph_encoder import encode_graph
+from earned_understanding_battery.domains.encoders.gym_encoder import encode_gym
+from earned_understanding_battery.domains.presets import SMALL, MEDIUM, LARGE
 
 class TestSBMGenerator:
     def test_basic_generation(self):

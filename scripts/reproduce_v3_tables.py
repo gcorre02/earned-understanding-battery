@@ -20,15 +20,15 @@ import time
 
 import numpy as np
 
-from m8_battery.domains.sbm_generator import generate_domain_family, generate_domain
-from m8_battery.domains.presets import MEDIUM
-from m8_battery.core.types import DomainConfig
-from m8_battery.instruments.generativity import (
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family, generate_domain
+from earned_understanding_battery.domains.presets import MEDIUM
+from earned_understanding_battery.core.types import DomainConfig
+from earned_understanding_battery.instruments.generativity import (
     _compute_transition_matrix,
     _js_divergence,
     _transition_jsd,
 )
-from m8_battery.instruments.role_utils import classify_all_nodes, compute_role_transition_matrix
+from earned_understanding_battery.instruments.role_utils import classify_all_nodes, compute_role_transition_matrix
 
 import networkx as nx
 
@@ -95,11 +95,11 @@ def main():
     domain_b2 = nx.relabel_nodes(domain_b2, {n: n + 1149 for n in domain_b2.nodes()})
 
     # --- Import systems ---
-    from m8_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
-    from m8_battery.systems.positive_controls.gnn_navigator import GNNNavigator
-    from m8_battery.systems.internal.hebbian_walker import HebbianWalker
-    from m8_battery.systems.class3.empowerment_agent import EmpowermentAgent
-    from m8_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
+    from earned_understanding_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
+    from earned_understanding_battery.systems.positive_controls.gnn_navigator import GNNNavigator
+    from earned_understanding_battery.systems.internal.hebbian_walker import HebbianWalker
+    from earned_understanding_battery.systems.class3.empowerment_agent import EmpowermentAgent
+    from earned_understanding_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
 
     # --- Table 1: Null distribution (50 pairs, PC1 type, B₂) ---
     _log("Computing null distribution (50 pairs, B₂)...")

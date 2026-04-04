@@ -1,4 +1,4 @@
-"""Blender — M8 Battery: 9 Systems, Growing Graphs of Light.
+"""Blender — Earned Understanding Battery: 9 Systems, Growing Graphs of Light.
 
 Each panel starts empty. Nodes appear on first visit, edges grow on
 traversal. Only 3C develops internal structure after exploration.
@@ -368,7 +368,7 @@ def create_lights():
 def main():
     render = "--render" in sys.argv
 
-    print("=== M8: Growing Graphs of Light ===")
+    print("=== Earned Understanding Battery: Growing Graphs of Light ===")
 
     if not DATA_PATH.exists():
         print(f"ERROR: {DATA_PATH} not found.")

@@ -22,9 +22,9 @@ from typing import Any, Callable
 import numpy as np
 import torch
 
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.domains.presets import MEDIUM
-from m8_battery.instruments.generativity import (
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.domains.presets import MEDIUM
+from earned_understanding_battery.instruments.generativity import (
     MAX_JSD,
     _compute_transition_matrix,
     _coherence_normalised,
@@ -36,7 +36,7 @@ from m8_battery.instruments.generativity import (
     _transition_entropy,
     _transition_jsd,
 )
-from m8_battery.instruments.role_utils import classify_all_nodes, compute_role_transition_matrix
+from earned_understanding_battery.instruments.role_utils import classify_all_nodes, compute_role_transition_matrix
 
 def _log(msg: str) -> None:
     print(f"[harmonised] {msg}", file=sys.stderr, flush=True)
@@ -279,8 +279,8 @@ def main():
     domain_b1 = family["B"]       # B₁: same params, different seed
     # B₂: zero-overlap — create with shifted node IDs
     import networkx as nx
-    from m8_battery.core.types import DomainConfig
-    from m8_battery.domains.sbm_generator import generate_domain
+    from earned_understanding_battery.core.types import DomainConfig
+    from earned_understanding_battery.domains.sbm_generator import generate_domain
 
     rng = np.random.default_rng(42)
     config_b2 = DomainConfig(
@@ -301,14 +301,14 @@ def main():
     _log(f"Edge Jaccard: A-B₀={ej_b0:.4f}, A-B₁={ej_b1:.4f}, A-B₂={ej_b2:.4f}")
 
     # --- System factories ---
-    from m8_battery.systems.class1.wordnet_graph import WordNetGraph
-    from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator
-    from m8_battery.systems.class1.foxworthy_a import FoxworthyA
-    from m8_battery.systems.internal.hebbian_walker import HebbianWalker
-    from m8_battery.systems.class3.empowerment_agent import EmpowermentAgent
-    from m8_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
-    from m8_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
-    from m8_battery.systems.positive_controls.gnn_navigator import GNNNavigator
+    from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
+    from earned_understanding_battery.systems.class1.rule_navigator import RuleBasedNavigator
+    from earned_understanding_battery.systems.class1.foxworthy_a import FoxworthyA
+    from earned_understanding_battery.systems.internal.hebbian_walker import HebbianWalker
+    from earned_understanding_battery.systems.class3.empowerment_agent import EmpowermentAgent
+    from earned_understanding_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
+    from earned_understanding_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
+    from earned_understanding_battery.systems.positive_controls.gnn_navigator import GNNNavigator
 
     # GPU device for LLM-based systems
     _llm_device = "mps" if torch.backends.mps.is_available() else "cpu"
@@ -360,7 +360,7 @@ def main():
     }
     # All remaining systems now have set_domain(). Add what we can import.
     try:
-        from m8_battery.systems.class1.foxworthy_a import FoxworthyA
+        from earned_understanding_battery.systems.class1.foxworthy_a import FoxworthyA
         non_graph_configs["1C"] = {
             "factory": lambda g, s: (fa := FoxworthyA(seed=s), fa.set_graph(g), fa)[-1],
             "fresh": lambda g, s: (fa := FoxworthyA(seed=s + 1000), fa.set_graph(g), fa)[-1],
@@ -370,7 +370,7 @@ def main():
         _log("SKIP 1C: FoxworthyA import failed")
 
     try:
-        from m8_battery.systems.class2.frozen_gnn import FrozenGAT
+        from earned_understanding_battery.systems.class2.frozen_gnn import FrozenGAT
         def _make_gat(g, s):
             n_feat = MEDIUM.n_node_features if hasattr(MEDIUM, 'n_node_features') else 8
             n_comm = MEDIUM.n_communities
@@ -386,7 +386,7 @@ def main():
         _log("SKIP 2B: FrozenGAT import failed (torch_geometric)")
 
     try:
-        from m8_battery.systems.class2.foxworthy_c import FoxworthyC
+        from earned_understanding_battery.systems.class2.foxworthy_c import FoxworthyC
         def _make_fc(g, s):
             n_feat = MEDIUM.n_node_features if hasattr(MEDIUM, 'n_node_features') else 8
             sys = FoxworthyC(n_features=n_feat, seed=s)
@@ -402,7 +402,7 @@ def main():
 
     # 2A FrozenLLM: constructor takes (seed, device), graph via set_graph()
     try:
-        from m8_battery.systems.class2.frozen_llm import FrozenLLM
+        from earned_understanding_battery.systems.class2.frozen_llm import FrozenLLM
         pass  # device set globally below
         def _make_llm(g, s):
             sys = FrozenLLM(seed=s, device=_llm_device)
@@ -418,7 +418,7 @@ def main():
 
     # 3A DQN: constructor takes (n_features, max_degree, seed), graph via set_graph()
     try:
-        from m8_battery.systems.class3.dqn_agent import DQNAgent
+        from earned_understanding_battery.systems.class3.dqn_agent import DQNAgent
         def _make_dqn(g, s):
             sys = DQNAgent(seed=s)
             sys.set_graph(g)
@@ -433,7 +433,7 @@ def main():
 
     # 3B Curiosity: same pattern as DQN
     try:
-        from m8_battery.systems.class3.curiosity_agent import CuriosityAgent
+        from earned_understanding_battery.systems.class3.curiosity_agent import CuriosityAgent
         def _make_curiosity(g, s):
             sys = CuriosityAgent(seed=s)
             sys.set_graph(g)
@@ -448,7 +448,7 @@ def main():
 
     # 3C FoxworthyF: requires peft (DistilGPT-2 + LoRA)
     try:
-        from m8_battery.systems.class3.foxworthy_f import FoxworthyF
+        from earned_understanding_battery.systems.class3.foxworthy_f import FoxworthyF
         def _make_ff(g, s):
             sys = FoxworthyF(seed=s, device=_llm_device)
             sys.set_graph(g)

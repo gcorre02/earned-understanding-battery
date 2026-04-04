@@ -11,8 +11,8 @@ import json
 import sys
 import numpy as np
 
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.domains.presets import MEDIUM
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.domains.presets import MEDIUM
 
 def _log(msg):
     print(f"[audit] {msg}", file=sys.stderr, flush=True)
@@ -63,13 +63,13 @@ def main():
     family = generate_domain_family(MEDIUM)
     domain_a = family["A"]
 
-    from m8_battery.systems.class1.wordnet_graph import WordNetGraph
-    from m8_battery.systems.class1.rule_navigator import RuleBasedNavigator
-    from m8_battery.systems.internal.hebbian_walker import HebbianWalker
-    from m8_battery.systems.class3.empowerment_agent import EmpowermentAgent
-    from m8_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
-    from m8_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
-    from m8_battery.systems.positive_controls.gnn_navigator import GNNNavigator
+    from earned_understanding_battery.systems.class1.wordnet_graph import WordNetGraph
+    from earned_understanding_battery.systems.class1.rule_navigator import RuleBasedNavigator
+    from earned_understanding_battery.systems.internal.hebbian_walker import HebbianWalker
+    from earned_understanding_battery.systems.class3.empowerment_agent import EmpowermentAgent
+    from earned_understanding_battery.systems.class3.active_inference_agent import ActiveInferenceAgent
+    from earned_understanding_battery.systems.positive_controls.role_based_walker import RoleBasedWalker
+    from earned_understanding_battery.systems.positive_controls.gnn_navigator import GNNNavigator
 
     configs = {
         "1A": lambda s: WordNetGraph(domain_a, seed=s),

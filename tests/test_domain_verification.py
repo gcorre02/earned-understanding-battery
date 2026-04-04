@@ -2,9 +2,9 @@
 
 import pytest
 
-from m8_battery.domains.sbm_generator import generate_domain_family
-from m8_battery.domains.presets import SMALL, MEDIUM
-from m8_battery.domains.domain_verification import (
+from earned_understanding_battery.domains.sbm_generator import generate_domain_family
+from earned_understanding_battery.domains.presets import SMALL, MEDIUM
+from earned_understanding_battery.domains.domain_verification import (
     verify_structural_preservation,
     verify_surface_destruction,
     verify_domain_family,

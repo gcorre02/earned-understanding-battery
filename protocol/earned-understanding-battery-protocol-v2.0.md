@@ -831,7 +831,7 @@ Each system-seed-domain combination receives one of the following signal classif
 | `absent` | System does not navigate (visits only 1 community, zero transitions) | No dynamics to assess. System lacks basic navigation capability. |
 | `degenerate_trained` | Trained system visits <3 communities with >1% engagement | Trained dynamics have collapsed. Cannot assess transfer meaningfully. |
 | `degenerate_fresh` | Fresh system visits <3 communities with >1% engagement | Baseline is degenerate. Comparison is unreliable. |
-| `maximum_divergence` | Transition JSD near ln(2) | Trained and fresh are maximally different. May indicate pathological behaviour rather than meaningful transfer. |
+| `maximum_divergence` | Transition JSD > 0.9 × ln(2) ≈ 0.624 | Trained and fresh are near-maximally different. May indicate pathological dynamics rather than meaningful transfer. Flagged for scrutiny but does not automatically fail the instrument. |
 | `potentially_confounded` | Edge Jaccard > 0 between A and B (applies to all B1 results) | Above-floor signal may be partially or wholly attributable to shared edges rather than structural transfer. |
 | `divergent_incoherent` | Transition JSD > noise floor but structural consistency is negative or near zero, AND coherence would have been expected | Signal is present but transferred dynamics are incoherent. On SBM this classification is diagnostic only (SBM domains too homogeneous for coherence metrics at moderate preferences). |
 | `candidate` | Transition JSD > noise floor, not degenerate, not confounded (B2 only) | Genuine candidate for structural transfer. Subject to seed replication check. |
@@ -1027,6 +1027,8 @@ Edge cases:
 - When both AUCs are near zero: ratio defaults to 1.0 (no earned advantage).
 - Global cap: `1e6` (ratio-based metric; higher cap acceptable compared to geometric-mean instruments).
 
+Final reporting must include raw `trained_AUC` and `naive_AUC` values alongside the earned ratio. The ratio alone is insufficient for interpretation — a reader must be able to assess whether a large ratio reflects a meaningful absolute advantage or a near-zero denominator.
+
 ### 6. Pass Condition
 
 ```
@@ -1172,6 +1174,14 @@ effect_size = sqrt(min(resistance_ratio, 100) * min(recovery_ratio, 100)) - 1.0
 ```
 
 This compresses the two ratios into a single number for cross-instrument comparison. The cap at 100 per ratio (not 1e6 as in other instruments) is justified because self-engagement uses a geometric mean -- without capping, one infinite ratio would dominate the mean regardless of the other ratio's value.
+
+### 5a. Ratio capping and infinity handling
+
+Resistance and recovery ratios that exceed 1,000,000 or produce division by zero are stored as 1,000,000 (the reporting cap). This cap is chosen to be unambiguously large without introducing floating-point artefacts.
+
+The `effect_size` geometric mean (Section 10.3) applies a second-stage cap of 100 per ratio before computing the geometric mean. This two-stage design ensures that: (a) raw ratios preserve the full magnitude of the measured effect, and (b) the summary statistic is not dominated by a single extreme ratio.
+
+Raw numerator and denominator values (`trained_disruption`, `fresh_disruption`, `trained_recovery`, `fresh_recovery`) are always reported alongside the capped ratios. A reader must be able to verify whether a capped ratio reflects a genuine extreme effect or a near-zero denominator.
 
 ### 6. Pass Condition
 
@@ -1386,6 +1396,8 @@ Method: 10,000 bootstrap resamples. Source: `results/per-instrument-roc-auc.json
 
 **Self-engagement and integration tested via direct instrument invocation.** PC-SE and PC-INT were tested via direct instrument invocation, bypassing battery preconditions. This is standard practice for instrument-level sensitivity validation. The trajectory precondition correctly classifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio approximately 1.0), which would gate them out of the full battery. Instrument sensitivity is validated per instrument, not per battery pipeline.
 
+Positive controls validated via direct invocation demonstrate that the instrument can detect its target property when architecturally present. They do not constitute evidence that the full battery pipeline would admit a true Class 4 system. Conjunction-level acceptance is tested prospectively in Phase C, not retrospectively against controls.
+
 **Trajectory relies on a single architecture.** STDP is the sole architecturally-grounded trajectory positive. HEB was excluded due to variable results across seeds. Additional trajectory-positive architectures in Phase B would strengthen this instrument's validation.
 
 ### Battery-Level Discrimination
@@ -1488,7 +1500,7 @@ The candidate does not satisfy the conjunction. The battery correctly classifies
 
 ### Scenario 6: Unexpected control pass
 
-If any Phase C ablation control (frozen, directed, OBSERVE-only) passes the conjunction, the battery cannot discriminate the candidate from its controls. STOP. Investigate. Do not report the candidate result without resolving the control anomaly.
+If any Phase C ablation control passes the conjunction, the battery cannot discriminate the candidate from its controls. Execution halts. The control anomaly must be investigated and resolved — with findings documented via the amendment procedure (Section 18) — before any candidate result is reported. If the anomaly cannot be resolved, the battery result for the candidate is voided and reported as inconclusive.
 ## 16. Hardware and Compute Requirements
 
 ### Calibration Hardware

@@ -469,6 +469,9 @@ Recalibration data, medium scale (150 nodes), three seeds per system.
 3. **Structure metric resolution.** The trajectory instrument depends entirely on `get_structure_metric()` as a scalar summary of internal structure. Systems whose structural development occurs in dimensions not captured by this scalar (e.g., 3C's adapter norm changes) will show absent or ambiguous trajectories even if genuine development is occurring. This is a known limitation of scalar summarisation, not of the trajectory analysis itself.
 
 4. **Linear regression assumption.** The analysis fits a linear model to what may be a nonlinear trajectory (e.g., sigmoid, logarithmic). A system with rapid early development followed by a plateau will have a lower R-squared than one with constant-rate development, even if the total structural change is greater. The monotonicity fraction partially compensates for this.
+
+5. **Candidate training protocol.** The default 50 `domain_a_inputs` and the measurement window defined in this section were calibrated against the Phase A system panel. The Class 4 candidate may require a different training protocol (step count, consolidation cycles, interaction types). The candidate's full training protocol — including step count, consolidation schedule, and any system-specific parameters — must be declared in a pre-Phase-C amendment (per Section 18) before any Phase C data is collected. This amendment will be filed as part of the Manny TestSystem adapter specification.
+
 ## 7. Integration
 
 **Instrument:** Integration (non-decomposable structure)
@@ -1501,6 +1504,15 @@ The candidate does not satisfy the conjunction. The battery correctly classifies
 ### Scenario 6: Unexpected control pass
 
 If any Phase C ablation control passes the conjunction, the battery cannot discriminate the candidate from its controls. Execution halts. The control anomaly must be investigated and resolved — with findings documented via the amendment procedure (Section 18) — before any candidate result is reported. If the anomaly cannot be resolved, the battery result for the candidate is voided and reported as inconclusive.
+
+**Phase C ablation controls.** Three matched controls will be run alongside the candidate during Phase C. Each control uses the same candidate architecture with one architectural condition removed:
+
+- **B4-frozen:** Learning disabled at deployment. The candidate's feedback loop is severed — it receives input but earns no new structure. Tests whether Class 2 dynamics suffice. Expected battery profile: Trajectory FAIL.
+- **B4-directed:** An externally specified reward signal replaces the candidate's undirected dynamics. The candidate updates its structure, but convergence is governed by an external objective. Tests whether Class 3 dynamics suffice. Expected battery profile: Generativity FAIL.
+- **B4-observe:** The candidate receives input and maintains its dynamics, but its structure cannot be modified (plasticity disabled, consolidation disabled). Tests whether passive observation suffices. Expected battery profile: Trajectory FAIL.
+
+The exact implementation of each control (which parameters are frozen, how the reward signal is specified, which plasticity mechanisms are disabled) will be defined in a pre-Phase-C amendment filed before any Phase C data is collected. If any control passes the full conjunction, execution halts per Scenario 6 above.
+
 ## 16. Hardware and Compute Requirements
 
 ### Calibration Hardware

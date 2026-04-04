@@ -1,0 +1,33 @@
+{
+  "title": "Earned Understanding Battery: framework-agnostic test suite for Class 4 candidacy",
+  "description": "An empirical test suite that operationalises the five necessary properties proposed in Paper 1 Section 3 (emergence, stability, integration, operational impact, and transfer) as a conjunction of five instruments applied under a provenance constraint. The battery is a Class 4 detector, not a spectrum classifier. It answers exactly one question: does the candidate satisfy all five necessary properties under the provenance constraint? This repository accompanies the OSF pre-registration of the battery protocol.",
+  "creators": [
+    {
+      "name": "Correia-Tribeiro, Guilherme",
+      "affiliation": ""
+    }
+  ],
+  "keywords": [
+    "cognitive science",
+    "consciousness research",
+    "emergent cognition",
+    "Class 4 candidacy",
+    "OSF pre-registration",
+    "earned structure",
+    "battery test",
+    "reproducible research",
+    "provenance constraint"
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.19178410",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-article",
+      "scheme": "doi"
+    }
+  ],
+  "notes": "Calibration panel covers 13 systems spanning Classes 1-3 plus positive controls. Phase C (candidate evaluation) is forthcoming. See protocol/earned-understanding-battery-protocol-v2.0.md for the pre-registered protocol."
+}

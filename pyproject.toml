@@ -7,7 +7,7 @@ name = "earned-understanding-battery"
 version = "0.1.0"
 description = "Earned Understanding Battery — framework-agnostic test suite for Class 4 candidacy"
 requires-python = ">=3.11"
-license = {text = "UNLICENSED"}
+license = {text = "MIT"}
 
 dependencies = [
     "numpy>=1.24,<3.0",

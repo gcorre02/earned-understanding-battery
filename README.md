@@ -109,3 +109,7 @@ https://doi.org/10.5281/zenodo.19178410
 ## Status
 
 This repository accompanies the OSF pre-registration of the battery protocol. Phase C (candidate evaluation) is forthcoming. Calibration data for the 13-system panel is included in `results/`.
+
+## License
+
+MIT License — see [`LICENSE`](LICENSE). Copyright (c) 2026 Guilherme C. T. Ribeiro.

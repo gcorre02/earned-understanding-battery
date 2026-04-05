@@ -413,6 +413,7 @@ class TestBaselineProtocol:
         not (torch.cuda.is_available() or torch.backends.mps.is_available()),
         reason="Foxworthy F (3C) requires GPU — run on M5 Max or CUDA machine"
     )
+    @pytest.mark.timeout(1200)
     def test_known_received(self):
         """3C generativity should classify as 'received' per earned ratio requirement.
 

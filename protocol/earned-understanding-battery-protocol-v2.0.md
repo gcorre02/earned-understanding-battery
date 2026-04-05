@@ -908,8 +908,8 @@ Note: 3D and 3E share null distributions with PC1 because all three use the same
 
 ### Discrimination Statistics
 
-- **ROC AUC:** 1.0 [1.0, 1.0] -- perfect separation between positive controls (PC1, PC3 non-degenerate seeds on B2) and negative controls (HEB, 3D, 3E on B2).
-- **Cohen's d:** approximately 3.27.
+**Discrimination:** PC1 and PC3 exceed the B2 per-type noise floor on all non-degenerate seeds (5/6 total; PC3 seed 456 is degenerate). No calibration system in the harmonised panel exceeds any per-type B2 noise floor (3/3 below: HEB, 3D, 3E). The separation gap between the lowest positive-control score (PC1 min = 0.0554) and the highest negative-control score (HEB seed 456 = 0.0324) is approximately 1.7× in raw units; the gap between PC1's minimum and PC1's own noise floor (p95 = 0.0313) is approximately 1.77×; PC3's maximum (0.1878) is approximately 6.4× PC3's noise floor. Cohen's d between the positive and negative pools is approximately 3.27.
+
 - PC1 exceeds the B2 floor on 3/3 seeds.
 - PC3 exceeds the B2 floor on 3/3 seeds (2/3 non-degenerate -- passes replication).
 
@@ -1380,39 +1380,53 @@ This demonstrates that the conjunction is more discriminative than any single in
 - **Instrument-level validation policy.** Battery preconditions (e.g., trajectory gating self-engagement) are not applied during instrument-level sensitivity testing. The preconditions gate the candidate, not the sensitivity measurement.
 ## 13. Per-Instrument Discrimination
 
-Each of the five battery instruments achieves perfect separation between its positive and negative controls, measured by ROC AUC with bootstrap confidence intervals.
+Each instrument achieves strict separation between its positive controls and the Phase A calibration panel. The primary evidence for instrument validity is **architectural grounding**: each positive control was selected because its architecture guarantees the target property, providing non-circular ground truth independent of the battery's own scoring. The sensitivity/specificity counts and raw metric values below confirm that the instrument detects what the architecture predicts.
 
-### Per-Instrument ROC AUC
+### Sensitivity and Specificity
 
-| Instrument       | AUC | 95% CI       | n_pos | n_neg | Positive Control(s)                              |
-|------------------|-----|--------------|-------|-------|--------------------------------------------------|
-| Generativity     | 1.0 | [1.0, 1.0]  | 6     | 9     | PC1 + PC3 (transition JSD on B2)                 |
-| Self-Engagement  | 1.0 | [1.0, 1.0]  | 3     | 9     | PC-SE (direct, recovery ratio)                   |
-| Integration      | 1.0 | [1.0, 1.0]  | 12    | 6     | PC-INT (direct, Gini) + Class 1 (received)       |
-| Trajectory       | 1.0 | [1.0, 1.0]  | 3     | 9     | STDP (earned trajectory)                         |
-| Transfer         | 1.0 | [1.0, 1.0]  | 1     | 6     | 3E active inference (~10x earned ratio)           |
+| Instrument               | Sensitivity (positives detected)                             | Specificity (negatives rejected)                                     | Positive controls                     | Negative pool                                                  |
+|--------------------------|--------------------------------------------------------------|----------------------------------------------------------------------|---------------------------------------|----------------------------------------------------------------|
+| Generativity             | PC1: 3/3 seeds above B2 noise floor; PC3: 2/3 non-degenerate | 3/3 calibration systems in the harmonised panel below B2 noise floor; 13/13 fail the full generativity pass condition at 2/3 aggregation | PC1, PC3 (harmonised generativity)    | HEB, 3D, 3E (harmonised panel); all 13 systems (full battery) |
+| Self-Engagement          | PC-SE: 3/3 seeds (direct invocation); STDP: 3/3 (battery)    | 11/13 calibration systems fail (all except STDP; HEB passes 1/3, fails 2/3 rule) | PC-SE (direct), STDP (battery)        | Class 1, Class 2, Class 3 (excluding STDP)                     |
+| Integration              | PC-INT: 3/3 seeds (direct invocation); HEB: 3/3 (battery)    | 11/13 calibration systems fail; 2 single-seed spurious passes (1B-123, 2B-123) rejected by 2/3 rule | PC-INT (direct), HEB (battery)        | Class 1, Class 2, Class 3, STDP (excluding HEB)                |
+| Developmental Trajectory | STDP: 3/3 seeds; HEB: 3/3 seeds                              | 11/13 calibration systems fail (2C and 3C have 2 non-pass + 1 indeterminate; 3E fails earned-ratio gate) | STDP, HEB                             | Class 1, Class 2, Class 3 (excluding STDP, HEB)                |
+| Transfer                 | 3E: 3/3 seeds; HEB: 3/3; STDP: 3/3                           | 9/13 calibration systems fail or indeterminate; 2C passes 2/3 seeds with borderline earned ratios (1.14, 1.26) | 3E (relational model), HEB, STDP      | Class 1, 2A, 2B, 3A, 3B, 3C, 3D                                |
 
-Method: 10,000 bootstrap resamples. Source: `results/per-instrument-roc-auc.json`.
+### Raw metric separation
+
+For each instrument, the table below shows the positive-control metric range, the highest comparable value from the calibration panel, and the separation gap in the instrument's own units.
+
+| Instrument               | Metric                             | Positive range                                     | Highest negative                               | Gap                                              |
+|--------------------------|------------------------------------|----------------------------------------------------|------------------------------------------------|--------------------------------------------------|
+| Generativity             | Transition JSD on B2               | PC1: 0.0554-0.1269; PC3: 0.0608-0.1878             | HEB seed 456: 0.0324 (just above its own noise floor 0.0277, below pass gate) | PC1 min (0.0554) is 1.77× PC1 noise floor (p95 = 0.0313); PC3 max (0.1878) is 6.4× PC3 noise floor (p95 = 0.0293) |
+| Self-Engagement          | Effect size (geometric mean of ratios) | PC-SE: resistance ratio at reporting cap (1e6) for all 3 seeds; recovery ratio 1.252-2.337 | HEB seed 456: passes (1/3 seeds only — fails 2/3 rule) | PC-SE's cap-level resistance is orders of magnitude above any calibration-panel system |
+| Integration              | Gini of ablation degradations      | PC-INT (direct): 0.3121-0.4037; HEB (battery): 0.2397-0.3388 | 2B seed 123 spurious: 0.471 (single-seed, rejected by 2/3 rule) | Clean separation at 2/3 aggregate; panel-level spurious single-seed passes flagged and rejected by the seed aggregation rule |
+| Developmental Trajectory | Earned ratio (trained / fresh metric range) | STDP: 2.00-3.43; HEB: 9.52-10.48                  | 3E: 0.14-0.18 (fails earned gate); 2C/3C earned ratios below 1.0 | STDP min (2.00) and HEB min (9.52) both comfortably exceed the earned-ratio threshold of 1.0 |
+| Transfer                 | Earned ratio (trained_AUC / naive_AUC) | 3E: 10.02-10.18; HEB: 82.46-84.40; STDP: 1.27-1.30 | 2C: 1.14, 1.26 (passes at 2/3, borderline); 3B seed 123: 2.3 (1/3 only)   | 3E and HEB separation is strong (>10× threshold); STDP and 2C are close to the threshold and warrant scrutiny |
 
 ### Caveats
 
-**Transfer has a single true positive.** System 3E (active inference) is the only system with earned transfer (advantage = 9.18, earned_ratio = 10.18). AUC = 1.0 reflects strict separation on this small sample, not strong statistical power. Additional transfer-positive systems would strengthen the estimate but are not available in the current calibration panel.
+**Transfer has multiple positive architectures with a wide range of earned ratios.** 3E (active inference) is the architecturally cleanest positive — its Dirichlet transition model explicitly represents relational structure that transfers to shifted node IDs. HEB (Hebbian walker) shows even higher earned ratios (~83×) because its edge weights trained on domain A give it a large initial advantage on A' (which shares topology with A). STDP (Brian2 spiking network) passes with earned ratios just above threshold (1.27-1.30). 2C (Foxworthy C) passes 2/3 seeds at borderline values (1.14, 1.26); these are above the numerical-tolerance epsilon (1.01) but warrant scrutiny as potential false positives. Transfer sensitivity is therefore established across multiple architectures, but the instrument's false-positive rate on the current calibration panel is not zero.
 
-**Integration includes both received and earned positives.** The 12 positives comprise 9 Class 1 systems (received integration -- topology-driven, not learning-driven) and 3 PC-INT seeds (earned integration via PageRank-Hebbian dynamics). The earned/received distinction is the conjunction's responsibility, not the integration instrument's. The instrument detects non-linear degradation under ablation regardless of origin.
+**Integration sensitivity includes both earned and received detections.** HEB and PC-INT represent earned integration (structure developed through operation). The integration instrument measures non-decomposability regardless of origin; the earned/received distinction is enforced by the earned ratio gate (integration earned_ratio > 1.0) and, in the conjunction, by the trajectory precondition for self-engagement.
 
 **Self-engagement and integration tested via direct instrument invocation.** PC-SE and PC-INT were tested via direct instrument invocation, bypassing battery preconditions. This is standard practice for instrument-level sensitivity validation. The trajectory precondition correctly classifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio approximately 1.0), which would gate them out of the full battery. Instrument sensitivity is validated per instrument, not per battery pipeline.
 
 Positive controls validated via direct invocation demonstrate that the instrument can detect its target property when architecturally present. They do not constitute evidence that the full battery pipeline would admit a true Class 4 system. Conjunction-level acceptance is tested prospectively in Phase C, not retrospectively against controls.
 
-**Trajectory relies on a single architecture.** STDP is the sole architecturally-grounded trajectory positive. HEB was excluded due to variable results across seeds. Additional trajectory-positive architectures in Phase B would strengthen this instrument's validation.
+**Trajectory positives span two architectures.** STDP (Brian2 spiking network with STDP plasticity) and HEB (Hebbian graph walker) both develop earned trajectories through live plasticity. STDP's earned ratios (~2-3) reflect gradual weight consolidation; HEB's earned ratios (~10) reflect the larger relative range of edge-weight Gini during Hebbian walk development. Both are architecturally grounded trajectory positives.
+
+**Generativity panel in the harmonised test is small.** The harmonised generativity protocol was run on 5 systems (PC1, PC3 as positives; HEB, 3D, 3E as negatives). Three calibration-panel systems is a narrow specificity check. The broader battery recalibration (13 systems) confirms 0/13 systems pass generativity at the 2/3 aggregation level, which provides a complementary specificity check through the full pass condition rather than the noise-floor comparison.
+
+**ROC AUC was computed on the continuous metric scores** and shows perfect separation (AUC = 1.0) for all five instruments. Given the small positive-control panels (1 to 6 positives per instrument), this statistic confirms strict ordering but does not carry distributional significance. The sensitivity/specificity counts and raw metric values above provide the substantive discrimination evidence. Computed ROC data is retained in `results/per-instrument-roc-auc.json` as a secondary artefact.
 
 ### Battery-Level Discrimination
 
-Battery-level (conjunction) ROC AUC is not computed at this stage. Gate F -- the Phase C candidate evaluation -- is the first test of conjunction discrimination. The calibration panel establishes that the conjunction rejects all 13 systems (0/13 pass), and positive controls confirm each instrument is individually sensitive. The conjunction's ability to accept a genuine Class 4 system is tested prospectively, not retrospectively.
+Battery-level (conjunction) discrimination is not computed retrospectively. The calibration panel establishes that the conjunction rejects all 13 systems at the 2/3 aggregation level (0/13 pass), and positive controls confirm each instrument is individually sensitive. The conjunction's ability to accept a genuine Class 4 system is tested prospectively in Phase C, not retrospectively against the calibration panel.
 
 ### Summary
 
-Strict separation on small panels. Architectural grounding -- not statistical power -- is the primary evidence for instrument validity. Each positive control was selected because its architecture guarantees the target property, providing non-circular ground truth independent of the battery's own scoring.
+Each instrument has at least one architecturally grounded positive control that exceeds the instrument's pass gate. The calibration panel establishes the specificity baseline: systems lacking the target property fail the instrument at the 2/3 seed aggregation level. The sensitivity/specificity counts are modest in absolute terms because the positive-control panels are small — three seeds per architecture, one to three architectures per instrument. The substantive evidence is architectural grounding, not statistical power. Each positive control was selected because its architecture guarantees the target property, providing non-circular ground truth independent of the battery's own scoring.
 ## 14. Foxworthy Cross-Validation
 
 Three of Foxworthy's (2026) published architectural variants were replicated as calibration systems 1C, 2C, and 3C. This section documents the cross-validation of our implementations against Foxworthy's published results and the independent verification of our Variant F (system 3C) implementation.

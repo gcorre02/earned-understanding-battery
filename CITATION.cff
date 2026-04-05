@@ -6,13 +6,14 @@ type: software
 title: "Earned Understanding Battery"
 abstract: >-
   A framework-agnostic empirical test suite for Class 4 candidacy, implementing
-  the five-instrument battery proposed in Paper 1 (Correia-Tribeiro, 2026). The
-  battery operationalises emergence, stability, integration, operational
-  impact, and transfer as a conjunction of five instruments applied under a
-  provenance constraint. It is a Class 4 detector, not a spectrum classifier.
+  the five-instrument battery proposed in Paper 1 (Ribeiro, 2026). The battery
+  operationalises emergence, stability, integration, operational impact, and
+  transfer as a conjunction of five instruments applied under a provenance
+  constraint. It is a Class 4 detector, not a spectrum classifier.
 authors:
-  - family-names: Correia-Tribeiro
-    given-names: Guilherme
+  - family-names: Ribeiro
+    given-names: Guilherme Correia Teles
+    orcid: "https://orcid.org/0009-0003-4109-6715"
 version: 0.1.0
 date-released: 2026-04-04
 license: MIT
@@ -32,8 +33,9 @@ references:
   - type: article
     title: "Understanding as earned structure: a framework-agnostic empirical test"
     authors:
-      - family-names: Correia-Tribeiro
-        given-names: Guilherme
+      - family-names: Ribeiro
+        given-names: Guilherme Correia Teles
+        orcid: "https://orcid.org/0009-0003-4109-6715"
     year: 2026
     doi: "10.5281/zenodo.19178410"
     url: "https://doi.org/10.5281/zenodo.19178410"

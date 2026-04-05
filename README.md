@@ -1,6 +1,6 @@
 # Earned Understanding Battery
 
-A framework-agnostic empirical test suite for Class 4 candidacy, implementing the five-instrument battery proposed in Paper 1 (Correia-Tribeiro, 2026).
+A framework-agnostic empirical test suite for Class 4 candidacy, implementing the five-instrument battery proposed in Paper 1 (Ribeiro, 2026).
 
 **Paper 1:** [DOI 10.5281/zenodo.19178410](https://doi.org/10.5281/zenodo.19178410)
 
@@ -101,7 +101,7 @@ governance/                     Phase A+ sign-off document
 If you use this battery in academic work, please cite Paper 1:
 
 ```
-Correia-Tribeiro, G. (2026). Understanding as earned structure: a
+Ribeiro, G. C. T. (2026). Understanding as earned structure: a
 framework-agnostic empirical test.
 https://doi.org/10.5281/zenodo.19178410
 ```

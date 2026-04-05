@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite both the software and the accompanying
+  Paper 1.
+type: software
+title: "Earned Understanding Battery"
+abstract: >-
+  A framework-agnostic empirical test suite for Class 4 candidacy, implementing
+  the five-instrument battery proposed in Paper 1 (Correia-Tribeiro, 2026). The
+  battery operationalises emergence, stability, integration, operational
+  impact, and transfer as a conjunction of five instruments applied under a
+  provenance constraint. It is a Class 4 detector, not a spectrum classifier.
+authors:
+  - family-names: Correia-Tribeiro
+    given-names: Guilherme
+version: 0.1.0
+date-released: 2026-04-04
+license: MIT
+repository-code: "https://github.com/gcorre02/earned-understanding-battery"
+url: "https://github.com/gcorre02/earned-understanding-battery"
+keywords:
+  - cognitive-science
+  - consciousness-research
+  - emergent-cognition
+  - class-4-candidacy
+  - osf-pre-registration
+  - earned-structure
+  - battery-test
+  - reproducible-research
+  - provenance-constraint
+references:
+  - type: article
+    title: "Understanding as earned structure: a framework-agnostic empirical test"
+    authors:
+      - family-names: Correia-Tribeiro
+        given-names: Guilherme
+    year: 2026
+    doi: "10.5281/zenodo.19178410"
+    url: "https://doi.org/10.5281/zenodo.19178410"

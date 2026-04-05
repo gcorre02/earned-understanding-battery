@@ -39,3 +39,10 @@ references:
     year: 2026
     doi: "10.5281/zenodo.19178410"
     url: "https://doi.org/10.5281/zenodo.19178410"
+    identifiers:
+      - type: doi
+        value: "10.5281/zenodo.19011223"
+        description: >-
+          Paper 1 v1 (original, published 2026-03-14). Superseded by the v2
+          DOI above. The Earned Understanding Battery is built against v2;
+          v1 is retained here for versioning lineage.

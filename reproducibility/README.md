@@ -51,4 +51,6 @@ system_type, seed_a, seed_b, marginal_jsd, transition_jsd, structural_consistenc
 
 ## Paper 1
 
-DOI: https://doi.org/10.5281/zenodo.19178410 (v2)
+DOI: https://doi.org/10.5281/zenodo.19178410 (v2 — current, the version this battery is built against)
+
+v1 (original, superseded): https://doi.org/10.5281/zenodo.19011223

@@ -11,8 +11,8 @@ abstract: >-
   transfer as a conjunction of five instruments applied under a provenance
   constraint. It is a Class 4 detector, not a spectrum classifier.
 authors:
-  - family-names: Ribeiro
-    given-names: Guilherme Correia Teles
+  - family-names: Correia Teles Ribeiro
+    given-names: Guilherme
     orcid: "https://orcid.org/0009-0003-4109-6715"
 version: 0.1.0
 date-released: 2026-04-04
@@ -33,8 +33,8 @@ references:
   - type: article
     title: "Understanding as earned structure: a framework-agnostic empirical test"
     authors:
-      - family-names: Ribeiro
-        given-names: Guilherme Correia Teles
+      - family-names: Correia Teles Ribeiro
+        given-names: Guilherme
         orcid: "https://orcid.org/0009-0003-4109-6715"
     year: 2026
     doi: "10.5281/zenodo.19178410"

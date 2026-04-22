@@ -638,7 +638,7 @@ Recalibration data, medium scale (150 nodes), three seeds per system. PC-INT res
 
 ### 8.1. Purpose
 
-The generativity instrument tests whether frozen earned structure produces coherent, differentiated responses on novel domains. A system that has genuinely learned structural dynamics on domain A should, when switched to a structurally similar but topologically distinct domain B, navigate in ways that are measurably different from an untrained system on the same domain. This is the empirical operationalisation of structural transfer as described in Paper 1 section 5, which defines generativity as the capacity for learned structure to produce novel but non-random behaviour beyond training conditions.
+The generativity instrument tests whether frozen earned structure produces coherent, differentiated responses on novel domains. A system that has genuinely learned structural dynamics on domain A should, when switched to a structurally similar but topologically distinct domain B, navigate in ways that are measurably different from an untrained system on the same domain. This probes the consequence predicted by the generativity property described in Paper 1 section 5: if the regime is present, learned structure produces novel but non-random behaviour beyond training conditions. The instrument does not measure generativity directly; it tests whether differentiated responses on topologically distinct novel domains — the observable signature that generativity entails — are present.
 
 ---
 
@@ -980,7 +980,7 @@ Pre-registered null result interpretation scenarios and per-instrument discrimin
 
 ### 1. Purpose
 
-The transfer instrument tests whether structural organisation learned in one domain accelerates acquisition in an isomorphic but statistically altered domain. A system that has genuinely earned relational structure on domain A should, when exposed to domain A' (same relational invariants, destroyed surface statistics), converge faster than a naive system encountering A' for the first time. This is the empirical operationalisation of structural transfer as described in Paper 1 section 5 and section 3.5, which defines transfer as traceable to shared relational invariants rather than statistical familiarity.
+The transfer instrument tests whether structural organisation learned in one domain accelerates acquisition in an isomorphic but statistically altered domain. A system that has genuinely earned relational structure on domain A should, when exposed to domain A' (same relational invariants, destroyed surface statistics), converge faster than a naive system encountering A' for the first time. This probes the consequence predicted by the transfer property described in Paper 1 section 5 and section 3.5: if the regime is present, convergence on A' is traceable to shared relational invariants rather than statistical familiarity. The instrument does not measure transfer directly; it tests whether faster convergence than a naive baseline on a statistically-altered isomorphic domain — the observable signature that transfer entails — is present.
 
 ### 2. Construct Definition
 

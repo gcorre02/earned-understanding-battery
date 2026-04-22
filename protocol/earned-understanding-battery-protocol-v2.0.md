@@ -71,11 +71,11 @@ The battery verdict is the conjunction of the five instrument-level verdicts. Ea
 
 A partial pass (4 out of 5 instruments positive) constitutes a battery **FAIL**. There is no weighted score, no aggregate metric, and no "close enough" threshold.
 
-The five instruments do not each correspond to a single property. Each instrument probes a different regime consequence — if the regime is present, that consequence must obtain. The conjunction tests whether all consequences obtain simultaneously. When an instrument fails, the predicted consequence did not obtain; this is diagnostic of which aspect of the regime is absent, even though no instrument is a 1:1 measurement of a single property:
+Because instruments probe predicted consequences rather than measure properties directly, a partial pass is diagnostic but not degreed. A single failing instrument identifies *which consequence did not obtain*, which points to the aspect of the regime that is absent; it does not quantify *how much* of the regime is present. The following table summarises what the non-obtaining consequence tells us in each case:
 
 | Failing Instrument       | Predicted consequence that did not obtain                   |
 |--------------------------|-------------------------------------------------------------|
-| Developmental Trajectory | Structural organisation does not develop through operation  |
+| Developmental Trajectory | Structural development through operation is absent or is not earned — a fresh system develops comparably |
 | Self-Engagement          | Developed structure is not actively maintained under perturbation |
 | Integration              | Structure is decomposable under regional ablation           |
 | Generativity             | Frozen structure is inert on domains the system has not encountered |
@@ -344,7 +344,7 @@ This is non-negotiable: no provenance, no result.
 
 ### 1. Purpose
 
-The developmental trajectory instrument tests whether structural organisation develops through operation -- compression from diffuse to stable over time. A Class 4 candidate should show measurable structural compression during training that is statistically distinguishable from both random fluctuation and architectural pre-specification. This is the empirical operationalisation of emergence as described in Paper 1 section 3.1: structure arises from dynamics, not from prior specification.
+The developmental trajectory instrument tests whether structural organisation develops through operation -- compression from diffuse to stable over time. A Class 4 candidate should show measurable structural compression during training that is statistically distinguishable from both random fluctuation and architectural pre-specification. This probes the consequence predicted by the emergence property described in Paper 1 section 3.1: if the regime is present, structure arises from dynamics rather than from prior specification. The instrument does not measure emergence directly; it tests whether development through operation — the observable signature that emergence entails — is present.
 
 ---
 
@@ -486,7 +486,7 @@ Recalibration data, medium scale (150 nodes), three seeds per system.
 
 ### 1. Purpose
 
-The integration instrument tests whether earned structure is non-decomposable -- the system is more than the sum of its parts. Removing a component should reorganise the whole, not merely leave a gap. This is the empirical operationalisation of integration as described in Paper 1 section 3.3: a system with genuine integration exhibits non-linear degradation under ablation, where the loss of any significant component forces the remaining structure to reorganise rather than continuing to function with a piece missing.
+The integration instrument tests whether earned structure is non-decomposable -- the system is more than the sum of its parts. Removing a component should reorganise the whole, not merely leave a gap. This probes the consequence predicted by the integration property described in Paper 1 section 3.3: if the regime is present, the loss of any significant component forces the remaining structure to reorganise rather than continuing to function with a piece missing. The instrument does not measure integration directly; it tests whether non-linear degradation under ablation — the observable signature that integration entails — is present.
 
 ---
 
@@ -1336,7 +1336,7 @@ AMB = ambiguous (null result on that instrument, not a clear pass or fail).
 
 **Zero false positives.** 0 of 13 systems pass the conjunction. The battery produces no false positives on this calibration panel.
 
-**Construct-validity evidence.** Each class of calibration system fails at the point its architecture predicts — Class 1 at trajectory (no learning mechanism), Class 2 at trajectory (frozen weights preclude operational development), Class 3 at the conjunction (real learning, but insufficient on at least one instrument). If the instruments probed the wrong consequences, the failure pattern would be incoherent; systems would fail for reasons unrelated to their architecture. Instead, the failures are architecturally principled. The 13-system calibration therefore provides construct-validity evidence that the instruments probe the right consequences predicted by the regime.
+**Construct-validity evidence.** Each class of calibration system fails at the point its architecture predicts — Class 1 at trajectory (no learning mechanism), Class 2 at trajectory (frozen weights preclude operational development), Class 3 at the conjunction (real learning, but insufficient on at least one instrument). If the instruments probed the wrong consequences, the failure pattern would be incoherent; systems would fail for reasons unrelated to their architecture. Instead, the failures are architecturally principled. The calibration therefore provides evidence not only of specificity (13/13 correct rejections) but of the stronger claim that the instruments detect what the regime predicts.
 
 **Within-class consistency:**
 
@@ -1347,7 +1347,7 @@ AMB = ambiguous (null result on that instrument, not a clear pass or fail).
 **Generativity is the universal blocker.** Every calibration system produces delta = 0.000000 on the generativity instrument (no response to novel domain). This is the instrument that most consistently separates the calibration panel from a hypothetical Class 4 system. The positive controls (Section 12) confirm that the instrument is sensitive when genuine structural transfer is present.
 ## 12. Positive Controls
 
-Five positive controls demonstrate that each instrument is individually sensitive -- capable of detecting the regime consequence it probes when that consequence is architecturally present. Each positive control is purpose-built (or empirically identified) so that its architecture guarantees the consequence the instrument probes, providing non-circular ground truth that the instrument detects what it claims to detect.
+Five positive controls demonstrate that each instrument is individually sensitive. Each control is purpose-built (or empirically identified) so that its architecture guarantees the regime consequence the instrument probes, providing non-circular ground truth that the instrument detects what the architecture predicts.
 
 ### Positive Control Panel
 

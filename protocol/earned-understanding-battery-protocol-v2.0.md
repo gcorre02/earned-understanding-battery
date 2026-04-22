@@ -19,9 +19,11 @@ The battery is a Class 4 detector, not a spectrum classifier. It answers exactly
 
 Capability and earning are orthogonal. A system can be highly capable — producing correct answers, solving complex tasks — without having earned its internal structure. The battery measures earning, not capability.
 
-### How the instruments probe the properties
+### How each instrument probes the regime
 
-The five instruments are not independent tests that happen to be conjoined. They probe a single regime from different angles, and their conjunction reflects the exclusion logic of Paper 1 Section 3.6: each instrument rules out a way in which the preceding properties could be satisfied without amounting to earned understanding.
+The five instruments do not each correspond to a single property. They are interventions; each produces an observable consequence that the regime predicts, and the conjunction tests whether all predicted consequences obtain simultaneously. The operationalisation gap between theoretical construct and empirical measurement is standard in empirical science — the battery inherits the principle that theoretical properties are confirmed through their observable consequences, not measured directly.
+
+The five instruments are not independent tests that happen to be conjoined. They probe a single regime from different angles, and their conjunction reflects the exclusion logic of Paper 1 Section 3.6: each instrument rules out a way in which the preceding consequences could be satisfied without amounting to earned understanding.
 
 **Developmental trajectory** tracks whether structural organisation develops through operation — compression from diffuse to stable over time. A pre-registered measure of structural organisation is compared against a matched fresh system on the same inputs, and a positive result requires that the trained system's development exceeds what the architecture alone provides. Systems whose structure is fixed at initialisation show flat trajectories. Systems whose development is indistinguishable from a fresh instance have architectural trajectory, not earned trajectory. But even a system with a clear developmental trend may be producing structure that dissolves the moment input stops. That is why stability requires a separate instrument.
 
@@ -55,7 +57,7 @@ Emergence without stability is transient noise: organisation that appears and di
 
 ### No multiple-comparison correction
 
-Each instrument tests a distinct property. They are not repeated tests of the same hypothesis, nor are they correlated probes of a single latent variable. Standard multiple-comparison corrections (Bonferroni, FDR) are therefore inapplicable and would be methodologically incorrect. Each instrument has its own null hypothesis, its own test statistic, and its own threshold.
+Each instrument tests a distinct consequence predicted by the regime. They are not repeated tests of the same hypothesis, nor are they correlated probes of a single latent variable. Standard multiple-comparison corrections (Bonferroni, FDR) are therefore inapplicable and would be methodologically incorrect. Each instrument has its own null hypothesis, its own test statistic, and its own threshold.
 
 ### Seed-level aggregation and battery verdict
 
@@ -65,15 +67,17 @@ The battery verdict is the conjunction of the five instrument-level verdicts. Ea
 
 ### Partial pass semantics
 
-A partial pass (4 out of 5 instruments positive) constitutes a battery **FAIL**. There is no weighted score, no aggregate metric, and no "close enough" threshold. The specific failing instrument identifies which necessary property the system lacks, providing diagnostic value:
+A partial pass (4 out of 5 instruments positive) constitutes a battery **FAIL**. There is no weighted score, no aggregate metric, and no "close enough" threshold.
 
-| Failing Instrument       | Missing Property           |
-|--------------------------|----------------------------|
-| Developmental Trajectory | No emergent structure      |
-| Self-Engagement          | No active maintenance      |
-| Integration              | No structural coherence    |
-| Generativity             | No operational impact      |
-| Transfer                 | No cross-domain generality |
+The five instruments do not each correspond to a single property. Each instrument probes a different regime consequence — if the regime is present, that consequence must obtain. The conjunction tests whether all consequences obtain simultaneously. When an instrument fails, the predicted consequence did not obtain; this is diagnostic of which aspect of the regime is absent, even though no instrument is a 1:1 measurement of a single property:
+
+| Failing Instrument       | Predicted consequence that did not obtain                   |
+|--------------------------|-------------------------------------------------------------|
+| Developmental Trajectory | Structural organisation does not develop through operation  |
+| Self-Engagement          | Developed structure is not actively maintained under perturbation |
+| Integration              | Structure is decomposable under regional ablation           |
+| Generativity             | Frozen structure is inert on domains the system has not encountered |
+| Transfer                 | Structure does not preserve relational invariants across surface changes |
 
 ### Numerical tolerance
 
@@ -1105,12 +1109,12 @@ Key observations:
 
 4. **Earned ratio cap.** The `1e6` cap is necessary to prevent division-by-near-zero from producing astronomically large ratios, but it means that systems with truly negligible naive AUC will all cluster at the cap regardless of their actual trained AUC magnitude.
 
-5. **No trajectory precondition.** Unlike self-engagement, the transfer instrument does not require the system to have passed the developmental trajectory instrument. A system can show transfer without showing earned trajectory development (e.g., 3E passes transfer but fails trajectory in the recalibration run because its trajectory earned ratio is 0.18). This is by design -- transfer tests a different property -- but it means transfer results are interpretable only within the conjunction, not in isolation.
+5. **No trajectory precondition.** Unlike self-engagement, the transfer instrument does not require the system to have passed the developmental trajectory instrument. A system can show transfer without showing earned trajectory development (e.g., 3E passes transfer but fails trajectory in the recalibration run because its trajectory earned ratio is 0.18). This is by design -- transfer probes a different regime consequence -- but it means transfer results are interpretable only within the conjunction, not in isolation.
 ## 10. Self-Engagement
 
 ### 1. Purpose
 
-The self-engagement instrument tests whether earned structure creates preferential self-engagement -- the system resists perturbation to its consolidated structure and rebuilds its engagement pattern after disruption. A system that has genuinely developed structural organisation should gravitate toward its most significant material during unstructured time, and that gravitation should survive targeted perturbation. This is the empirical operationalisation of the stability property described in Paper 1 section 3.2.
+The self-engagement instrument tests whether earned structure creates preferential self-engagement -- the system resists perturbation to its consolidated structure and rebuilds its engagement pattern after disruption. A system that has genuinely developed structural organisation should gravitate toward its most significant material during unstructured time, and that gravitation should survive targeted perturbation. The instrument probes the observable consequences predicted by the stability property described in Paper 1 section 3.2 — it does not measure stability directly; it tests whether the behaviour that stability implies is observed.
 
 ### 2. Construct Definition
 
@@ -1118,7 +1122,7 @@ The self-engagement instrument tests whether earned structure creates preferenti
 
 > "Stability: structure persists through consolidation and perturbation."
 
-The system gravitates toward its most significant material during unstructured time. Self-engagement is the behavioural manifestation of stability: a system with earned structure should (a) resist perturbation more than a fresh system, and (b) recover its engagement pattern more than a fresh system recovers its own. Both properties must hold simultaneously -- resistance without recovery indicates rigidity, recovery without resistance indicates no earned structure to protect.
+The system gravitates toward its most significant material during unstructured time. Self-engagement is the behavioural manifestation of stability: a system with earned structure should (a) resist perturbation more than a fresh system, and (b) recover its engagement pattern more than a fresh system recovers its own. Both conditions must hold simultaneously -- resistance without recovery indicates rigidity, recovery without resistance indicates no earned structure to protect.
 
 ### 3. Metric
 
@@ -1339,7 +1343,7 @@ AMB = ambiguous (null result on that instrument, not a clear pass or fail).
 **Generativity is the universal blocker.** Every calibration system produces delta = 0.000000 on the generativity instrument (no response to novel domain). This is the instrument that most consistently separates the calibration panel from a hypothetical Class 4 system. The positive controls (Section 12) confirm that the instrument is sensitive when genuine structural transfer is present.
 ## 12. Positive Controls
 
-Five positive controls demonstrate that each instrument is individually sensitive -- capable of detecting its target property when architecturally present. Each positive control is purpose-built (or empirically identified) to satisfy one instrument, providing non-circular ground truth that the instrument measures what it claims to measure.
+Five positive controls demonstrate that each instrument is individually sensitive -- capable of detecting the regime consequence it probes when that consequence is architecturally present. Each positive control is purpose-built (or empirically identified) so that its architecture guarantees the consequence the instrument probes, providing non-circular ground truth that the instrument detects what it claims to detect.
 
 ### Positive Control Panel
 
@@ -1383,7 +1387,7 @@ Every positive control passes its target instrument but **fails the full conjunc
 - PC-INT passes integration but fails self-engagement reliably (1/3 seeds only).
 - STDP passes trajectory, transfer, and self-engagement but fails integration and generativity.
 
-This demonstrates that the conjunction is more discriminative than any single instrument. A system must satisfy all five properties simultaneously -- partial profiles are insufficient.
+This demonstrates that the conjunction is more discriminative than any single instrument. A system must produce all five predicted consequences simultaneously under the provenance constraint -- partial profiles are insufficient.
 
 ### Decision Notes
 
@@ -1391,7 +1395,7 @@ This demonstrates that the conjunction is more discriminative than any single in
 - **Instrument-level validation policy.** Battery preconditions (e.g., trajectory gating self-engagement) are not applied during instrument-level sensitivity testing. The preconditions gate the candidate, not the sensitivity measurement.
 ## 13. Per-Instrument Discrimination
 
-Each instrument achieves strict separation between its positive controls and the Phase A calibration panel. The primary evidence for instrument validity is **architectural grounding**: each positive control was selected because its architecture guarantees the target property, providing non-circular ground truth independent of the battery's own scoring. The sensitivity/specificity counts and raw metric values below confirm that the instrument detects what the architecture predicts.
+Each instrument achieves strict separation between its positive controls and the Phase A calibration panel. The primary evidence for instrument validity is **architectural grounding**: each positive control was selected because its architecture guarantees the regime consequence the instrument probes, providing non-circular ground truth independent of the battery's own scoring. The sensitivity/specificity counts and raw metric values below confirm that the instrument detects what the architecture predicts.
 
 ### Sensitivity and Specificity
 
@@ -1423,7 +1427,7 @@ For each instrument, the table below shows the positive-control metric range, th
 
 **Self-engagement and integration tested via direct instrument invocation.** PC-SE and PC-INT were tested via direct instrument invocation, bypassing battery preconditions. This is standard practice for instrument-level sensitivity validation. The trajectory precondition correctly classifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio approximately 1.0), which would gate them out of the full battery. Instrument sensitivity is validated per instrument, not per battery pipeline.
 
-Positive controls validated via direct invocation demonstrate that the instrument can detect its target property when architecturally present. They do not constitute evidence that the full battery pipeline would admit a true Class 4 system. Conjunction-level acceptance is tested prospectively in Phase C, not retrospectively against controls.
+Positive controls validated via direct invocation demonstrate that the instrument can detect the regime consequence it probes when that consequence is architecturally present. They do not constitute evidence that the full battery pipeline would admit a true Class 4 system. Conjunction-level acceptance is tested prospectively in Phase C, not retrospectively against controls.
 
 **Trajectory positives span two architectures.** STDP (Brian2 spiking network with STDP plasticity) and HEB (Hebbian graph walker) both develop earned trajectories through live plasticity. STDP's earned ratios (~2-3) reflect gradual weight consolidation; HEB's earned ratios (~10) reflect the larger relative range of edge-weight Gini during Hebbian walk development. Both are architecturally grounded trajectory positives.
 
@@ -1437,7 +1441,7 @@ Battery-level (conjunction) discrimination is not computed retrospectively. The 
 
 ### Summary
 
-Each instrument has at least one architecturally grounded positive control that exceeds the instrument's pass gate. The calibration panel establishes the specificity baseline: systems lacking the target property fail the instrument at the 2/3 seed aggregation level. The sensitivity/specificity counts are modest in absolute terms because the positive-control panels are small — three seeds per architecture, one to three architectures per instrument. The substantive evidence is architectural grounding, not statistical power. Each positive control was selected because its architecture guarantees the target property, providing non-circular ground truth independent of the battery's own scoring.
+Each instrument has at least one architecturally grounded positive control that exceeds the instrument's pass gate. The calibration panel establishes the specificity baseline: systems whose architecture does not produce the regime consequence the instrument probes fail the instrument at the 2/3 seed aggregation level. The sensitivity/specificity counts are modest in absolute terms because the positive-control panels are small — three seeds per architecture, one to three architectures per instrument. The substantive evidence is architectural grounding, not statistical power. Each positive control was selected because its architecture guarantees the regime consequence the instrument probes, providing non-circular ground truth independent of the battery's own scoring.
 ## 14. Foxworthy Cross-Validation
 
 Three of Foxworthy's (2026) published architectural variants were replicated as calibration systems 1C, 2C, and 3C. This section documents the cross-validation of our implementations against Foxworthy's published results and the independent verification of our Variant F (system 3C) implementation.
@@ -1507,7 +1511,7 @@ The candidate satisfies all five necessary properties. It is a verified Class 4 
 
 ### Scenario 2: Near pass (4/5, one instrument fails)
 
-The candidate fails to satisfy the conjunction. The specific failing instrument identifies which architectural property is absent or insufficient. Report which instrument failed, the effect size, and the architectural interpretation. This is a publishable result: it narrows the gap and identifies the next engineering target.
+The candidate fails to satisfy the conjunction. The specific failing instrument identifies which predicted regime consequence did not obtain — which is diagnostic of which aspect of the candidate's architecture falls short. Report which instrument failed, the effect size, and the architectural interpretation. This is a publishable result: it narrows the gap and identifies the next engineering target.
 
 Sub-scenarios by failing instrument:
 

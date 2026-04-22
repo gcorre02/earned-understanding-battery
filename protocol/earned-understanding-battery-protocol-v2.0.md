@@ -21,7 +21,9 @@ Capability and earning are orthogonal. A system can be highly capable — produc
 
 ### How each instrument probes the regime
 
-The five instruments do not each correspond to a single property. They are interventions; each produces an observable consequence that the regime predicts, and the conjunction tests whether all predicted consequences obtain simultaneously. The operationalisation gap between theoretical construct and empirical measurement is standard in empirical science — the battery inherits the principle that theoretical properties are confirmed through their observable consequences, not measured directly.
+The five instruments do not each correspond to a single property. They are interventions; each produces an observable consequence that the regime predicts, and the conjunction tests whether all predicted consequences obtain simultaneously.
+
+The gap between a theoretical construct and its empirical measurement is the **operationalisation gap**. The same principle underlies intelligence measured through IQ tests, consciousness measured through PCI or phi, and biological fitness measured through reproductive success — no instrument is the construct it detects. The gap is not a flaw to apologise for; it is the space where **construct validity** lives. The relevant question is not "why don't the instruments align with the properties?" but "do these instruments probe the right consequences?" — which is answered by the 13-system calibration in Section 11.
 
 The five instruments are not independent tests that happen to be conjoined. They probe a single regime from different angles, and their conjunction reflects the exclusion logic of Paper 1 Section 3.6: each instrument rules out a way in which the preceding consequences could be satisfied without amounting to earned understanding.
 
@@ -1334,6 +1336,8 @@ AMB = ambiguous (null result on that instrument, not a clear pass or fail).
 
 **Zero false positives.** 0 of 13 systems pass the conjunction. The battery produces no false positives on this calibration panel.
 
+**Construct-validity evidence.** Each class of calibration system fails at the point its architecture predicts — Class 1 at trajectory (no learning mechanism), Class 2 at trajectory (frozen weights preclude operational development), Class 3 at the conjunction (real learning, but insufficient on at least one instrument). If the instruments probed the wrong consequences, the failure pattern would be incoherent; systems would fail for reasons unrelated to their architecture. Instead, the failures are architecturally principled. The 13-system calibration therefore provides construct-validity evidence that the instruments probe the right consequences predicted by the regime.
+
 **Within-class consistency:**
 
 - **Class 1 (1A, 1B, 1C):** All three fail every instrument. No learning mechanism means no developmental trajectory, no earned structure, no generativity. Integration effects in 1A/1B are received (earned_ratio = 1.00, indicating the property comes from graph topology rather than operational learning) and correctly excluded.
@@ -1395,7 +1399,7 @@ This demonstrates that the conjunction is more discriminative than any single in
 - **Instrument-level validation policy.** Battery preconditions (e.g., trajectory gating self-engagement) are not applied during instrument-level sensitivity testing. The preconditions gate the candidate, not the sensitivity measurement.
 ## 13. Per-Instrument Discrimination
 
-Each instrument achieves strict separation between its positive controls and the Phase A calibration panel. The primary evidence for instrument validity is **architectural grounding**: each positive control was selected because its architecture guarantees the regime consequence the instrument probes, providing non-circular ground truth independent of the battery's own scoring. The sensitivity/specificity counts and raw metric values below confirm that the instrument detects what the architecture predicts.
+Each instrument achieves strict separation between its positive controls and the Phase A calibration panel. The primary evidence for instrument validity is **architectural grounding**: each positive control was selected because its architecture guarantees the regime consequence the instrument probes, providing non-circular ground truth independent of the battery's own scoring. This is **construct-validity evidence** — the positive control's architecture makes the predicted consequence inevitable, and the instrument's detection of it confirms that the instrument is sensitive to the consequence it is meant to probe. The sensitivity/specificity counts and raw metric values below confirm that the instrument detects what the architecture predicts.
 
 ### Sensitivity and Specificity
 

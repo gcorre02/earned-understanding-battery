@@ -463,7 +463,7 @@ def main():
 
     all_results = []
 
-    # --- Phase A: Graph walker systems on B₁ + B₂ (+ B₀ for PC1/PC3) ---
+    # --- Pass 1: Graph walker systems on B₁ + B₂ (+ B₀ for PC1/PC3) ---
     for name, cfg in graph_walker_configs.items():
         domains = [("B1", domain_b1, ej_b1), ("B2", domain_b2, ej_b2)]
         if name in ("PC1", "PC3"):
@@ -504,7 +504,7 @@ def main():
                      f"sc={result.structural_consistency:.4f} "
                      f"({time.monotonic()-t0:.1f}s)")
 
-    # --- Phase B: Non-graph-walker systems on B₁ ---
+    # --- Pass 2: Non-graph-walker systems on B₁ ---
     # These now have set_domain(). Run on actual B₁ domain.
     for name, cfg in non_graph_configs.items():
         for seed in SEEDS:
@@ -515,7 +515,7 @@ def main():
             if cfg["train_steps"] > 0:
                 trained.train_on_domain(domain_a, n_steps=cfg["train_steps"])
 
-            # Post-training recording on A (same as Phase A)
+            # Post-training recording on A (same as Pass 1)
             trained.set_training(False)
             trained.reset_engagement_tracking()
             training_seq = []
@@ -543,7 +543,7 @@ def main():
                  f"sc={result.structural_consistency:.4f} "
                  f"({time.monotonic()-t0:.1f}s)")
 
-    # --- Phase C: Null distributions (50 pairs per type, B₁ + B₂) ---
+    # --- Pass 3: Null distributions (50 pairs per type, B₁ + B₂) ---
     _log("=== Null distributions ===")
     null_samples = []
     null_types = {

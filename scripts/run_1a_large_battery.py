@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-1A LARGE full battery — Phase B blocker.
+1A LARGE full battery.
 
 Runs WordNetGraph at 500 nodes (LARGE preset) with full structural battery
 (5 instruments) + behavioural generativity, for 3 seeds.

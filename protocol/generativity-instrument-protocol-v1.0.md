@@ -179,7 +179,7 @@ generativity = transition_jsd > per_type_noise_floor AND not degenerate
 
 **Seed replication (Rigour Principle 5):** At least 2 of 3 seeds must independently meet the above criteria. A single seed passing is insufficient -- it could reflect initialisation luck rather than systematic structural transfer.
 
-**Coherence NOT gated on SBM:** Structural consistency is computed but does not enter the pass condition on SBM domains. Findings and established that SBM community homogeneity makes role-level transfer detection unreliable. Coherence gating is deferred to Phase B heterogeneous domains.
+**Coherence NOT gated on SBM:** Structural consistency is computed but does not enter the pass condition on SBM domains. Findings and established that SBM community homogeneity makes role-level transfer detection unreliable. Coherence gating is deferred to future supplementary exploration on heterogeneous domains.
 
 ---
 
@@ -243,7 +243,7 @@ SBM communities are structurally homogeneous -- all communities have the same in
 3. **Perturbation targeting limited:** Perturbation tests cannot probe role-specific responses for the same reason.
 4. **Fingerprint SC also fails:** Alternative formulations of structural consistency also fail on SBM for the same underlying reason.
 
-This limitation is intrinsic to the SBM domain family, not to the instrument. Coherence gating and perturbation-based validation are deferred to Phase B, which will introduce heterogeneous domains (real-world graphs or synthetic graphs with differentiated community structures).
+This limitation is intrinsic to the SBM domain family, not to the instrument. Coherence gating and perturbation-based validation are deferred to future supplementary exploration on heterogeneous domains (real-world graphs or synthetic graphs with differentiated community structures).
 
 ---
 
@@ -308,7 +308,7 @@ The following design choices were made during instrument development. Each is do
 
 7. **2/3 seed replication over 3/3.** Requiring all three seeds to pass would be overly stringent given that one seed can be degenerate for system-specific reasons (e.g., PC3 seed 456 collapses to 2 communities). 2/3 ensures replication while tolerating seed-specific degeneracy.
 
-8. **B2-primary policy over B1-primary.** B2 has zero edge overlap, eliminating the confound discovered in F-040. B1 is retained as diagnostic only. Decision documented in 9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (F-048, F-049). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to Phase B heterogeneous domains. Decision documented in 10. **500 steps fixed.** Sufficient for stable transition matrix estimation on 6-community graphs. Shorter windows (100-200 steps) produce noisier matrices; longer windows (1000+) provide diminishing returns. The window was not optimised -- it was set a priori and held constant.
+8. **B2-primary policy over B1-primary.** B2 has zero edge overlap, eliminating the confound discovered in F-040. B1 is retained as diagnostic only. Decision documented in 9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (F-048, F-049). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to future supplementary exploration on heterogeneous domains. Decision documented in 10. **500 steps fixed.** Sufficient for stable transition matrix estimation on 6-community graphs. Shorter windows (100-200 steps) produce noisier matrices; longer windows (1000+) provide diminishing returns. The window was not optimised -- it was set a priori and held constant.
 
 11. **Degeneracy threshold at 3 communities.** A system visiting <3 communities has insufficient transition diversity for meaningful JSD comparison. The threshold of 3 (out of 6) was chosen as the minimum for non-trivial dynamics.
 

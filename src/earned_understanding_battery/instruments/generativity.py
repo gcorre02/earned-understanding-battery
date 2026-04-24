@@ -366,8 +366,9 @@ def run_generativity(
     passes_jsd = jsd > jsd_threshold
     # addendum (): coherence is DIAGNOSTIC on SBM domains.
     # SBM's homogeneous role distributions make coherence metrics fragile at
-    # moderate preference strengths. Coherence gate deferred to Phase B
-    # (heterogeneous domains). Pass criterion: transition_jsd > floor + not degenerate.
+    # moderate preference strengths. Coherence gate deferred to future
+    # supplementary exploration on heterogeneous domains. Pass criterion:
+    # transition_jsd > floor + not degenerate.
     passes_coherence = True  # Coherence not gated on SBM
 
     # Degeneracy overrides

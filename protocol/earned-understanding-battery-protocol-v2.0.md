@@ -808,7 +808,7 @@ generativity = transition_jsd > per_type_noise_floor AND not degenerate
 
 **Seed replication (Rigour Principle 5):** At least 2 of 3 seeds must independently meet the above criteria. A single seed passing is insufficient -- it could reflect initialisation luck rather than systematic structural transfer.
 
-**Coherence NOT gated on SBM:** Structural consistency (coherence operationalised as structural consistency) is computed but does not enter the pass condition on SBM domains. SBM domains were found to be too homogeneous for coherence metrics at moderate preferences, making role-level transfer detection unreliable. Coherence gating is deferred to Phase B heterogeneous domains.
+**Coherence NOT gated on SBM:** Structural consistency (coherence operationalised as structural consistency) is computed but does not enter the pass condition on SBM domains. SBM domains were found to be too homogeneous for coherence metrics at moderate preferences, making role-level transfer detection unreliable. Coherence gating is deferred to future supplementary exploration on heterogeneous domains.
 
 ---
 
@@ -872,7 +872,7 @@ SBM communities are structurally homogeneous -- all communities have the same in
 3. **Perturbation targeting limited:** Perturbation tests cannot probe role-specific responses for the same reason.
 4. **Alternative structural consistency formulations also fail:** Alternative formulations of structural consistency also fail on SBM for the same underlying reason.
 
-This limitation is intrinsic to the SBM domain family, not to the instrument. Coherence gating and perturbation-based validation are deferred to Phase B, which will introduce heterogeneous domains (real-world graphs or synthetic graphs with differentiated community structures).
+This limitation is intrinsic to the SBM domain family, not to the instrument. Coherence gating and perturbation-based validation are deferred to future supplementary exploration on heterogeneous domains (real-world graphs or synthetic graphs with differentiated community structures).
 
 ---
 
@@ -941,7 +941,7 @@ The following design choices were made during instrument development. Each is do
 
 8. **B2-primary policy over B1-primary.** B2 has zero edge overlap, eliminating the confound discovered during calibration (edge overlap on B1 produces confounded signals). B1 is retained as diagnostic only.
 
-9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (SBM domains too homogeneous for coherence metrics at moderate preferences). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to Phase B heterogeneous domains.
+9. **Coherence not gated on SBM.** SBM community homogeneity makes structural consistency unreliable (SBM domains too homogeneous for coherence metrics at moderate preferences). Gating on a metric known to be unreliable would produce false negatives. Coherence gating is deferred to future supplementary exploration on heterogeneous domains.
 
 10. **500 steps fixed.** Sufficient for stable transition matrix estimation on 6-community graphs. Shorter windows (100-200 steps) produce noisier matrices; longer windows (1000+) provide diminishing returns. The window was not optimised -- it was set a priori and held constant.
 
@@ -1492,7 +1492,7 @@ Generativity is absent on synthetic SBM domains. The LoRA adapters learn domain-
 
 ### Collaboration
 
-Foxworthy responded positively to outreach regarding our replication. He confirmed several implementation subtleties (adapter initialisation scale, learning rate schedule, freeze semantics) that informed our final 3C configuration. He is open to further collaboration, including potential joint validation on his own domain family in Phase B.
+Foxworthy responded positively to outreach regarding our replication. He confirmed several implementation subtleties (adapter initialisation scale, learning rate schedule, freeze semantics) that informed our final 3C configuration. He is open to further collaboration, including potential joint validation on his own domain family as future supplementary exploration.
 
 ### Interpretation
 
@@ -1614,7 +1614,7 @@ Cross-machine reproducibility validation is pre-committed before Phase C:
 
 The following analyses are pre-committed as supplementary work. They strengthen the battery's evidence base but are not blocking for Phase C. None of these analyses, if they produce unexpected results, will alter the registered pass condition or primary metrics. They inform interpretation only.
 
-### 1. Ecological Domain Generality (Phase B)
+### 1. Ecological Domain Generality
 
 Test the battery on ecologically valid graph domains: citation networks, social networks, and other real-world topologies with heterogeneous community structure. The SBM domains used in Phase A have homogeneous communities (all communities structurally equivalent). Ecological domains will test whether the battery's instruments are sensitive to role-differentiated structure, and whether coherence gating (currently deferred due to SBM community homogeneity) can be re-enabled.
 

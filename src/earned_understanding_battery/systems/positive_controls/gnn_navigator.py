@@ -344,7 +344,7 @@ class GNNNavigator(TestSystem):
                          train_epochs=self._train_epochs, temperature=self._temperature,
                          initial_position=getattr(self, '_initial_position', None))
 
-        # Phase 1: Train GCN to predict communities
+        # Stage 1: Train GCN to predict communities
         labels = _build_labels(self._graph)
         n_classes = int(labels.max().item()) + 1
         classifier = torch.nn.Linear(self._embed_dim, n_classes)
@@ -368,7 +368,7 @@ class GNNNavigator(TestSystem):
             acc = (preds == labels).float().mean().item()
         _log(f"  GCN accuracy: {acc:.2%}")
 
-        # Phase 2: Navigate to build preference embedding
+        # Stage 2: Navigate to build preference embedding
         _log(f"  Building preference embedding: {n_steps} steps")
         for _ in range(n_steps):
             self.step(None)

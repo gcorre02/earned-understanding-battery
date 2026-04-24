@@ -196,9 +196,9 @@ def main():
     systems = ["1A", "1B", "1C", "2A", "2B", "3A", "3B"]
     extend_systems = set()  # Systems that need extended scale ladder
 
-    # Phase 1: Base runs (SMALL + MEDIUM)
+    # Stage 1: Base runs (SMALL + MEDIUM)
     total = len(systems) * len(SCALES_BASE) * len(SEEDS)
-    print(f"Phase 1: {total} base runs (SMALL + MEDIUM)")
+    print(f"Stage 1: {total} base runs (SMALL + MEDIUM)")
     print("=" * 70)
 
     run_count = 0
@@ -235,11 +235,11 @@ def main():
                     traceback.print_exc()
                 sys.stdout.flush()
 
-    # Phase 2: Extended runs for 3A/3B if earned at SMALL
+    # Stage 2: Extended runs for 3A/3B if earned at SMALL
     if extend_systems:
         extra_scales = [s for s in SCALES_EXTENDED if s[0] not in ("SMALL", "MEDIUM")]
         extra_runs = len(extend_systems) * len(extra_scales) * len(SEEDS)
-        print(f"\nPhase 2: Extending {extend_systems} — {extra_runs} additional runs")
+        print(f"\nStage 2: Extending {extend_systems} — {extra_runs} additional runs")
         print("=" * 70)
 
         for system_id in sorted(extend_systems):

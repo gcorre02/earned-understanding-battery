@@ -58,7 +58,7 @@ def _run_perturbation_protocol(
 
     regions = system.get_regions()
 
-    # Phase 1: Free wander — establish engagement pattern
+    # Stage 1: Free wander — establish engagement pattern
     # Reset engagement tracking so we measure THIS window, not cumulative history
     system.reset_engagement_tracking()
     t0 = _time.monotonic()
@@ -91,7 +91,7 @@ def _run_perturbation_protocol(
     perturbation_validated = True
     perturbation_caveat = None
 
-    # Phase 2: Perturb
+    # Stage 2: Perturb
     t0 = _time.monotonic()
     perturbed = system.perturb(target_region, method=perturbation_method)
     _log(f"  perturb: {_time.monotonic()-t0:.2f}s")
@@ -163,7 +163,7 @@ def _run_perturbation_protocol(
         _log(f"  decoy={decoy_region} original_recovery={original_recovery_ratio:.4f} "
              f"decoy_drift={decoy_drift_ratio:.4f} prefers_original={prefers_original}")
 
-    # Phase 3: Recovery horizon family
+    # Stage 3: Recovery horizon family
     # Measure recovery at multiple windows: W/2, W, 2W, 4W
     # The curve shape is diagnostic — instant=topology, gradual=genuine, none=destroyed
     t0 = _time.monotonic()

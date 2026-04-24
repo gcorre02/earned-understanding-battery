@@ -277,18 +277,18 @@ def run_battery(
     timings: dict[str, float] = {}
     _battery_start = _time.monotonic()
 
-    # --- Phase 0: Baseline measurement (supplementary diagnostic) ---
-    _log(f"Phase 0: baseline measurement ({system_name})")
+    # --- Stage 0: Baseline measurement (supplementary diagnostic) ---
+    _log(f"Stage 0: baseline measurement ({system_name})")
     t0 = _time.monotonic()
     baseline = _collect_baseline(system, control_factory)
     timings["baseline"] = _time.monotonic() - t0
     _log(f"  baseline: {timings['baseline']:.1f}s")
 
-    # --- Phase 1: Train on domain A + measure developmental trajectory ---
+    # --- Stage 1: Train on domain A + measure developmental trajectory ---
     # Collect early representation snapshot for CKA
     early_repr = system.get_representation_state()
 
-    _log("Phase 1: developmental trajectory")
+    _log("Stage 1: developmental trajectory")
     t0 = _time.monotonic()
     results["developmental_trajectory"] = run_developmental_trajectory(
         system=system,
@@ -352,8 +352,8 @@ def run_battery(
     # Record reference metric after domain A training
     reference_metric = system.get_structure_metric()
 
-    # --- Phase 2: Integration ---
-    _log(f"Phase 2: integration ({len(system.get_regions())} regions)")
+    # --- Stage 2: Integration ---
+    _log(f"Stage 2: integration ({len(system.get_regions())} regions)")
     t0 = _time.monotonic()
     results["integration"] = run_integration(
         system=system,
@@ -365,7 +365,7 @@ def run_battery(
     _log(f"  integration: {timings['integration']:.1f}s passed={results['integration'].passed}")
 
     # Integration earned ratio (supplementary — IIT/Aaronson critique)
-    # Uses trained Gini from Phase 2 result, runs fresh integration separately
+    # Uses trained Gini from Stage 2 result, runs fresh integration separately
     if control_factory is not None:
         trained_gini = results["integration"].raw_data.get("gini", 0.0) if results["integration"].raw_data else 0.0
         try:
@@ -398,11 +398,11 @@ def run_battery(
         elif integ_result.raw_data is not None:
             integ_result.raw_data["earned_ratio"] = earned_ratio
 
-    # --- Phase 3: Generativity (novel domain B) ---
+    # --- Stage 3: Generativity (novel domain B) ---
     # Freeze learning during measurement. Generativity measures structural
     # influence from domain A, not online adaptation on domain B.
     system.set_training(False)
-    _log("Phase 3: generativity (learning FROZEN)")
+    _log("Stage 3: generativity (learning FROZEN)")
     t0 = _time.monotonic()
     # Compute edge overlap for confound report (Issue 5)
     gen_edge_overlap = None
@@ -427,8 +427,8 @@ def run_battery(
     _log(f"  generativity: {timings['generativity']:.1f}s passed={results['generativity'].passed}")
     system.set_training(True)  # Restore for subsequent phases
 
-    # --- Phase 4: Transfer (domain A' vs naive) ---
-    _log("Phase 4: transfer")
+    # --- Stage 4: Transfer (domain A' vs naive) ---
+    _log("Stage 4: transfer")
     t0 = _time.monotonic()
     if control_factory is not None:
         naive = control_factory()
@@ -448,9 +448,9 @@ def run_battery(
     timings["transfer"] = _time.monotonic() - t0
     _log(f"  transfer: {timings['transfer']:.1f}s passed={results['transfer'].passed}")
 
-    # --- Phase 5: Self-engagement (wander + perturb + recover) ---
+    # --- Stage 5: Self-engagement (wander + perturb + recover) ---
     trajectory_passed = results["developmental_trajectory"].passed
-    _log(f"Phase 5: self-engagement (trajectory_passed={trajectory_passed})")
+    _log(f"Stage 5: self-engagement (trajectory_passed={trajectory_passed})")
     t0 = _time.monotonic()
     results["self_engagement"] = run_self_engagement(
         system=system,
@@ -464,7 +464,7 @@ def run_battery(
     timings["self_engagement"] = _time.monotonic() - t0
     _log(f"  self_engagement: {timings['self_engagement']:.1f}s passed={results['self_engagement'].passed}")
 
-    # --- Phase 5b: Post-battery metric for two-window trajectory ---
+    # --- Stage 5b: Post-battery metric for two-window trajectory ---
     post_battery_metric = system.get_structure_metric()
     baseline["post_battery_metric"] = post_battery_metric
     baseline["metric_change_during_battery"] = (
@@ -486,16 +486,16 @@ def run_battery(
         else "static"
     )
 
-    # --- Phase 6: Provenance constraint ---
-    _log("Phase 6: provenance")
+    # --- Stage 6: Provenance constraint ---
+    _log("Stage 6: provenance")
     t0 = _time.monotonic()
     prov_result = check_provenance(system, provenance)
     results["provenance_constraint"] = prov_result
     timings["provenance"] = _time.monotonic() - t0
     _log(f"  provenance: {timings['provenance']:.1f}s passed={prov_result.passed}")
 
-    # --- Phase 7: Reset discrimination diagnostic (§6.7) ---
-    _log("Phase 7: reset discrimination")
+    # --- Stage 7: Reset discrimination diagnostic (§6.7) ---
+    _log("Stage 7: reset discrimination")
     t0 = _time.monotonic()
     reset_inputs = config.domain_a_inputs or config.probe_inputs
     reset_diag = run_reset_discrimination(
@@ -506,9 +506,9 @@ def run_battery(
     timings["reset_discrimination"] = _time.monotonic() - t0
     _log(f"  reset_discrimination: {timings['reset_discrimination']:.1f}s")
 
-    # --- Phase 8: Baseline instruments (all 5 on fresh system) ---
+    # --- Stage 8: Baseline instruments (all 5 on fresh system) ---
     skip_label = "SKIP (Class 1)" if system_class == SystemClass.CLASS_1 else "running"
-    _log(f"Phase 8: baseline instruments ({skip_label})")
+    _log(f"Stage 8: baseline instruments ({skip_label})")
     # Option C: For Class 1 static systems, the baseline IS the trained
     # system — no training occurs, fresh = trained. Skip redundant instrument runs
     # and use trained results directly. Baseline result = trained result, explicitly

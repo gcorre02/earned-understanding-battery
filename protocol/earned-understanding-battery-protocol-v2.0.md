@@ -223,17 +223,17 @@ fresh control system on demand. This ensures:
 
 The battery runner collects measurements in two phases:
 
-1. **Phase 0 (baseline)**: fresh system metrics before any training occurs.
+1. **Stage 0 (baseline)**: fresh system metrics before any training occurs.
    Establishes the untrained baseline for each instrument.
-2. **Phase 8 (post-training baseline)**: fresh system metrics collected after
+2. **Stage 8 (post-training baseline)**: fresh system metrics collected after
    the trained system has completed all instruments. Confirms that baseline
    properties have not changed.
 
 Each instrument therefore reports three values:
 
-- **Baseline measurement**: fresh system metric (Phase 0).
+- **Baseline measurement**: fresh system metric (Stage 0).
 - **Battery measurement**: trained system metric during battery execution.
-- **Post-training baseline**: fresh system metric (Phase 8).
+- **Post-training baseline**: fresh system metric (Stage 8).
 
 ### Property classification
 
@@ -303,7 +303,7 @@ Five event types must be present for a provenance-complete run:
 
 ### Completeness check
 
-After all instruments complete (Phase 6 of the battery runner), the provenance
+After all instruments complete (Stage 6 of the battery runner), the provenance
 log is checked for completeness:
 
 1. All five event types must be present.
@@ -1369,13 +1369,13 @@ Five positive controls demonstrate that each instrument is individually sensitiv
 
 **PC-INT (PageRankHebbianWalker) -- Integration.** Tested via direct instrument invocation using the battery-runner probe convention (`probe_inputs = list(G.nodes())[:10]`, training mode, training_steps = 2000). Results: seed 42 Gini = 0.3625, seed 123 Gini = 0.4037, seed 456 Gini = 0.3121. All three PASS and are classified as `fragile` (architectural signature of PageRank-driven integration — ablating any region redistributes flow globally). CV values (1.52, 5.78, 14.56) comfortably clear the CV > 0.5 gate. All three show near-unity reorganisation_stability (0.9999, 1.0000, 0.9999) — PageRank converges to new equilibria rapidly after ablation.
 
-**PC-INT invocation methodology (pre-registered).** PC-INT is measured via direct instrument invocation using the following exact methodology, which matches how all other systems are measured in the battery runner (Phase 2, `battery_runner.py` lines 172/360):
+**PC-INT invocation methodology (pre-registered).** PC-INT is measured via direct instrument invocation using the following exact methodology, which matches how all other systems are measured in the battery runner (Stage 2, `battery_runner.py` lines 172/360):
 
 1. SBM graph: `DomainConfig(n_nodes=150, n_communities=6, p_within=0.3, p_between=0.02, seed=42)` → `generate_domain_family(config)["A"]`
 2. Walker instantiation: `PageRankHebbianWalker(G, seed=s)` for `s ∈ {42, 123, 456}`
 3. Training: `system.train_on_domain(G, n_steps=2000)`
 4. Probe inputs: `probe_inputs = list(G.nodes())[:10]` (first 10 nodes of domain A, matching the battery runner convention for `config.domain_a_inputs[:10]`)
-5. Training mode active during probing (no `set_training(False)` call) — matches Phase 2 behaviour in the battery runner where integration runs before the learning-freeze at Phase 3 generativity
+5. Training mode active during probing (no `set_training(False)` call) — matches Stage 2 behaviour in the battery runner where integration runs before the learning-freeze at Stage 3 generativity
 6. Instrument invocation: `run_integration(system=system, probe_inputs=probe_inputs, provenance=prov)`
 
 The integration instrument's Gini metric is sensitive to `probe_inputs` length because `_probe_metric` calls `system.step(input)` for each probe, and PC-INT continues learning during those steps. This methodology is pre-registered to ensure reproducibility across re-runs.

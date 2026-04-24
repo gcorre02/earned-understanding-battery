@@ -101,8 +101,8 @@ governance/                     Phase A+ sign-off document
 If you use this battery in academic work, please cite Paper 1:
 
 ```
-Ribeiro, G. C. T. (2026). Understanding as earned structure: a
-framework-agnostic empirical test.
+Ribeiro, G. C. T. (2026). Can a System Generate Understanding?
+Toward an Operational Framework for Emergent Cognition. Zenodo
 https://doi.org/10.5281/zenodo.19178410
 ```
 

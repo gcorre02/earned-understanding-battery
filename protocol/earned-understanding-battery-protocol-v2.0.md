@@ -1650,7 +1650,11 @@ Run representative systems at SMALL (50 nodes) and LARGE (500 nodes) scales. Ver
 
 Priority systems for scale validation: 1A, 2A, 3C, HEB, STDP, PC1, PC3.
 
-### 7. Multi-Domain Training Protocol (Planned Second Registration)
+### 7. Text-Native Battery Extension (Planned Future Registration)
+
+A future registration will assess text-mediated systems (including large language models with active learning) under instruments adapted for naturalistic text domains. The current battery's synthetic graph domain is intentionally controlled to remove pre-training advantages, but consequently provides limited discrimination for systems whose representations are tuned to natural language. Extending the battery to ecological text domains requires text-native instrument designs, text-native calibration, and purpose-built positive controls — work the project commits to in a subsequent registration.
+
+### 8. Multi-Domain Training Protocol (Planned Second Registration)
 
 Should the candidate pass the single-domain conjunction, a planned second registration will assess multi-domain training protocols to test whether the system discovers cross-domain relational invariants — the distinction between earning concrete structure (domain-specific paths) and earning abstract structure (domain-general patterns).
 

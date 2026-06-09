@@ -1,8 +1,8 @@
 # Earned Understanding Battery
 
-A framework-agnostic empirical test suite for Class 4 candidacy, implementing the five-instrument battery proposed in Paper 1 (Ribeiro, 2026).
+A framework-agnostic empirical test suite for Class 4 candidacy, implementing the five-instrument battery proposed in the framework paper (Ribeiro, 2026).
 
-**Paper 1:** [DOI 10.5281/zenodo.19178410](https://doi.org/10.5281/zenodo.19178410)
+**Framework paper:** Ribeiro, G. C. T. (2026). *Can a System Generate Understanding? Toward an Operational Framework for Emergent Cognition* (Version v2). Zenodo. [DOI 10.5281/zenodo.19178410](https://doi.org/10.5281/zenodo.19178410)
 
 **Pre-registered protocol:** [`protocol/earned-understanding-battery-protocol-v2.0.md`](protocol/earned-understanding-battery-protocol-v2.0.md)
 
@@ -98,12 +98,12 @@ governance/                     Phase A+ sign-off document
 
 ## Citation
 
-If you use this battery in academic work, please cite Paper 1:
+If you use this battery in academic work, please cite the framework paper:
 
 ```
 Ribeiro, G. C. T. (2026). Can a System Generate Understanding?
-Toward an Operational Framework for Emergent Cognition. Zenodo
-https://doi.org/10.5281/zenodo.19178410
+Toward an Operational Framework for Emergent Cognition (Version v2).
+Zenodo. https://doi.org/10.5281/zenodo.19178410
 ```
 
 ## Status

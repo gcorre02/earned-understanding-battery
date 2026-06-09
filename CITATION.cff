@@ -1,12 +1,12 @@
 cff-version: 1.2.0
 message: >-
   If you use this software, please cite both the software and the accompanying
-  Paper 1.
+  framework paper (Ribeiro, 2026).
 type: software
 title: "Earned Understanding Battery"
 abstract: >-
   A framework-agnostic empirical test suite for Class 4 candidacy, implementing
-  the five-instrument battery proposed in Paper 1 (Ribeiro, 2026). The battery
+  the five-instrument battery proposed in the framework paper (Ribeiro, 2026). The battery
   operationalises emergence, stability, integration, operational impact, and
   transfer as a conjunction of five instruments applied under a provenance
   constraint. It is a Class 4 detector, not a spectrum classifier.
@@ -31,7 +31,7 @@ keywords:
   - provenance-constraint
 references:
   - type: article
-    title: "Understanding as earned structure: a framework-agnostic empirical test"
+    title: "Can a System Generate Understanding? Toward an Operational Framework for Emergent Cognition"
     authors:
       - family-names: Correia Teles Ribeiro
         given-names: Guilherme

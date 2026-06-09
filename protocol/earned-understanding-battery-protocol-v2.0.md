@@ -3,7 +3,7 @@
 **Status:** FROZEN — For OSF Preregistration
 **Date:** 2026-04-02
 **Supersedes:** protocol/generativity-instrument-protocol-v1.0.md
-**Paper 1 DOI:** https://doi.org/10.5281/zenodo.19178410
+**Framework paper:** Ribeiro, G. C. T. (2026). *Can a System Generate Understanding? Toward an Operational Framework for Emergent Cognition* (Version v2). Zenodo. DOI [10.5281/zenodo.19178410](https://doi.org/10.5281/zenodo.19178410)
 
 ---
 
@@ -11,7 +11,7 @@
 
 ## 1. Purpose and Scope
 
-The battery is a framework-agnostic empirical test for Class 4 candidacy as defined in Paper 1 (DOI: 10.5281/zenodo.19178410). It operationalises the five necessary properties proposed in Paper 1 Section 3 — emergence, stability, integration, operational impact, and transfer — as a conjunction of five instruments applied under a provenance constraint.
+The battery is a framework-agnostic empirical test for Class 4 candidacy as defined in the framework paper (Ribeiro 2026). It operationalises the five necessary properties proposed in Ribeiro 2026, §3 — emergence, stability, integration, operational impact, and transfer — as a conjunction of five instruments applied under a provenance constraint.
 
 The battery does not validate the definition by measuring its components one by one. It attempts to falsify the regime predicted by the definition. Each instrument is an intervention designed to determine whether the system's organisational dynamics behave as the framework predicts. Failure of any instrument constitutes a negative result, regardless of task performance.
 
@@ -25,7 +25,7 @@ The five instruments do not each correspond to a single property. They are inter
 
 The gap between a theoretical construct and its empirical measurement is the **operationalisation gap**. The same principle underlies intelligence measured through IQ tests, consciousness measured through PCI or phi, and biological fitness measured through reproductive success — no instrument is the construct it detects. The gap is not a flaw to apologise for; it is the space where **construct validity** lives. The relevant question is not "why don't the instruments align with the properties?" but "do these instruments probe the right consequences?" — which is answered by the 13-system calibration in Section 11.
 
-The five instruments are not independent tests that happen to be conjoined. They probe a single regime from different angles, and their conjunction reflects the exclusion logic of Paper 1 Section 3.6: each instrument rules out a way in which the preceding consequences could be satisfied without amounting to earned understanding.
+The five instruments are not independent tests that happen to be conjoined. They probe a single regime from different angles, and their conjunction reflects the exclusion logic of Ribeiro 2026, §3.6: each instrument rules out a way in which the preceding consequences could be satisfied without amounting to earned understanding.
 
 **Developmental trajectory** tracks whether structural organisation develops through operation — compression from diffuse to stable over time. A pre-registered measure of structural organisation is compared against a matched fresh system on the same inputs, and a positive result requires that the trained system's development exceeds what the architecture alone provides. Systems whose structure is fixed at initialisation show flat trajectories. Systems whose development is indistinguishable from a fresh instance have architectural trajectory, not earned trajectory. But even a system with a clear developmental trend may be producing structure that dissolves the moment input stops. That is why stability requires a separate instrument.
 
@@ -45,15 +45,15 @@ All threshold choices, domain parameters, and instrument designs in this documen
 
 Phase C — the evaluation of a Class 4 candidate — is the confirmatory stage. Results from Phase C will be interpreted under this frozen protocol. Supplementary analyses (Section 17) may inform discussion but do not alter the registered pass/fail rules unless formally amended per Section 18.
 
-The framework's value lies in making the question answerable, not in guaranteeing the answer. A null result — a system that fails the battery — is a publishable finding that constrains the space of viable architectures (Paper 1 Section 10.1).
+The framework's value lies in making the question answerable, not in guaranteeing the answer. A null result — a system that fails the battery — is a publishable finding that constrains the space of viable architectures (Ribeiro 2026, §10.1).
 
 ## 2. Conjunction Logic
 
 ### The conjunction is the test
 
-All five instruments must return a positive result under the provenance constraint for the battery to pass. No single instrument is sufficient on its own (Paper 1 Section 3.6). The five properties are jointly necessary because each captures a distinct aspect of earned structure that the others do not entail.
+All five instruments must return a positive result under the provenance constraint for the battery to pass. No single instrument is sufficient on its own (Ribeiro 2026, §3.6). The five properties are jointly necessary because each captures a distinct aspect of earned structure that the others do not entail.
 
-The conjunction is not a checklist. It reflects the exclusion logic of Paper 1 Section 3.6: each property rules out a way in which the preceding ones could be satisfied without amounting to earned understanding.
+The conjunction is not a checklist. It reflects the exclusion logic of Ribeiro 2026, §3.6: each property rules out a way in which the preceding ones could be satisfied without amounting to earned understanding.
 
 Emergence without stability is transient noise: organisation that appears and dissolves. Stability without integration is frozen modularity: persistent structure that remains side by side without mutual constraint. Integration without operational impact is dead structure: tightly coupled organisation that never changes what the system can do. Operational impact without transfer is context-bound expertise: behavioural transformation confined to one domain. Transfer without emergence is statistical generalisation: competence that extends to new contexts through distributional regularity rather than through structure earned during operation.
 
@@ -274,14 +274,14 @@ adopted.
 ### Provenance is not a sixth property
 
 Provenance is the **epistemic condition** that makes scientific verification of
-the five properties possible (Paper 1 Section 5). It is not a property of the
+the five properties possible (Ribeiro 2026, §5). It is not a property of the
 system under test -- it is a property of the measurement process.
 
 Understanding may exist without traceability. A system could possess earned
 structure that we cannot observe or verify. But scientific confirmation requires
 an unbroken evidential chain from raw observations to claimed results.
 Provenance is what separates "we believe the system understands" from "we can
-demonstrate that it does."
+demonstrate that its structure is earned."
 
 ### Implementation: ProvenanceLog
 
@@ -344,13 +344,13 @@ This is non-negotiable: no provenance, no result.
 
 ### 1. Purpose
 
-The developmental trajectory instrument tests whether structural organisation develops through operation -- compression from diffuse to stable over time. A Class 4 candidate should show measurable structural compression during training that is statistically distinguishable from both random fluctuation and architectural pre-specification. This probes the consequence predicted by the emergence property described in Paper 1 section 3.1: if the regime is present, structure arises from dynamics rather than from prior specification. The instrument does not measure emergence directly; it tests whether development through operation — the observable signature that emergence entails — is present.
+The developmental trajectory instrument tests whether structural organisation develops through operation -- compression from diffuse to stable over time. A Class 4 candidate should show measurable structural compression during training that is statistically distinguishable from both random fluctuation and architectural pre-specification. This probes the consequence predicted by the emergence property described in Ribeiro 2026, §3.1: if the regime is present, structure arises from dynamics rather than from prior specification. The instrument does not measure emergence directly; it tests whether development through operation — the observable signature that emergence entails — is present.
 
 ---
 
 ### 2. Construct Definition
 
-**Emergence** (Paper 1 section 3.1):
+**Emergence** (Ribeiro 2026, §3.1):
 
 > "Structure arises from dynamics, not prior specification."
 
@@ -486,13 +486,13 @@ Recalibration data, medium scale (150 nodes), three seeds per system.
 
 ### 1. Purpose
 
-The integration instrument tests whether earned structure is non-decomposable -- the system is more than the sum of its parts. Removing a component should reorganise the whole, not merely leave a gap. This probes the consequence predicted by the integration property described in Paper 1 section 3.3: if the regime is present, the loss of any significant component forces the remaining structure to reorganise rather than continuing to function with a piece missing. The instrument does not measure integration directly; it tests whether non-linear degradation under ablation — the observable signature that integration entails — is present.
+The integration instrument tests whether earned structure is non-decomposable -- the system is more than the sum of its parts. Removing a component should reorganise the whole, not merely leave a gap. This probes the consequence predicted by the integration property described in Ribeiro 2026, §3.3: if the regime is present, the loss of any significant component forces the remaining structure to reorganise rather than continuing to function with a piece missing. The instrument does not measure integration directly; it tests whether non-linear degradation under ablation — the observable signature that integration entails — is present.
 
 ---
 
 ### 2. Construct Definition
 
-**Integration** (Paper 1 section 3.3):
+**Integration** (Ribeiro 2026, §3.3):
 
 > "Non-decomposable. Removing a component reorganises the whole, not just leaves a gap."
 
@@ -638,17 +638,17 @@ Recalibration data, medium scale (150 nodes), three seeds per system. PC-INT res
 
 ### 8.1. Purpose
 
-The generativity instrument tests whether frozen earned structure produces coherent, differentiated responses on novel domains. A system that has genuinely learned structural dynamics on domain A should, when switched to a structurally similar but topologically distinct domain B, navigate in ways that are measurably different from an untrained system on the same domain. This probes the consequence predicted by the generativity property described in Paper 1 section 5: if the regime is present, learned structure produces novel but non-random behaviour beyond training conditions. The instrument does not measure generativity directly; it tests whether differentiated responses on topologically distinct novel domains — the observable signature that generativity entails — are present.
+The generativity instrument tests whether frozen earned structure produces coherent, differentiated responses on novel domains. A system that has genuinely learned structural dynamics on domain A should, when switched to a structurally similar but topologically distinct domain B, navigate in ways that are measurably different from an untrained system on the same domain. This probes the consequence predicted by the generativity property described in Ribeiro 2026, §5: if the regime is present, learned structure produces novel but non-random behaviour beyond training conditions. The instrument does not measure generativity directly; it tests whether differentiated responses on topologically distinct novel domains — the observable signature that generativity entails — are present.
 
 ---
 
 ### 8.2. Construct Definitions
 
-**Generativity** (Paper 1 section 5):
+**Generativity** (Ribeiro 2026, §5):
 
 > "Generativity: the capacity of earned structure to produce coherent, differentiated responses in domains not encountered during training. A system exhibits generativity when its frozen learned dynamics produce systematic, above-noise divergence from baseline behaviour on a novel domain."
 
-**Transfer** (Paper 1 section 5):
+**Transfer** (Ribeiro 2026, §5):
 
 > "Transfer: the mechanism by which earned structure, developed through interaction with one domain, produces measurable effects when applied to a structurally related but topologically distinct domain. Transfer is evidenced by systematic divergence between trained and untrained systems navigating the same novel domain."
 
@@ -929,7 +929,7 @@ The following design choices were made during instrument development. Each is do
 
 2. **Row-wise weighted JSD over unweighted.** Weighting by visitation frequency ensures that communities the system actually navigates contribute more than communities it rarely visits. Unweighted averaging would give equal weight to rarely-visited communities where transition estimates are noisy.
 
-3. **Natural logarithm (base e) over base 2.** Base e gives JSD range [0, ln(2)] rather than [0, 1]. This is a scaling convention with no effect on ranking or pass/fail decisions. Natural log is standard in the information theory literature used by Paper 1.
+3. **Natural logarithm (base e) over base 2.** Base e gives JSD range [0, ln(2)] rather than [0, 1]. This is a scaling convention with no effect on ranking or pass/fail decisions. Natural log is standard in the information theory literature used in the framework paper (Ribeiro 2026).
 
 4. **Epsilon smoothing (1e-10) over Laplace smoothing.** Epsilon smoothing adds a negligible constant to avoid log(0) without materially altering the distribution. Laplace smoothing (+1 to all counts) would bias sparse distributions more heavily.
 
@@ -980,11 +980,11 @@ Pre-registered null result interpretation scenarios and per-instrument discrimin
 
 ### 1. Purpose
 
-The transfer instrument tests whether structural organisation learned in one domain accelerates acquisition in an isomorphic but statistically altered domain. A system that has genuinely earned relational structure on domain A should, when exposed to domain A' (same relational invariants, destroyed surface statistics), converge faster than a naive system encountering A' for the first time. This probes the consequence predicted by the transfer property described in Paper 1 section 5 and section 3.5: if the regime is present, convergence on A' is traceable to shared relational invariants rather than statistical familiarity. The instrument does not measure transfer directly; it tests whether faster convergence than a naive baseline on a statistically-altered isomorphic domain — the observable signature that transfer entails — is present.
+The transfer instrument tests whether structural organisation learned in one domain accelerates acquisition in an isomorphic but statistically altered domain. A system that has genuinely earned relational structure on domain A should, when exposed to domain A' (same relational invariants, destroyed surface statistics), converge faster than a naive system encountering A' for the first time. This probes the consequence predicted by the transfer property described in Ribeiro 2026, §5 and section 3.5: if the regime is present, convergence on A' is traceable to shared relational invariants rather than statistical familiarity. The instrument does not measure transfer directly; it tests whether faster convergence than a naive baseline on a statistically-altered isomorphic domain — the observable signature that transfer entails — is present.
 
 ### 2. Construct Definition
 
-**Transfer** (Paper 1 section 5):
+**Transfer** (Ribeiro 2026, §5):
 
 > "Transfer must be traceable to structural correspondence (shared relational invariants), not statistical familiarity."
 
@@ -1116,11 +1116,11 @@ Key observations:
 
 ### 1. Purpose
 
-The self-engagement instrument tests whether earned structure creates preferential self-engagement -- the system resists perturbation to its consolidated structure and rebuilds its engagement pattern after disruption. A system that has genuinely developed structural organisation should gravitate toward its most significant material during unstructured time, and that gravitation should survive targeted perturbation. The instrument probes the observable consequences predicted by the stability property described in Paper 1 section 3.2 — it does not measure stability directly; it tests whether the behaviour that stability implies is observed.
+The self-engagement instrument tests whether earned structure creates preferential self-engagement -- the system resists perturbation to its consolidated structure and rebuilds its engagement pattern after disruption. A system that has genuinely developed structural organisation should gravitate toward its most significant material during unstructured time, and that gravitation should survive targeted perturbation. The instrument probes the observable consequences predicted by the stability property described in Ribeiro 2026, §3.2 — it does not measure stability directly; it tests whether the behaviour that stability implies is observed.
 
 ### 2. Construct Definition
 
-**Stability** (Paper 1 section 3.2):
+**Stability** (Ribeiro 2026, §3.2):
 
 > "Stability: structure persists through consolidation and perturbation."
 
@@ -1511,7 +1511,7 @@ These interpretations are locked BEFORE Phase C data exists. They define how eac
 
 ### Scenario 1: Full conjunction pass (5/5 instruments positive under provenance)
 
-The candidate satisfies all five necessary properties. It is a verified Class 4 system under this framework. The further question of whether this constitutes "understanding" in a phenomenological sense remains open (Paper 1 section 6).
+The candidate satisfies all five necessary properties. It is a verified Class 4 system under this framework. The further question of whether this constitutes "understanding" in a phenomenological sense remains open (Ribeiro 2026, §6).
 
 ### Scenario 2: Near pass (4/5, one instrument fails)
 
@@ -1535,7 +1535,7 @@ The architectural properties may be present but fragile under scaling. Report th
 
 ### Scenario 5: Full fail (0/5 or 1/5)
 
-The candidate does not satisfy the conjunction. The battery correctly classifies it alongside Class 1-3 systems. This is a null result -- publishable under Paper 1 section 10.1. The null result demonstrates that the battery is rigorous enough to reject its own designer's system.
+The candidate does not satisfy the conjunction. The battery correctly classifies it alongside Class 1-3 systems. This is a null result -- publishable under Ribeiro 2026, §10.1. The null result demonstrates that the battery is rigorous enough to reject its own designer's system.
 
 ### Scenario 6: Unexpected control pass
 

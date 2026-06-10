@@ -41,9 +41,9 @@ The five instruments are not independent tests that happen to be conjoined. They
 
 ### Registration scope
 
-All threshold choices, domain parameters, and instrument designs in this document were informed by Phase A and Phase A+ calibration data. Those data existed before this protocol was written. The calibration panel (13 systems spanning Classes 1–3) was used to develop and validate the instruments, not to test the central hypothesis.
+All threshold choices, domain parameters, and instrument designs in this document were informed by the calibration data. Those data existed before this protocol was written. The calibration panel (13 systems spanning Classes 1–3) was used to develop and validate the instruments, not to test the central hypothesis.
 
-Phase C — the evaluation of a Class 4 candidate — is the confirmatory stage. Results from Phase C will be interpreted under this protocol. Supplementary analyses (Section 17) may inform discussion but do not alter the pass/fail rules unless the protocol is revised (Section 18).
+The confirmatory candidate evaluation — assessing a Class 4 candidate — is the confirmatory stage, distinct from the pre-existing calibration. Its results will be interpreted under this protocol. Supplementary analyses (Section 17) may inform discussion but do not alter the pass/fail rules unless the protocol is revised (Section 18).
 
 The framework's value lies in making the question answerable, not in guaranteeing the answer. A null result — a system that fails the battery — is a publishable finding that constrains the space of viable architectures (Ribeiro 2026, §10.1).
 
@@ -476,7 +476,7 @@ Recalibration data, medium scale (150 nodes), three seeds per system.
 
 4. **Linear regression assumption.** The analysis fits a linear model to what may be a nonlinear trajectory (e.g., sigmoid, logarithmic). A system with rapid early development followed by a plateau will have a lower R-squared than one with constant-rate development, even if the total structural change is greater. The monotonicity fraction partially compensates for this.
 
-5. **Candidate training protocol.** The default 50 `domain_a_inputs` and the measurement window defined in this section were calibrated against the Phase A system panel. The Class 4 candidate may require a different training protocol (step count, consolidation cycles, interaction types). The candidate's full training protocol — including step count, consolidation schedule, and any system-specific parameters — must be declared in a pre-Phase-C amendment (per Section 18) before any Phase C data is collected. This amendment will be filed as part of the Manny TestSystem adapter specification.
+5. **Candidate training protocol.** The default 50 `domain_a_inputs` and the measurement window defined in this section were calibrated against the calibration system panel. The Class 4 candidate may require a different training protocol (step count, consolidation cycles, interaction types). The candidate's full training protocol — including step count, consolidation schedule, and any system-specific parameters — must be declared in a candidate specification filed before any candidate-evaluation data is collected. This specification forms part of the candidate's TestSystem adapter specification.
 
 ## 7. Integration
 
@@ -620,13 +620,13 @@ Recalibration data, medium scale (150 nodes), three seeds per system. PC-INT res
 
 2. **PC-INT tested directly, not through battery runner.** PC-INT was tested via direct instrument invocation (positive control sensitivity validated at instrument level) because the trajectory precondition correctly identifies its topology-driven Hebbian learning as non-path-dependent (earned_ratio near 1.0 for trajectory). Running PC-INT through the battery would gate it out at the trajectory stage. Direct invocation is standard practice for instrument-level validation -- diagnostic sensitivity is validated per test, not per test panel.
 
-3. **Partition family limited to system.get_regions().** The current partition family is the set of communities returned by `system.get_regions()` (all SBM communities). No preregistered partition beyond this is defined. Alternative partitions (e.g., random bisections, hierarchical decompositions) might reveal integration patterns not visible at the community level. This is a known scope limitation for Phase A.
+3. **Partition family limited to system.get_regions().** The current partition family is the set of communities returned by `system.get_regions()` (all SBM communities). No preregistered partition beyond this is defined. Alternative partitions (e.g., random bisections, hierarchical decompositions) might reveal integration patterns not visible at the community level. This is a known scope limitation for the calibration.
 
 4. **Fragile vs earned boundary.** The fragile/earned distinction depends on the control ablation (removing a low-engagement region). If all regions have similar engagement, the control ablation is not well-separated from the primary ablations, and the fragile classification may be unreliable. PC-INT demonstrates this edge case: all three seeds pass integration but are classified as `fragile` because the control ablation also causes reorganisation. For PC-INT this is not an edge case — it is the architectural signature. PageRank is a global measure, so ablating any region (high- or low-engagement) redistributes flow throughout the graph. The fragile classification here is diagnostic, not a defect; the pass gate (Gini > 0.3 OR CV > 0.5) is the primary criterion.
 
 5. **Reorganisation stability is architecture-dependent.** HEB shows very high reorganisation stability (0.9997) because Hebbian walkers quickly find new equilibria. Other architectures may show lower stability not because they lack integration but because their reorganisation dynamics are slower. The stability metric is diagnostic only, not gated, for this reason.
 
-   Systems with slower reorganisation dynamics may show `earned_unsettled` classification (reorganisation_stability <= 0.5) despite having genuine integration. The observation window (M steps, default 50) was calibrated on the Phase A panel and may be insufficient for architectures with longer convergence times. The `earned_unsettled` classification does not affect the pass/fail verdict — it flags that the post-ablation stability question remains open for that system and merits longer observation in supplementary analysis.
+   Systems with slower reorganisation dynamics may show `earned_unsettled` classification (reorganisation_stability <= 0.5) despite having genuine integration. The observation window (M steps, default 50) was calibrated on the calibration panel and may be insufficient for architectures with longer convergence times. The `earned_unsettled` classification does not affect the pass/fail verdict — it flags that the post-ablation stability question remains open for that system and merits longer observation in supplementary analysis.
 ## 8. Generativity
 **Instrument:** Generativity (structural transfer to novel domains)
 
@@ -1056,7 +1056,7 @@ Calibration results (medium scale, 3 seeds):
 
 ### 9. Calibration Results
 
-Results from the Phase A recalibration run (medium scale, seed 42 shown; multi-seed summary in pass rate column).
+Results from the recalibration run (medium scale, seed 42 shown; multi-seed summary in pass rate column).
 
 | System | Class | Seed 42 Result | Earned Ratio | Pass Rate (3 seeds) |
 |--------|-------|----------------|--------------|---------------------|
@@ -1078,12 +1078,12 @@ Key observations:
 - **3E** is the designated positive control with a 10x earned ratio, stable across seeds.
 - **HEB** shows the highest earned ratio (~84x) but this reflects Hebbian weight accumulation rather than relational model transfer. HEB's transfer is mechanistically different from 3E's (weight magnitude vs. relational structure).
 - **STDP** passes with modest earned ratios (~1.3x), consistent with spike-timing-dependent plasticity creating transferable edge-weight structure.
-- **2C** passes 2/3 seeds with marginal earned ratios (~1.2x). This is a borderline case worth monitoring in Phase C.
+- **2C** passes 2/3 seeds with marginal earned ratios (~1.2x). This is a borderline case worth monitoring in the candidate evaluation.
 - All Class 1 systems fail or return indeterminate. All pure Class 2 systems (2A, 2B) fail.
 
 ### 10. Known Limitations
 
-1. **Single true positive for relational transfer.** 3E is the only system whose transfer is architecturally grounded in relational model generalisation. HEB and STDP pass via weight-based mechanisms. AUC = 1.0 for per-instrument ROC reflects strict separation between the positive and negative pools, not statistical power. Confidence in the instrument's sensitivity depends on expanding the positive control set in Phase C.
+1. **Single true positive for relational transfer.** 3E is the only system whose transfer is architecturally grounded in relational model generalisation. HEB and STDP pass via weight-based mechanisms. AUC = 1.0 for per-instrument ROC reflects strict separation between the positive and negative pools, not statistical power. Confidence in the instrument's sensitivity depends on expanding the positive control set in the candidate evaluation.
 
 2. **Domain A' construction quality.** A' preserves relational structure while destroying surface statistics. Spectral similarity between A and A' is verified by spectral basin signature comparison (k=10 eigenvalues, full-basin variant, symmetrised Laplacian). However, the verification is internal to the battery -- it has not been independently audited. If A' inadvertently preserves surface statistics that a system can exploit, the instrument would produce false positives.
 
@@ -1217,7 +1217,7 @@ Direct instrument testing results (positive control sensitivity validated at ins
 
 ### 9. Calibration Results
 
-Results from the Phase A recalibration run (medium scale, 3 seeds per system).
+Results from the recalibration run (medium scale, 3 seeds per system).
 
 | System | Class | Pass Rate | Failure Mode | Notes |
 |--------|-------|-----------|--------------|-------|
@@ -1244,13 +1244,13 @@ Key observations:
 
 ### 10. Known Limitations
 
-1. **Trajectory precondition blocks most systems.** The precondition (`trajectory_passed = True`) prevents self-engagement from being assessed on any system that does not show earned developmental trajectory. In the Phase A calibration, this blocks 11/13 battery-pipeline systems. This is correct behaviour -- topology-driven walkers should not be tested for self-engagement -- but it means the instrument's discrimination power is primarily exercised in the conjunction, not in isolation.
+1. **Trajectory precondition blocks most systems.** The precondition (`trajectory_passed = True`) prevents self-engagement from being assessed on any system that does not show earned developmental trajectory. In the calibration, this blocks 11/13 battery-pipeline systems. This is correct behaviour -- topology-driven walkers should not be tested for self-engagement -- but it means the instrument's discrimination power is primarily exercised in the conjunction, not in isolation.
 
 2. **PC-SE tested via direct invocation, not battery runner.** The positive control cannot pass through the normal battery pipeline because the trajectory precondition correctly identifies its topology-driven dynamics as non-path-dependent. Direct invocation (positive control sensitivity validated at instrument level) validates instrument sensitivity but does not test the full battery workflow for self-engagement. This gap is acceptable because the precondition is a feature, not a bug.
 
 3. **Perturbation semantics.** The default perturbation method (`flatten_to_mean`) replaces edge weights in the target region with their mean value. This may be too aggressive for some architectures -- it destroys fine-grained weight structure entirely rather than degrading it. Alternative perturbation methods (noise injection, partial flattening) are not currently implemented.
 
-4. **SBM community homogeneity limits perturbation targeting.** SBM generates communities with identical internal structure, so the "perturbation targets highest-structure region" heuristic depends on the system having developed differential structure across homogeneous communities. In the Phase A calibration, 9/21 system-seed combinations pass the perturbation validation gate after this fix. The remaining 12/21 fail because no region has sufficiently elevated structure relative to the non-target mean.
+4. **SBM community homogeneity limits perturbation targeting.** SBM generates communities with identical internal structure, so the "perturbation targets highest-structure region" heuristic depends on the system having developed differential structure across homogeneous communities. In the calibration, 9/21 system-seed combinations pass the perturbation validation gate after this fix. The remaining 12/21 fail because no region has sufficiently elevated structure relative to the non-target mean.
 
 5. **Recovery horizon family is diagnostic, not gated.** The recovery curve is measured at [W/2, W, 2W, 4W] to provide diagnostic information about recovery dynamics (instant recovery suggests topology-driven, gradual recovery suggests genuine self-engagement, no recovery suggests destroyed structure). However, only the primary recovery at W enters the pass condition. The curve shape informs interpretation but does not determine pass/fail.
 
@@ -1379,7 +1379,7 @@ This demonstrates that the conjunction is more discriminative than any single in
 - **Instrument-level validation policy.** Battery preconditions (e.g., trajectory gating self-engagement) are not applied during instrument-level sensitivity testing. The preconditions gate the candidate, not the sensitivity measurement.
 ## 13. Per-Instrument Discrimination
 
-Each instrument achieves strict separation between its positive controls and the Phase A calibration panel. The primary evidence for instrument validity is **architectural grounding**: each positive control was selected because its architecture guarantees the regime consequence the instrument probes, providing non-circular ground truth independent of the battery's own scoring. This is **construct-validity evidence** — the positive control's architecture makes the predicted consequence inevitable, and the instrument's detection of it confirms that the instrument is sensitive to the consequence it is meant to probe. The sensitivity/specificity counts and raw metric values below confirm that the instrument detects what the architecture predicts.
+Each instrument achieves strict separation between its positive controls and the calibration panel. The primary evidence for instrument validity is **architectural grounding**: each positive control was selected because its architecture guarantees the regime consequence the instrument probes, providing non-circular ground truth independent of the battery's own scoring. This is **construct-validity evidence** — the positive control's architecture makes the predicted consequence inevitable, and the instrument's detection of it confirms that the instrument is sensitive to the consequence it is meant to probe. The sensitivity/specificity counts and raw metric values below confirm that the instrument detects what the architecture predicts.
 
 ### Sensitivity and Specificity
 
@@ -1411,7 +1411,7 @@ For each instrument, the table below shows the positive-control metric range, th
 
 **Self-engagement and integration tested via direct instrument invocation.** PC-SE and PC-INT were tested via direct instrument invocation, bypassing battery preconditions. This is standard practice for instrument-level sensitivity validation. The trajectory precondition correctly classifies their topology-driven Hebbian learning as non-path-dependent (earned_ratio approximately 1.0), which would gate them out of the full battery. Instrument sensitivity is validated per instrument, not per battery pipeline.
 
-Positive controls validated via direct invocation demonstrate that the instrument can detect the regime consequence it probes when that consequence is architecturally present. They do not constitute evidence that the full battery pipeline would admit a true Class 4 system. Conjunction-level acceptance is tested prospectively in Phase C, not retrospectively against controls.
+Positive controls validated via direct invocation demonstrate that the instrument can detect the regime consequence it probes when that consequence is architecturally present. They do not constitute evidence that the full battery pipeline would admit a true Class 4 system. Conjunction-level acceptance is tested prospectively in the candidate evaluation, not retrospectively against controls.
 
 **Trajectory positives span two architectures.** STDP (Brian2 spiking network with STDP plasticity) and HEB (Hebbian graph walker) both develop earned trajectories through live plasticity. STDP's earned ratios (~2-3) reflect gradual weight consolidation; HEB's earned ratios (~10) reflect the larger relative range of edge-weight Gini during Hebbian walk development. Both are architecturally grounded trajectory positives.
 
@@ -1421,7 +1421,7 @@ Positive controls validated via direct invocation demonstrate that the instrumen
 
 ### Battery-Level Discrimination
 
-Battery-level (conjunction) discrimination is not computed retrospectively. The calibration panel establishes that the conjunction rejects all 13 systems at the 2/3 aggregation level (0/13 pass), and positive controls confirm each instrument is individually sensitive. The conjunction's ability to accept a genuine Class 4 system is tested prospectively in Phase C, not retrospectively against the calibration panel.
+Battery-level (conjunction) discrimination is not computed retrospectively. The calibration panel establishes that the conjunction rejects all 13 systems at the 2/3 aggregation level (0/13 pass), and positive controls confirm each instrument is individually sensitive. The conjunction's ability to accept a genuine Class 4 system is tested prospectively in the candidate evaluation, not retrospectively against the calibration panel.
 
 ### Summary
 
@@ -1487,7 +1487,7 @@ The Foxworthy cross-validation serves two purposes:
 
 ## 15. Pre-Registered Null Result Interpretation Scenarios
 
-These interpretations are locked BEFORE Phase C data exists. They define how each plausible outcome on the Class 4 candidate will be reported, preventing post-hoc narrative fitting.
+These interpretations are locked BEFORE candidate-evaluation data exists. They define how each plausible outcome on the Class 4 candidate will be reported, preventing post-hoc narrative fitting.
 
 ### Scenario 1: Full conjunction pass (5/5 instruments positive under provenance)
 
@@ -1519,21 +1519,21 @@ The candidate does not satisfy the conjunction. The battery correctly classifies
 
 ### Scenario 6: Unexpected control pass
 
-If any Phase C ablation control passes the conjunction, the battery cannot discriminate the candidate from its controls. Execution halts. The control anomaly must be investigated and resolved — with findings documented via the amendment procedure (Section 18) — before any candidate result is reported. If the anomaly cannot be resolved, the battery result for the candidate is voided and reported as inconclusive.
+If any candidate-evaluation ablation control passes the conjunction, the battery cannot discriminate the candidate from its controls. Execution halts. The control anomaly must be investigated and resolved — with findings documented via the amendment procedure (Section 18) — before any candidate result is reported. If the anomaly cannot be resolved, the battery result for the candidate is voided and reported as inconclusive.
 
-**Phase C ablation controls.** Three matched controls will be run alongside the candidate during Phase C. Each control uses the same candidate architecture with one architectural condition removed:
+**candidate-evaluation ablation controls.** Three matched controls will be run alongside the candidate during the candidate evaluation. Each control uses the same candidate architecture with one architectural condition removed:
 
 - **B4-frozen:** Learning disabled at deployment. The candidate's feedback loop is severed — it receives input but earns no new structure. Tests whether Class 2 dynamics suffice. Expected battery profile: Trajectory FAIL.
 - **B4-directed:** An externally specified reward signal replaces the candidate's undirected dynamics. The candidate updates its structure, but convergence is governed by an external objective. Tests whether Class 3 dynamics suffice. Expected battery profile: Generativity FAIL.
 - **B4-observe:** The candidate receives input and maintains its dynamics, but its structure cannot be modified (plasticity disabled, consolidation disabled). Tests whether passive observation suffices. Expected battery profile: Trajectory FAIL.
 
-The exact implementation of each control (which parameters are frozen, how the reward signal is specified, which plasticity mechanisms are disabled) will be defined in a pre-Phase-C amendment filed before any Phase C data is collected. If any control passes the full conjunction, execution halts per Scenario 6 above.
+The exact implementation of each control (which parameters are frozen, how the reward signal is specified, which plasticity mechanisms are disabled) will be defined in a candidate specification filed before any candidate-evaluation data is collected. If any control passes the full conjunction, execution halts per Scenario 6 above.
 
 ## 16. Hardware and Compute Requirements
 
 ### Calibration Hardware
 
-All Phase A calibration and Phase A+ validation results were produced on a single machine:
+All calibration and validation results were produced on a single machine:
 
 - **Machine:** Apple M5 Max
 - **Memory:** 128 GB unified memory
@@ -1543,12 +1543,12 @@ All Phase A calibration and Phase A+ validation results were produced on a singl
 
 ### Cross-Machine Validation
 
-Cross-machine reproducibility validation is pre-committed before Phase C:
+Cross-machine reproducibility validation is pre-committed before the candidate evaluation:
 
 - **Machine:** Razer desktop
 - **GPU:** GeForce RTX 3060 (6 GB VRAM)
 - **OS:** Windows
-- **Purpose:** Verify that all calibration results reproduce on different hardware, OS, and accelerator. Any discrepancies will be documented and resolved before Phase C proceeds.
+- **Purpose:** Verify that all calibration results reproduce on different hardware, OS, and accelerator. Any discrepancies will be documented and resolved before the candidate evaluation proceeds.
 
 ### Graph Scale
 
@@ -1592,15 +1592,15 @@ Cross-machine reproducibility validation is pre-committed before Phase C:
 - **Runtime:** Approximately 18 minutes per full battery run on M5 Max CPU
 ## 17. Pre-Committed Supplementary Analyses
 
-The following analyses are pre-committed as supplementary work. They strengthen the battery's evidence base but are not blocking for Phase C. None of these analyses, if they produce unexpected results, will alter the registered pass condition or primary metrics. They inform interpretation only.
+The following analyses are pre-committed as supplementary work. They strengthen the battery's evidence base but are not blocking for the candidate evaluation. None of these analyses, if they produce unexpected results, will alter the registered pass condition or primary metrics. They inform interpretation only.
 
 ### 1. Ecological Domain Generality
 
-Test the battery on ecologically valid graph domains: citation networks, social networks, and other real-world topologies with heterogeneous community structure. The SBM domains used in Phase A have homogeneous communities (all communities structurally equivalent). Ecological domains will test whether the battery's instruments are sensitive to role-differentiated structure, and whether coherence gating (currently deferred due to SBM community homogeneity) can be re-enabled.
+Test the battery on ecologically valid graph domains: citation networks, social networks, and other real-world topologies with heterogeneous community structure. The SBM domains used in the calibration have homogeneous communities (all communities structurally equivalent). Ecological domains will test whether the battery's instruments are sensitive to role-differentiated structure, and whether coherence gating (currently deferred due to SBM community homogeneity) can be re-enabled.
 
 ### 2. Cross-Machine Reproducibility
 
-Replicate all Phase A calibration results on the Razer desktop (GeForce RTX 3060, Windows). Verify that pass/fail verdicts, effect sizes, and noise floors are consistent across hardware, operating system, and accelerator. Any discrepancies will be documented with root-cause analysis.
+Replicate all calibration results on the Razer desktop (GeForce RTX 3060, Windows). Verify that pass/fail verdicts, effect sizes, and noise floors are consistent across hardware, operating system, and accelerator. Any discrepancies will be documented with root-cause analysis.
 
 ### 3. Expanded Positive Control Panel
 
@@ -1640,7 +1640,7 @@ Should the candidate pass the single-domain conjunction, a planned second regist
 
 ### Relationship to Registered Protocol
 
-These supplementary analyses strengthen but do not change the protocol's pass/fail rules. If any supplementary analysis reveals a flaw in the battery's discrimination (e.g., a calibration system spuriously passing at a different scale), the finding will be documented and the protocol revised (Section 18). The Phase C candidate evaluation proceeds under this protocol regardless of supplementary analysis status.
+These supplementary analyses strengthen but do not change the protocol's pass/fail rules. If any supplementary analysis reveals a flaw in the battery's discrimination (e.g., a calibration system spuriously passing at a different scale), the finding will be documented and the protocol revised (Section 18). The the candidate evaluation proceeds under this protocol regardless of supplementary analysis status.
 ## 18. Version Control
 
 This protocol is a pre-registration draft under development; it has not yet been registered. Its complete change history is maintained in the public repository's git history, which is the authoritative, timestamped record of every revision.
@@ -1649,4 +1649,4 @@ A formal amendment procedure — defining how changes are handled relative to a 
 
 ### Governance principle
 
-The intent that governs this protocol is that Phase C results are interpreted under the version of the protocol in force when Phase C begins, and that no revision retroactively changes the interpretation of Phase A/A+ calibration results without re-running the affected analyses.
+The intent that governs this protocol is that the candidate evaluation results are interpreted under the version of the protocol in force when the candidate evaluation begins, and that no revision retroactively changes the interpretation of the calibration/A+ calibration results without re-running the affected analyses.

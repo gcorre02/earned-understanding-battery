@@ -1,6 +1,6 @@
 # Earned Understanding Battery Protocol v2.0
 
-**Status:** FROZEN — For OSF Preregistration
+**Status:** Pre-registration draft — under development (not yet registered)
 **Date:** 2026-04-02
 **Supersedes:** protocol/generativity-instrument-protocol-v1.0.md
 **Framework paper:** Ribeiro, G. C. T. (2026). *Can a System Generate Understanding? Toward an Operational Framework for Emergent Cognition* (Version v2). Zenodo. DOI [10.5281/zenodo.19178410](https://doi.org/10.5281/zenodo.19178410)
@@ -41,9 +41,9 @@ The five instruments are not independent tests that happen to be conjoined. They
 
 ### Registration scope
 
-All threshold choices, domain parameters, and instrument designs in this document were informed by Phase A and Phase A+ calibration data. Those data existed before the protocol was frozen. The calibration panel (13 systems spanning Classes 1–3) was used to develop and validate the instruments, not to test the central hypothesis.
+All threshold choices, domain parameters, and instrument designs in this document were informed by Phase A and Phase A+ calibration data. Those data existed before this protocol was written. The calibration panel (13 systems spanning Classes 1–3) was used to develop and validate the instruments, not to test the central hypothesis.
 
-Phase C — the evaluation of a Class 4 candidate — is the confirmatory stage. Results from Phase C will be interpreted under this frozen protocol. Supplementary analyses (Section 17) may inform discussion but do not alter the registered pass/fail rules unless formally amended per Section 18.
+Phase C — the evaluation of a Class 4 candidate — is the confirmatory stage. Results from Phase C will be interpreted under this protocol. Supplementary analyses (Section 17) may inform discussion but do not alter the pass/fail rules unless the protocol is revised (Section 18).
 
 The framework's value lies in making the question answerable, not in guaranteeing the answer. A null result — a system that fails the battery — is a publishable finding that constrains the space of viable architectures (Ribeiro 2026, §10.1).
 
@@ -628,10 +628,6 @@ Recalibration data, medium scale (150 nodes), three seeds per system. PC-INT res
 
    Systems with slower reorganisation dynamics may show `earned_unsettled` classification (reorganisation_stability <= 0.5) despite having genuine integration. The observation window (M steps, default 50) was calibrated on the Phase A panel and may be insufficient for architectures with longer convergence times. The `earned_unsettled` classification does not affect the pass/fail verdict — it flags that the post-ablation stability question remains open for that system and merits longer observation in supplementary analysis.
 ## 8. Generativity
-
-**Status:** FROZEN
-**Date:** 2026-03-21
-**Commit:** 72c9f6d
 **Instrument:** Generativity (structural transfer to novel domains)
 
 ---
@@ -951,25 +947,9 @@ The following design choices were made during instrument development. Each is do
 
 ---
 
-### 8.15. Version Control and Amendment Policy
+### 8.15. Version Control
 
-| Item | Value |
-|------|-------|
-| Protocol version | 2.0 |
-| Frozen at commit | 72c9f6d |
-| Freeze date | 2026-03-21 |
-| Data commit | 72c9f6d |
-| Author | Guilherme C. T. Ribeiro |
-
-This protocol is frozen as of the date and commit above. No modifications may be made without a documented amendment following this procedure:
-
-1. **Amendment proposal** filed in the governance register with rationale.
-2. **Impact assessment** documenting which results (if any) would change under the amendment.
-3. **Decision note** (governance decision note) recording the decision to accept or reject the amendment.
-4. **Version increment** (v1.0 -> v1.1 for minor, v2.0 for major changes to pass condition or primary metric).
-5. **Re-run obligation:** If the amendment changes the pass condition, noise floor methodology, or primary metric, all results must be re-computed and the data package updated.
-
-This section documents the generativity instrument as frozen at the time of registration. All parameters, thresholds, and procedures above are locked.
+This section's parameters, thresholds, and procedures are maintained under version control in the public repository's git history, which is the authoritative record of every change.
 
 ---
 
@@ -1660,41 +1640,13 @@ Should the candidate pass the single-domain conjunction, a planned second regist
 
 ### Relationship to Registered Protocol
 
-These supplementary analyses strengthen but do not change the registered protocol. If any supplementary analysis reveals a flaw in the battery's discrimination (e.g., a calibration system spuriously passing at a different scale), the finding will be documented and an amendment proposed per Section 18. The Phase C candidate evaluation proceeds under the frozen protocol regardless of supplementary analysis status.
-## 18. Version Control and Amendment Procedure
+These supplementary analyses strengthen but do not change the protocol's pass/fail rules. If any supplementary analysis reveals a flaw in the battery's discrimination (e.g., a calibration system spuriously passing at a different scale), the finding will be documented and the protocol revised (Section 18). The Phase C candidate evaluation proceeds under this protocol regardless of supplementary analysis status.
+## 18. Version Control
 
-This protocol is frozen. No modifications may be made without a documented amendment following this procedure:
+This protocol is a pre-registration draft under development; it has not yet been registered. Its complete change history is maintained in the public repository's git history, which is the authoritative, timestamped record of every revision.
 
-### Amendment Process
+A formal amendment procedure — defining how changes are handled relative to a registered version (impact assessment, version increment, re-run obligations) — is established at the point of OSF registration, against the registered version. Until then, changes are ordinary revisions tracked in git.
 
-1. **Amendment proposal** filed in the governance register with rationale. The proposal must identify the specific section(s) to be modified and the reason for the change. Proposals may originate from calibration findings, supplementary analyses, external review, or Phase C results.
+### Governance principle
 
-2. **Impact assessment** documenting which results (if any) would change under the amendment. This includes:
-   - Whether any calibration system's pass/fail verdict would change.
-   - Whether any positive control's sensitivity result would change.
-   - Whether noise floors require recomputation.
-   - Whether Phase C results (if they exist) would be affected.
-
-3. **Decision note** (governance decision note) recording the decision to accept or reject the amendment. The decision note must include the rationale, the vote (if applicable), and any dissenting views. Rejected amendments remain in the governance register for transparency.
-
-4. **Version increment:**
-   - **Minor** (v1.0 to v1.1): Changes to diagnostic metrics, reporting format, supplementary analyses, or clarifications that do not affect pass/fail decisions.
-   - **Major** (v1.0 to v2.0): Changes to the pass condition, primary metric, noise floor methodology, conjunction logic, or instrument definitions.
-
-5. **Re-run obligation:** If the amendment changes the pass condition, noise floor methodology, or primary metric, all results must be re-computed and the data package updated. Minor amendments do not trigger re-runs.
-
-### Current Version
-
-| Item | Value |
-|------|-------|
-| Protocol version | 2.0 |
-| Frozen at commit | 72c9f6d |
-| Freeze date | 2026-03-21 |
-| Data commit | 72c9f6d |
-| Author | Guilherme C. T. Ribeiro |
-
-### Governance Principles
-
-- Amendments are disclosed, not hidden. Every change to the protocol is traceable through the governance decision register.
-- The pre-registration commitment means that Phase C results are interpreted under the frozen protocol version that was current when Phase C began. If an amendment is made after Phase C data exists, both the original and amended interpretations are reported.
-- No amendment may retroactively change the interpretation of Phase A/A+ calibration results without re-running the affected analyses.
+The intent that governs this protocol is that Phase C results are interpreted under the version of the protocol in force when Phase C begins, and that no revision retroactively changes the interpretation of Phase A/A+ calibration results without re-running the affected analyses.

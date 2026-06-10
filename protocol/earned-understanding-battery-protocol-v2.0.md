@@ -1519,7 +1519,7 @@ The candidate does not satisfy the conjunction. The battery correctly classifies
 
 ### Scenario 6: Unexpected control pass
 
-If any candidate-evaluation ablation control passes the conjunction, the battery cannot discriminate the candidate from its controls. Execution halts. The control anomaly must be investigated and resolved — with findings documented via the amendment procedure (Section 18) — before any candidate result is reported. If the anomaly cannot be resolved, the battery result for the candidate is voided and reported as inconclusive.
+If any candidate-evaluation ablation control passes the conjunction, the battery cannot discriminate the candidate from its controls. Execution halts. The control anomaly must be investigated and resolved — with findings documented in the change record (Section 18) — before any candidate result is reported. If the anomaly cannot be resolved, the battery result for the candidate is voided and reported as inconclusive.
 
 **candidate-evaluation ablation controls.** Three matched controls will be run alongside the candidate during the candidate evaluation. Each control uses the same candidate architecture with one architectural condition removed:
 

@@ -7,14 +7,7 @@
 
 ---
 
-> **⚠️ Correction banner added 2026-04-24 — phase namespace drift.** This document uses "Phase B" throughout to refer to ecological-domain / heterogeneous-domain supplementary work. That usage is **drift**, not canon. The canonical project phase namespace (defined in `manny_kb/04-governance/governance-note-phase-b-preregistration-constraints.md` 2026-03-16 and `k-gate-master-registry-and-renaming-2026-04-19.md` Part 6 Timeline) is:
->
-> - **Phase A / Phase A+** — calibration (what this document signs off).
-> - **Phase B** — OSF pre-registration + freeze.
-> - **Phase C** — Gate F execution (Class 4 candidate evaluation).
-> - **Phase D** — Paper 2 drafting.
->
-> Where this document says "Phase B" in reference to ecological / heterogeneous-domain work, read instead: "future supplementary exploration on heterogeneous domains". The body is left intact as historical record. See `manny_kb/04-governance/canon-phase-namespace-and-protocol-drift-correction-2026-04-24.md` for the full correction note.
+> **Note (2026-04-24):** Where this historical sign-off record refers to later "heterogeneous-domain" work, read it as *future supplementary exploration*, not as part of this pre-registration. The body is retained unedited as a record.
 
 ---
 
